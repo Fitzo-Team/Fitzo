@@ -949,11 +949,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.IntegrationTests\\Fitzo.IntegrationTests.csproj",
+      "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.IntegrationTests\\Fitzo.IntegrationTests.csproj",
       "projectName": "Fitzo.IntegrationTests",
-      "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.IntegrationTests\\Fitzo.IntegrationTests.csproj",
+      "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.IntegrationTests\\Fitzo.IntegrationTests.csproj",
       "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-      "outputPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.IntegrationTests\\obj\\",
+      "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.IntegrationTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

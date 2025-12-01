@@ -1,0 +1,1 @@
+namespace Fitzo.Functions.Functions;

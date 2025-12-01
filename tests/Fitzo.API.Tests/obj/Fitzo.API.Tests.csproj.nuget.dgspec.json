@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {}
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {}
   },
   "projects": {
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.API\\Fitzo.API.csproj": {
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.API\\Fitzo.API.csproj",
+        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
         "projectName": "Fitzo.API",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.API\\Fitzo.API.csproj",
+        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
         "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.API\\obj\\",
+        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
-                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
+              "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
               }
             }
           }
@@ -82,14 +82,14 @@
         }
       }
     },
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
+        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
         "projectName": "Fitzo.Shared",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
+        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
         "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\obj\\",
+        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -147,14 +147,14 @@
         }
       }
     },
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
+        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
         "projectName": "Fitzo.API.Tests",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
+        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
         "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.API.Tests\\obj\\",
+        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -175,8 +175,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.API\\Fitzo.API.csproj": {
-                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.API\\Fitzo.API.csproj"
+              "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
+                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj"
               }
             }
           }

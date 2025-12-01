@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj": {}
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj": {}
   },
   "projects": {
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj": {
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj",
+        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj",
         "projectName": "Fitzo.Desktop",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj",
+        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Desktop\\Fitzo.Desktop.csproj",
         "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Desktop\\obj\\",
+        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Desktop\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
-                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
+              "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
               }
             }
           }
@@ -76,14 +76,14 @@
         }
       }
     },
-    "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
+        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
         "projectName": "Fitzo.Shared",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
+        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
         "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\src\\Fitzo.Shared\\obj\\",
+        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

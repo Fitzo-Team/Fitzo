@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cbjiRcUhAyU=",
+  "dgSpecHash": "u0dAFxGpb7g=",
   "success": true,
-  "projectFilePath": "C:\\oddzielne\\Projekty\\ZTP_Projekt\\Fitazio\\tests\\Fitzo.Desktop.Tests\\Fitzo.Desktop.Tests.csproj",
+  "projectFilePath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.Desktop.Tests\\Fitzo.Desktop.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kamil\\.nuget\\packages\\coverlet.collector\\6.0.2\\coverlet.collector.6.0.2.nupkg.sha512",
     "C:\\Users\\Kamil\\.nuget\\packages\\microsoft.codecoverage\\17.12.0\\microsoft.codecoverage.17.12.0.nupkg.sha512",

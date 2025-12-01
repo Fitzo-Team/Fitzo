@@ -1,2 +1,2 @@
-# Fitzo
-Meal/calorie/exercise tracking app
+# Fitazio
+ZTP project

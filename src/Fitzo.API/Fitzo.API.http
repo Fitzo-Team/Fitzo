@@ -1,0 +1,6 @@
+@Fitzo.API_HostAddress = http://localhost:5123
+
+GET {{Fitzo.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

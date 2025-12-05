@@ -8,7 +8,7 @@ on:
       - 'src/Fitzo.Functions/**'
       - 'src/Fitzo.Shared/**'
       - 'tests/**'
-      - '.github/workflows/backend_pipeline.yml'
+      - '.github/workflows/backend_pipeline.yml' 
   pull_request:
     branches: [ "main" ]
     paths:
@@ -34,7 +34,7 @@ jobs:
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: fitzo_test_db
         ports:
-          - 5432:5432 # 
+          - 5432:5432 
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

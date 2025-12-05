@@ -143,3 +143,28 @@ jobs:
           app-name: 'fitzo-api-app'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: '${{ env.IMAGE_NAME }}:${{ github.sha }}'
+
+  deploy-functions:
+    name: ⚡ Deploy Functions
+    needs: build-and-test 
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+        
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 8.0.x
+
+      - name: Publish Functions
+        run: dotnet publish src/Fitzo.Functions/Fitzo.Functions.csproj -c Release -o ./func-publish
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+            app-name: 'fitzofunc'
+            package: './func-publish'
+            publish-profile: ${{ secrets.AZURE_FUNC_PUBLISH_PROFILE }}

@@ -66,13 +66,13 @@ jobs:
           dotnet sonarscanner begin /k:"Fitzo-Team_Fitzo" /o:"fitzo-team" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
       - name: Restore Dependencies
-        run: dotnet restore Fitzo.sln
+        run: dotnet restore Fitzo.Backend.sln
 
       - name: Build
-        run: dotnet build Fitzo.sln --no-restore --configuration Release 
+        run: dotnet build Fitzo.Backend.sln --no-restore --configuration Release 
 
       - name: Test and Coverage
-        run: dotnet test Fitzo.sln --no-build --configuration Release --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        run: dotnet test Fitzo.Backend.sln --no-build --configuration Release --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
         env: 
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=fitzo_test_db;Username=testuser;Password=testpassword"
 

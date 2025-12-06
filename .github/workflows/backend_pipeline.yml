@@ -105,7 +105,9 @@ jobs:
 
       - name: Set Image Name env
         run: |
-          echo "IMAGE_NAME=ghcr.io/${{ github.repository }}/fitzo-api" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          RAW_NAME=ghcr.io/${{ github.repository }}/fitzo-api
+          LOWER_NAME=$(echo $RAW_NAME | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=$LOWER_NAME" >> $GITHUB_ENV
 
       - name: Build Docker Image
         run: | 
@@ -145,7 +147,7 @@ jobs:
           images: '${{ env.IMAGE_NAME }}:${{ github.sha }}'
 
   deploy-functions:
-    name: ⚡ Deploy Functions
+    name:  Deploy Functions
     needs: build-and-test 
     runs-on: ubuntu-latest
     if: github.event_name == 'push'

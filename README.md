@@ -22,14 +22,20 @@ This section outlines the environment setup and CI/CD strategies used in Fitzo.
 ### 🐳 Docker Compose (Test Environment)
 To ensure a consistent development environment across the team, we use **Docker Compose**. It spins up the necessary infrastructure locally without polluting the host machine.
 
-* **Services:**
-    * `db`: PostgreSQL 16 (Database)
-    * `pgadmin`: PgAdmin 4 (GUI for Database management)
-    * `azurite`: Azure Storage Emulator (Blob/Queue storage simulation)
-* **Usage:**
+1.  **Start Environment:**
     ```bash
     docker-compose up -d
     ```
+2.  **Access Services:**
+
+| Service | URL / Host | Credentials | Description |
+| :--- | :--- | :--- | :--- |
+| **PostgreSQL** | `localhost:5432` | User: `fitzouser`<br>Pass: `fitzopassword`<br>DB: `fitzo_db` | Main database for the API. |
+| **PgAdmin 4** | [http://localhost:5050](http://localhost:5050) | Email: `admin@fitzo.com`<br>Pass: `admin` | Web GUI for managing PostgreSQL. |
+| **Azurite** | `localhost:10000` | String: `UseDevelopmentStorage=true` | Emulator for Azure Blob Storage. |
+
+> **⚠️ Important Note for PgAdmin:**
+> When adding a new server inside PgAdmin, use **`db`** as the Host name/address (instead of `localhost`), because PgAdmin runs inside the Docker network.
 
 ### 🚀 Backend Pipeline (CI/CD)
 We utilize **GitHub Actions** to automate our delivery process.

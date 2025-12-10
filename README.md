@@ -49,7 +49,7 @@ We utilize **GitHub Actions** to automate our delivery process.
     5.  **Deploy:** Automatically deploys the API to **Azure App Service**.
 
 ### 📐 UML Architecture
-<img width="4096" height="1257" alt="image" src="https://github.com/user-attachments/assets/7244820b-68f6-4c52-a2c4-2ab0cb4fab20" />
+<img width="1914" height="543" alt="image" src="https://github.com/user-attachments/assets/b5f05ec5-4c8c-4a77-99cb-b003671740d9" />
 
 > The system architecture is visualized using PlantUML, highlighting the relationships between the API Layer, Business Logic (Patterns), and Data Layer.
 

@@ -1,6 +1,10 @@
-@Fitzo.API_HostAddress = http://localhost:5123
+@Fitzo_API_HostAddress = http://localhost:5123
 
-//GET {{Fitzo.API_HostAddress}}/weatherforecast/
+//GET {{Fitzo_API_HostAddress}}/api/v2/product/8410762861023
 //Accept: application/json
 
-###
+GET {{Fitzo_API_HostAddress}}/api/product/search/8410762861023
+Accept: application/json
+
+//GET {{Fitzo_API_HostAddress}}/api/product/search/0000000000
+//Accept: application/json

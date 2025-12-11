@@ -1,5 +1,9 @@
+using System.Net.Http.Headers;
+using System.Text;
 using Fitzo.API.Data;
 using Fitzo.API.Entities;
+using Fitzo.API.Interfaces;
+using Fitzo.API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +28,16 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<FitzoDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddHttpClient<INutritionProvider, OffAdapter>(client =>
+{
+    client.BaseAddress = new Uri("https://world.openfoodfacts.net/");
+    client.DefaultRequestHeaders.Add("User-Agent", "FitzoApp - StudentProject - version 1.0");
+
+    var authString = "off:off";
+    var authBytes = Encoding.ASCII.GetBytes(authString);
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authBytes));
+});
 
 var app = builder.Build();
 

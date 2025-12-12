@@ -16,7 +16,7 @@ public class UsdaAdapter : INutritionProvider
         apiKey = configuration["UsdaApiKey"] ?? throw new ArgumentNullException("Brakuje klucza USDA API!");
     }
 
-    public async Task<ProductDto> GetProductAsync(string query)
+    public virtual async Task<ProductDto> GetProductAsync(string query)
     {
         var url = $"https://api.nal.usda.gov/fdc/v1/foods/search?api_key={apiKey}&query={query}&dataType=Foundation,SR Legacy&pageSize=1&requireAllWords=true";
         var response = await httpClient.GetFromJsonAsync<UsdaSearchResult>(url);

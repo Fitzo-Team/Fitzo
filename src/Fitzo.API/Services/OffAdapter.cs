@@ -14,7 +14,7 @@ public class OffAdapter : INutritionProvider
         httpClient = _httpClient;
     }
 
-    public async Task<ProductDto> GetProductAsync(string id)
+    public virtual async Task<ProductDto> GetProductAsync(string id)
     {
         var url = $"api/v2/product/{id}";
 

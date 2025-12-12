@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "TyIQxl9ZiVE=",
+  "dgSpecHash": "a//ebY49vbM=",
   "success": true,
   "projectFilePath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kamil\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\Kamil\\.nuget\\packages\\coverlet.collector\\6.0.2\\coverlet.collector.6.0.2.nupkg.sha512",
+    "C:\\Users\\Kamil\\.nuget\\packages\\coverlet.msbuild\\6.0.4\\coverlet.msbuild.6.0.4.nupkg.sha512",
     "C:\\Users\\Kamil\\.nuget\\packages\\fluentassertions\\8.8.0\\fluentassertions.8.8.0.nupkg.sha512",
     "C:\\Users\\Kamil\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\8.0.10\\microsoft.aspnetcore.cryptography.internal.8.0.10.nupkg.sha512",
     "C:\\Users\\Kamil\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\8.0.10\\microsoft.aspnetcore.cryptography.keyderivation.8.0.10.nupkg.sha512",

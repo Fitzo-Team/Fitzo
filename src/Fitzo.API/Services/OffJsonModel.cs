@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Fitzo.API.Services;
-
+[ExcludeFromCodeCoverage]
 public class offResponse
 {
     [JsonPropertyName("Product")]
@@ -9,7 +10,7 @@ public class offResponse
     [JsonPropertyName("Status")]
     public int Status {get;set;}
 }
-
+[ExcludeFromCodeCoverage]
 public class OffProduct
 {
     [JsonPropertyName("_id")]
@@ -21,7 +22,7 @@ public class OffProduct
     [JsonPropertyName("nutriments")]
     public OffNutriments Nutriments { get; set; } // 1 || 0
 }
-
+[ExcludeFromCodeCoverage]
 public class OffNutriments
 {
     [JsonPropertyName("energy-kcal_100g")]

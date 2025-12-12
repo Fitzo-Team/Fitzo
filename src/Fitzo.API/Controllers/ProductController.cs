@@ -8,7 +8,7 @@ namespace Fitzo.API.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-    private INutritionProvider nutritionProvider;
+    private readonly INutritionProvider nutritionProvider;
 
     public ProductController(INutritionProvider _nutritionProvider)
     {

@@ -13,7 +13,7 @@ public class UsdaAdapter : INutritionProvider
     public UsdaAdapter(HttpClient _httpClient, IConfiguration configuration)
     {
         httpClient = _httpClient;
-        apiKey = configuration["UsdaApiKey"] ?? throw new Exception("Brakuje klucza USDA API!");
+        apiKey = configuration["UsdaApiKey"] ?? throw new ArgumentNullException("Brakuje klucza USDA API!");
     }
 
     public async Task<ProductDto> GetProductAsync(string query)
@@ -21,7 +21,7 @@ public class UsdaAdapter : INutritionProvider
         var url = $"https://api.nal.usda.gov/fdc/v1/foods/search?api_key={apiKey}&query={query}&dataType=Foundation,SR Legacy&pageSize=1&requireAllWords=true";
         var response = await httpClient.GetFromJsonAsync<UsdaSearchResult>(url);
 
-        if(response == null || !response.Foods.Any())
+        if(response == null || !(response.Foods.Count() != 0))
         {
             return null;
         }

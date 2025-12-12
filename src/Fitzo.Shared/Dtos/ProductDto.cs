@@ -1,6 +1,8 @@
 using Fitzo.Shared.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Fitzo.Shared.Dtos;
+[ExcludeFromCodeCoverage]
 public class ProductDto
 {
     public string ExternalId { get; set; }

@@ -49,6 +49,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles(); //tymczasowo
+app.UseStaticFiles(); //tymczasowo
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

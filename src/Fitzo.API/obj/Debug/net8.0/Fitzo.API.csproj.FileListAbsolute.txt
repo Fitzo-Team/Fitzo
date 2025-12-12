@@ -120,3 +120,4 @@ C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\refint\Fitzo.
 C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\Fitzo.API.pdb
 C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\Fitzo.API.genruntimeconfig.cache
 C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\ref\Fitzo.API.dll
+C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.API\bin\Debug\net8.0\Fitzo.API.staticwebassets.runtime.json

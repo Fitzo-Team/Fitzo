@@ -8,19 +8,19 @@ namespace Fitzo.API.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-    private INutritionProvider nutritionProvider;
+    private readonly INutritionProvider nutritionProvider;
 
     public ProductController(INutritionProvider _nutritionProvider)
     {
         nutritionProvider = _nutritionProvider;
     }
 
-    [HttpGet("search/{id}")]
-    public async Task<IActionResult> GetProduct(string id)
+    [HttpGet("{query}")]
+    public async Task<IActionResult> GetProduct(string query)
     {
-        var Product = await nutritionProvider.GetProductAsync(id);
+        var Product = await nutritionProvider.GetProductAsync(query);
         if(Product == null)
-            throw new Exception("Nie znaleziono w bazie");
+            return NotFound($"Nie znaleziono produktu dla zapytania: {query}");
 
         return Ok(Product);
     }

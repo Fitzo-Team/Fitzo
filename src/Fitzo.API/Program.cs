@@ -29,15 +29,22 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole>(options =>
 .AddEntityFrameworkStores<FitzoDbContext>()
 .AddDefaultTokenProviders();
 
-builder.Services.AddHttpClient<INutritionProvider, OffAdapter>(client =>
+builder.Services.AddHttpClient<OffAdapter>(client =>
 {
-    client.BaseAddress = new Uri("https://world.openfoodfacts.net/");
+    client.BaseAddress = new Uri("https://world.openfoodfacts.org/");
     client.DefaultRequestHeaders.Add("User-Agent", "FitzoApp - StudentProject - version 1.0");
 
     var authString = "off:off";
     var authBytes = Encoding.ASCII.GetBytes(authString);
     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authBytes));
 });
+
+builder.Services.AddHttpClient<UsdaAdapter>(client =>
+{
+    client.BaseAddress = new Uri("https://api.nal.usda.gov/");
+});
+
+builder.Services.AddScoped<INutritionProvider, HybridNutritionProvider>();
 
 var app = builder.Build();
 

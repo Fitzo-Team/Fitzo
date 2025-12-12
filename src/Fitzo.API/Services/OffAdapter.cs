@@ -16,20 +16,27 @@ public class OffAdapter : INutritionProvider
 
     public async Task<ProductDto> GetProductAsync(string id)
     {
-        var url = $"api/v2/product/{id}.json"; //Zmienic .net na .org gdzy apka bedzie gotowa
-        var response = await httpClient.GetFromJsonAsync<offResponse>(url);
+        var url = $"api/v2/product/{id}";
 
-        if(response == null || response.Status != 1)
+        using var response = await httpClient.GetAsync(url);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
             return null;
+        }
 
+        response.EnsureSuccessStatusCode();
+
+        var offResponse = await response.Content.ReadFromJsonAsync<offResponse>();
+
+        if (offResponse?.Product == null) return null;
         return new ProductDto
         {
-            ExternalId = response.Product.Id,
-            Name = response.Product.ProductName,
-            Calories = response.Product.Nutriments.Calories ?? 0,
-            Protein = response.Product.Nutriments.Proteins ?? 0,
-            Fat = response.Product.Nutriments.Fat ?? 0,
-            Carbs = response.Product.Nutriments.Carbs ?? 0
+        Name = offResponse.Product.ProductName,
+        Calories = offResponse.Product.Nutriments.Calories ?? 0,
+        Carbs = offResponse.Product.Nutriments.Carbs ?? 0,
+        Protein = offResponse.Product.Nutriments.Proteins ?? 0,
+        Fat = offResponse.Product.Nutriments.Fat ?? 0
         };
     }
 }

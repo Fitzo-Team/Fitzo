@@ -137,7 +137,9 @@ jobs:
     steps: 
       - name: Image name
         run: |
-          echo "IMAGE_NAME=ghcr.io/${{ github.repository }}/fitzo-api" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          RAW_NAME=ghcr.io/${{ github.repository }}/fitzo-api
+          LOWER_NAME=$(echo $RAW_NAME | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=$LOWER_NAME" >> $GITHUB_ENV
 
       - name: Deploy to WebApp
         uses: azure/webapps-deploy@v2

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Fitzo.API.props" />
+</Project>

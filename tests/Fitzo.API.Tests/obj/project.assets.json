@@ -166,6 +166,22 @@
           "lib/netstandard2.0/_._": {}
         }
       },
+      "Microsoft.EntityFrameworkCore.InMemory/8.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.EntityFrameworkCore.Relational/8.0.10": {
         "type": "package",
         "dependencies": {
@@ -967,6 +983,7 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "Fitzo.Shared": "1.0.0",
+          "FluentAssertions": "8.8.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.10",
           "Microsoft.AspNetCore.OpenApi": "8.0.10",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.10",
@@ -1333,6 +1350,20 @@
         "lib/netstandard2.0/_._",
         "microsoft.entityframeworkcore.analyzers.8.0.10.nupkg.sha512",
         "microsoft.entityframeworkcore.analyzers.nuspec"
+      ]
+    },
+    "Microsoft.EntityFrameworkCore.InMemory/8.0.0": {
+      "sha512": "/pT9FOO0BxGSRscK/ekEb6TdiP3+nnyhPLElE1yuVG/QaZLaBAuM3RoywBHdIxWoFALaOS7ktXlKzuMX3khJ4A==",
+      "type": "package",
+      "path": "microsoft.entityframeworkcore.inmemory/8.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll",
+        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.xml",
+        "microsoft.entityframeworkcore.inmemory.8.0.0.nupkg.sha512",
+        "microsoft.entityframeworkcore.inmemory.nuspec"
       ]
     },
     "Microsoft.EntityFrameworkCore.Relational/8.0.10": {
@@ -2437,6 +2468,7 @@
     "net8.0": [
       "Fitzo.API >= 1.0.0",
       "FluentAssertions >= 8.8.0",
+      "Microsoft.EntityFrameworkCore.InMemory >= 8.0.0",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
       "Moq >= 4.20.72",
       "coverlet.collector >= 6.0.2",
@@ -2446,23 +2478,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Kamil\\.nuget\\packages\\": {},
+    "C:\\Users\\BLAZE\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
       "projectName": "Fitzo.API.Tests",
-      "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
-      "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-      "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\obj\\",
+      "projectPath": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
+      "packagesPath": "C:\\Users\\BLAZE\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Kamil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\BLAZE\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2477,8 +2509,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
-              "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj"
+            "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
+              "projectPath": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj"
             }
           }
         }
@@ -2493,7 +2525,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -2502,6 +2534,10 @@
           "FluentAssertions": {
             "target": "Package",
             "version": "[8.8.0, )"
+          },
+          "Microsoft.EntityFrameworkCore.InMemory": {
+            "target": "Package",
+            "version": "[8.0.0, )"
           },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
@@ -2546,7 +2582,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

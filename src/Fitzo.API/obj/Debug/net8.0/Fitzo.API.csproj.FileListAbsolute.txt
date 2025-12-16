@@ -244,3 +244,4 @@ C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\refint\F
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\Fitzo.API.pdb
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\Fitzo.API.genruntimeconfig.cache
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.API\obj\Debug\net8.0\ref\Fitzo.API.dll
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.API\bin\Debug\net8.0\FluentAssertions.dll

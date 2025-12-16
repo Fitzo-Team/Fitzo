@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Fitzo.IntegrationTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a8f6dfbb2d53537e959169e3f9a9d9eb62d2ba0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+00a136890de8515f7f7356e0d41201a35a1cc754")]
 [assembly: System.Reflection.AssemblyProductAttribute("Fitzo.IntegrationTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Fitzo.IntegrationTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

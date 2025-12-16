@@ -967,6 +967,7 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "Fitzo.Shared": "1.0.0",
+          "FluentAssertions": "8.8.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.10",
           "Microsoft.AspNetCore.OpenApi": "8.0.10",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.10",

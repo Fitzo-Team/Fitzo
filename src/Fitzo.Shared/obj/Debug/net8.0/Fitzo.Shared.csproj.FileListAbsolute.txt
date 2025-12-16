@@ -10,3 +10,15 @@ C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shar
 C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\refint\Fitzo.Shared.dll
 C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.pdb
 C:\oddzielne\Projekty\ZTP_FIT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\ref\Fitzo.Shared.dll
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\bin\Debug\net8.0\Fitzo.Shared.deps.json
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\bin\Debug\net8.0\Fitzo.Shared.dll
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\bin\Debug\net8.0\Fitzo.Shared.pdb
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.AssemblyInfoInputs.cache
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.AssemblyInfo.cs
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.csproj.CoreCompileInputs.cache
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.sourcelink.json
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.dll
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\refint\Fitzo.Shared.dll
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.pdb
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\ref\Fitzo.Shared.dll

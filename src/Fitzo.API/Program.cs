@@ -6,6 +6,9 @@ using Fitzo.API.Interfaces;
 using Fitzo.API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Fitzo.API.Services.Bmr;
+using Fitzo.Shared.Enums;
+using Fitzo.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +48,10 @@ builder.Services.AddHttpClient<UsdaAdapter>(client =>
 });
 
 builder.Services.AddScoped<INutritionProvider, HybridNutritionProvider>();
+
+builder.Services.AddKeyedScoped<IBmrStrategy, MifflinStJeorStrategy>(BmrFormula.MifflinStJeor);
+builder.Services.AddKeyedScoped<IBmrStrategy, HarrisBenedictStrategy>(BmrFormula.HarrisBenedict);
+builder.Services.AddScoped<BmrService>();
 
 var app = builder.Build();
 

@@ -270,3 +270,4 @@ C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\tests\Fitzo.API.Tests\obj\Debug\net8.0\
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\tests\Fitzo.API.Tests\obj\Debug\net8.0\Fitzo.API.Tests.pdb
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\tests\Fitzo.API.Tests\obj\Debug\net8.0\Fitzo.API.Tests.genruntimeconfig.cache
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\tests\Fitzo.API.Tests\obj\Debug\net8.0\ref\Fitzo.API.Tests.dll
+C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\tests\Fitzo.API.Tests\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.InMemory.dll

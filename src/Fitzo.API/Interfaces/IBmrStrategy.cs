@@ -1,6 +1,6 @@
 using Fitzo.Shared.Dtos;
 using Fitzo.API.Entities;
-namespace Fitzo.Domain.Interfaces;
+namespace Fitzo.API.Interfaces;
 
 public interface IBmrStrategy
 {

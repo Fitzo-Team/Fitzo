@@ -1,6 +1,6 @@
 using Fitzo.API.Entities;
 using Fitzo.API.Interfaces;
-using Fitzo.Domain.Interfaces;
+using Fitzo.API.Interfaces;
 using Fitzo.Shared.Enums;
 
 namespace Fitzo.API.Services.Bmr;

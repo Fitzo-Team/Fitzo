@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Fitzo.API.Services.Bmr;
 using Fitzo.Shared.Enums;
-using Fitzo.Domain.Interfaces;
+using Fitzo.API.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

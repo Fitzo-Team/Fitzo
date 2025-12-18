@@ -3,8 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Fitzo.Shared.Enums;
 using Fitzo.API.Entities;
-using Fitzo.API.Data;     
+using Fitzo.API.Data;     
 using Fitzo.API.Services; 
+using Fitzo.Shared.Dtos;
 
 namespace Fitzo.API.Controllers; 
 
@@ -12,9 +13,7 @@ namespace Fitzo.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-
     private readonly FitzoDbContext _context;
-    
     private readonly BmrService _bmrService;
 
     public UsersController(FitzoDbContext context, BmrService bmrService)
@@ -26,15 +25,20 @@ public class UsersController : ControllerBase
     [HttpPost("profile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UserProfileDto dto)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
 
+        // Konwersja string -> Guid
+        if (!Guid.TryParse(userIdString, out var userIdGuid))
+        {
+            return BadRequest("Nieprawidłowy format identyfikatora użytkownika.");
+        }
 
-        var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userId);
+        var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userIdGuid);
         
         if (profile == null)
         {
-            profile = new UserProfile { UserId = userId };
+            profile = new UserProfile { UserId = userIdGuid };
             _context.UserProfiles.Add(profile);
         }
 
@@ -50,10 +54,16 @@ public class UsersController : ControllerBase
     [HttpGet("bmr")]
     public async Task<IActionResult> GetBmr([FromQuery] BmrFormula formula = BmrFormula.MifflinStJeor)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
 
-        var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userId);
+        // Konwersja string -> Guid
+        if (!Guid.TryParse(userIdString, out var userIdGuid))
+        {
+            return BadRequest("Nieprawidłowy format identyfikatora użytkownika.");
+        }
+
+        var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userIdGuid);
 
         if (profile == null)
         {
@@ -68,12 +78,4 @@ public class UsersController : ControllerBase
             Bmr = Math.Round(bmrValue, 0) 
         });
     }
-}
-
-public class UserProfileDto
-{
-    public double Weight { get; set; }
-    public double Height { get; set; }
-    public int Age { get; set; }
-    public Gender Gender { get; set; }
 }

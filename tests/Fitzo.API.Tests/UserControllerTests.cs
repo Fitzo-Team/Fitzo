@@ -1,10 +1,14 @@
+using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Fitzo.API.Controllers;
 using Fitzo.API.Data;
 using Fitzo.API.Entities;
 using Fitzo.API.Services;
 using Fitzo.API.Services.Bmr;
+using Fitzo.API.Interfaces;
 using Fitzo.Shared.Enums;
+using Fitzo.Shared.Dtos;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,18 +31,18 @@ public class UsersControllerTests
     private BmrService GetRealBmrService()
     {
         var services = new ServiceCollection();
-        services.AddKeyedScoped<API.Interfaces.IBmrStrategy, MifflinStJeorStrategy>(BmrFormula.MifflinStJeor);
-        services.AddKeyedScoped<API.Interfaces.IBmrStrategy, HarrisBenedictStrategy>(BmrFormula.HarrisBenedict);
+        services.AddKeyedScoped<IBmrStrategy, MifflinStJeorStrategy>(BmrFormula.MifflinStJeor);
+        services.AddKeyedScoped<IBmrStrategy, HarrisBenedictStrategy>(BmrFormula.HarrisBenedict);
         var provider = services.BuildServiceProvider();
 
         return new BmrService(provider);
     }
 
-    private void SetupUser(UsersController controller, string userId)
+    private void SetupUser(UsersController controller, Guid userId)
     {
         var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
-            new Claim(ClaimTypes.NameIdentifier, userId),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
         }, "mock"));
 
         controller.ControllerContext = new ControllerContext()
@@ -47,19 +51,18 @@ public class UsersControllerTests
         };
     }
 
+
     [Fact]
     public async Task UpdateProfile_ShouldCreateNewProfile_WhenNoneExists()
     {
-
         var context = GetInMemoryDbContext();
         var bmrService = GetRealBmrService();
         var controller = new UsersController(context, bmrService);
-        var userId = "test-user-1";
+        var userId = Guid.NewGuid();
         
         SetupUser(controller, userId);
 
         var dto = new UserProfileDto { Weight = 80, Height = 180, Age = 25, Gender = Gender.Male };
-
 
         var result = await controller.UpdateProfile(dto);
 
@@ -75,11 +78,10 @@ public class UsersControllerTests
     [Fact]
     public async Task GetBmr_ShouldReturnCorrectValue_WhenProfileExists()
     {
-
         var context = GetInMemoryDbContext();
         var bmrService = GetRealBmrService();
         var controller = new UsersController(context, bmrService);
-        var userId = "test-user-2";
+        var userId = Guid.NewGuid();
 
         context.UserProfiles.Add(new UserProfile
         {
@@ -96,7 +98,46 @@ public class UsersControllerTests
         var result = await controller.GetBmr(BmrFormula.MifflinStJeor);
 
         var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-
         okResult.StatusCode.Should().Be(200);
+    }
+
+
+    [Fact]
+    public async Task GetBmr_ShouldReturnBadRequest_WhenProfileDoesNotExist()
+    {
+        var context = GetInMemoryDbContext();
+        var bmrService = GetRealBmrService();
+        var controller = new UsersController(context, bmrService);
+        var userId = Guid.NewGuid();
+
+        SetupUser(controller, userId);
+
+        var result = await controller.GetBmr(BmrFormula.MifflinStJeor);
+
+
+        result.Should().BeOfType<BadRequestObjectResult>()
+            .Which.Value.Should().Be("Najpierw uzupełnij profil użytkownika (waga, wzrost, wiek).");
+    }
+
+    [Fact]
+    public async Task UpdateProfile_ShouldReturnUnauthorized_WhenUserNotLoggedIn()
+    {
+        var context = GetInMemoryDbContext();
+        var bmrService = GetRealBmrService();
+        var controller = new UsersController(context, bmrService);
+        
+        controller.ControllerContext = new ControllerContext()
+        {
+            HttpContext = new DefaultHttpContext() 
+            { 
+                User = new ClaimsPrincipal(new ClaimsIdentity()) 
+            }
+        };
+
+        var dto = new UserProfileDto { Weight = 70, Height = 170, Age = 20, Gender = Gender.Female };
+
+        var result = await controller.UpdateProfile(dto);
+
+        result.Should().BeOfType<UnauthorizedResult>();
     }
 }

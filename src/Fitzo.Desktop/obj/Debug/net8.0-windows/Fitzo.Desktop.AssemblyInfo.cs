@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Fitzo.Desktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e2602c9043fe2d397c91a71829234a23ff98d12")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a1f3eb633da934e6399284965f917b749f936fa")]
 [assembly: System.Reflection.AssemblyProductAttribute("Fitzo.Desktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Fitzo.Desktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

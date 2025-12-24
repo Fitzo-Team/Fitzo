@@ -1,98 +1,116 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    // Tło: #10002B
+    <SafeAreaView className="flex-1 bg-brand-dark">
+      
+      {/* HEADER */}
+      <View className="flex-row justify-between items-center px-5 py-3">
+        <TouchableOpacity className="bg-brand-card p-2 rounded-full border border-brand-accent">
+          <Ionicons name="person" size={24} color="white" />
+        </TouchableOpacity>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <Text className="text-2xl font-black text-white tracking-tighter">
+          fitzo<Text className="text-brand-vivid">.</Text>
+        </Text>
+
+        <TouchableOpacity>
+          <Ionicons name="notifications-outline" size={28} color="white" />
+          <View className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-brand-dark" />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+        
+        {/* Sekcja "Dzisiaj" */}
+        <View className="px-5 mb-4 mt-2 flex-row justify-between items-end">
+            <Text className="text-3xl font-bold text-white">Dzisiaj</Text>
+            <TouchableOpacity>
+                <Text className="text-brand-muted font-semibold mb-1">Edytuj</Text>
+            </TouchableOpacity>
+        </View>
+
+        {/* --- KARTA KALORII --- */}
+        <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5">
+            <View className="flex-row justify-between items-start mb-4">
+                <Text className="text-white text-lg font-bold">Kalorie</Text>
+                <Text className="text-brand-muted text-xs">Cel - Posiłki + Ćwicz.</Text>
+            </View>
+
+            <View className="flex-row items-center">
+                <View className="w-28 h-28 rounded-full border-[8px] border-brand-vivid justify-center items-center mr-6">
+                    <Text className="text-white text-3xl font-bold">1 501</Text>
+                    <Text className="text-brand-muted text-xs">Pozostało</Text>
+                </View>
+
+                <View className="flex-1 gap-3">
+                    <View>
+                        <Text className="text-brand-muted text-xs">Cel podstawowy</Text>
+                        <Text className="text-white font-bold text-lg">2 500</Text>
+                    </View>
+                    <View>
+                        <Text className="text-brand-muted text-xs">Posiłki</Text>
+                        <Text className="text-white font-bold text-lg">999</Text>
+                    </View>
+                </View>
+            </View>
+        </View>
+
+        {/* --- MAŁE KAFELKI --- */}
+        <View className="mx-5 flex-row gap-4 mb-5">
+            
+            {/* Kroki */}
+            <View className="flex-1 bg-brand-card p-4 rounded-3xl justify-between h-36 border border-brand-accent">
+                <View>
+                    <Text className="text-brand-muted font-semibold mb-1">Kroki</Text>
+                    <Ionicons name="footsteps" size={24} color="#E0AAFF" /> 
+                </View>
+                <View>
+                    <Text className="text-2xl font-bold text-white">1 901</Text>
+                    <Text className="text-xs text-brand-muted">Cel: 10 000</Text>
+                    <View className="h-2 bg-brand-dark rounded-full mt-2 overflow-hidden">
+                        <View className="h-full bg-brand-vivid w-[20%]" />
+                    </View>
+                </View>
+            </View>
+
+            {/* Ćwiczenia */}
+            <View className="flex-1 bg-brand-card p-4 rounded-3xl justify-between h-36 border border-brand-accent">
+                <View className="flex-row justify-between items-start">
+                    <Text className="text-white font-semibold">Ćwiczenia</Text>
+                    <Ionicons name="add" size={20} color="#C77DFF" />
+                </View>
+                
+                <View className="gap-2">
+                    <View className="flex-row items-center gap-2">
+                        {/* 🔥 ZMIANA: Kolor płomienia na brand-flame (#FF9100) */}
+                        <Ionicons name="flame" size={22} color="#FF9100" />
+                        <Text className="text-white text-lg font-bold">120 kcal</Text>
+                    </View>
+                    <View className="flex-row items-center gap-2">
+                        <Ionicons name="time" size={22} color="#FF9100" />
+                        <Text className="text-white text-lg font-bold">0:45 h</Text>
+                    </View>
+                </View>
+            </View>
+
+        </View>
+
+        {/* Waga */}
+        <View className="mx-5 bg-brand-card rounded-3xl p-5 mb-5 flex-row justify-between items-center border border-brand-accent">
+             <View>
+                <Text className="text-brand-muted font-semibold mb-1">Waga</Text>
+                <Text className="text-3xl font-bold text-white">75.5 <Text className="text-lg text-brand-muted font-normal">kg</Text></Text>
+             </View>
+             <TouchableOpacity className="bg-brand-primary p-3 rounded-full">
+                <Ionicons name="add" size={24} color="white" />
+             </TouchableOpacity>
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});

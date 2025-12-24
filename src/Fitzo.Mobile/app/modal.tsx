@@ -1,29 +1,39 @@
-import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-
-export default function ModalScreen() {
+export default function ActionModal() {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo style={styles.link}>
-        <ThemedText type="link">Go to home screen</ThemedText>
-      </Link>
-    </ThemedView>
+    <View className="flex-1 justify-end bg-transparent">
+      <TouchableOpacity 
+        className="flex-1" 
+        onPress={() => router.back()} 
+      />
+
+      <View className="bg-white rounded-t-3xl p-6 shadow-lg">
+        <Text className="text-xl font-bold text-center mb-6">Szybki wybór</Text>
+
+        <TouchableOpacity className="flex-row items-center p-4 bg-orange-100 rounded-xl mb-4">
+            <View className="bg-orange-500 p-2 rounded-full mr-4">
+                <Ionicons name="fast-food" size={24} color="white" />
+            </View>
+            <Text className="text-lg font-semibold">Dodaj Posiłek</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity className="flex-row items-center p-4 bg-blue-100 rounded-xl mb-4">
+            <View className="bg-blue-500 p-2 rounded-full mr-4">
+                <Ionicons name="fitness" size={24} color="white" />
+            </View>
+            <Text className="text-lg font-semibold">Dodaj Trening</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+            className="mt-2 items-center" 
+            onPress={() => router.back()}
+        >
+            <Text className="text-gray-500 text-lg">Anuluj</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-});

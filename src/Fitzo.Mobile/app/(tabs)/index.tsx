@@ -7,7 +7,6 @@ export default function HomeScreen() {
     // Tło: #10002B
     <SafeAreaView className="flex-1 bg-brand-dark">
       
-      {/* HEADER */}
       <View className="flex-row justify-between items-center px-5 py-3">
         <TouchableOpacity className="bg-brand-card p-2 rounded-full border border-brand-accent">
           <Ionicons name="person" size={24} color="white" />
@@ -24,8 +23,7 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
-        
-        {/* Sekcja "Dzisiaj" */}
+
         <View className="px-5 mb-4 mt-2 flex-row justify-between items-end">
             <Text className="text-3xl font-bold text-white">Dzisiaj</Text>
             <TouchableOpacity>
@@ -33,7 +31,6 @@ export default function HomeScreen() {
             </TouchableOpacity>
         </View>
 
-        {/* --- KARTA KALORII --- */}
         <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5">
             <View className="flex-row justify-between items-start mb-4">
                 <Text className="text-white text-lg font-bold">Kalorie</Text>
@@ -59,10 +56,54 @@ export default function HomeScreen() {
             </View>
         </View>
 
-        {/* --- MAŁE KAFELKI --- */}
+        <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5 border border-brand-accent">
+            
+            <Text className="text-white text-lg font-bold mb-4">Makroskładniki</Text>
+
+            <View className="gap-5">
+                
+                <View>
+                    <View className="flex-row justify-between mb-2">
+                        <Text className="text-brand-text font-semibold">Białko</Text>
+                        <Text className="text-brand-muted text-xs">110 / 180 g</Text>
+                    </View>
+                    
+                    <View className="h-3 bg-brand-dark rounded-full overflow-hidden">
+                        <View className="h-full w-[60%] bg-blue-500 rounded-full" />
+                    </View>
+                </View>
+
+                <View>
+                    <View className="flex-row justify-between mb-2">
+                        <Text className="text-brand-text font-semibold">Węglowodany</Text>
+                        <Text className="text-brand-muted text-xs">140 / 250 g</Text>
+                    </View>
+                    
+                    <View className="h-3 bg-brand-dark rounded-full overflow-hidden">
+                        <View className="h-full w-[45%] bg-green-500 rounded-full" />
+                    </View>
+                </View>
+
+                <View>
+                    <View className="flex-row justify-between mb-2">
+                        <Text className="text-brand-text font-semibold">Tłuszcze</Text>
+                        <Text className="text-brand-muted text-xs">30 / 70 g</Text>
+                    </View>
+                    
+                    <View className="h-3 bg-brand-dark rounded-full overflow-hidden">
+                        <View className="h-full w-[30%] bg-brand-flame rounded-full" />
+                        {/*<View 
+                        className="h-full bg-blue-500 rounded-full" 
+                        style={{ width: `${(zjedzone / cel) * 100}%` }}   DO LICZENIA PO PODŁĄCZENIU DB
+                        /> */}  
+                    </View>
+                </View>
+
+            </View>
+        </View>
+
         <View className="mx-5 flex-row gap-4 mb-5">
             
-            {/* Kroki */}
             <View className="flex-1 bg-brand-card p-4 rounded-3xl justify-between h-36 border border-brand-accent">
                 <View>
                     <Text className="text-brand-muted font-semibold mb-1">Kroki</Text>
@@ -77,7 +118,6 @@ export default function HomeScreen() {
                 </View>
             </View>
 
-            {/* Ćwiczenia */}
             <View className="flex-1 bg-brand-card p-4 rounded-3xl justify-between h-36 border border-brand-accent">
                 <View className="flex-row justify-between items-start">
                     <Text className="text-white font-semibold">Ćwiczenia</Text>
@@ -99,7 +139,6 @@ export default function HomeScreen() {
 
         </View>
 
-        {/* Waga */}
         <View className="mx-5 bg-brand-card rounded-3xl p-5 mb-5 flex-row justify-between items-center border border-brand-accent">
              <View>
                 <Text className="text-brand-muted font-semibold mb-1">Waga</Text>

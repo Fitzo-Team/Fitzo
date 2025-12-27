@@ -2751,23 +2751,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\BLAZE\\.nuget\\packages\\": {},
+    "C:\\Users\\Kamil\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
+      "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
       "projectName": "Fitzo.API",
-      "projectPath": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
-      "packagesPath": "C:\\Users\\BLAZE\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\obj\\",
+      "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
+      "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
+      "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\BLAZE\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Kamil\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2782,8 +2782,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
-              "projectPath": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
+            "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+              "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
             }
           }
         }
@@ -2798,7 +2798,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -2850,7 +2850,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

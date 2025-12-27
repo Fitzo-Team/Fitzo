@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -38,9 +38,10 @@ export default function AddScreen() {
   useEffect(() => {
     if (scannedCode) {
       setFoodName(`Produkt (Kod: ${scannedCode})`);
-      setCalories('250');
-
-      setProtein('10'); setFat('5'); setCarbs('30');
+      setCalories('250'); 
+      setProtein('20'); 
+      setFat('10'); 
+      setCarbs('30');
       
       setIsScannerOpen(false);
       setActiveTab('product');
@@ -53,6 +54,7 @@ export default function AddScreen() {
 
   const handleSaveProduct = () => {
     if (!foodName || !calories) return;
+    
     addFood('2023-10-27', selectedMeal, {
       name: foodName,
       calories: parseInt(calories),
@@ -61,13 +63,14 @@ export default function AddScreen() {
       carbs: carbs ? parseInt(carbs) : 0,
       barcode: scannedCode || undefined
     });
+
     setScannedCode(null);
     router.back();
   };
 
   const handleSaveRecipe = () => {
     if (!recipeName || selectedIngredients.length === 0) return;
-
+    
     const totalCals = selectedIngredients.reduce((acc, curr) => acc + curr.calories, 0);
     const totalProt = selectedIngredients.reduce((acc, curr) => acc + (curr.protein || 0), 0);
     const totalFat = selectedIngredients.reduce((acc, curr) => acc + (curr.fat || 0), 0);
@@ -80,6 +83,7 @@ export default function AddScreen() {
       fat: totalFat,
       carbs: totalCarbs,
     });
+    
     router.back();
   };
 
@@ -93,19 +97,31 @@ export default function AddScreen() {
 
   if (isScannerOpen) {
     if (hasPermission === null) return <View className="flex-1 bg-brand-dark justify-center items-center"><Text className="text-brand-text">Proszę czekać...</Text></View>;
-    if (hasPermission === false) return <View className="flex-1 bg-brand-dark justify-center items-center"><Text className="text-brand-text">Brak dostępu do kamery</Text></View>;
+    if (hasPermission === false) return <View className="flex-1 bg-brand-dark justify-center items-center"><Text className="text-brand-text">Brak dostępu do kamery. Sprawdź ustawienia.</Text></View>;
     
     return (
-      <View className="flex-1 bg-black">
-        <CameraView onBarcodeScanned={scannedCode ? undefined : handleBarcodeScanned} className="flex-1" />
-        <TouchableOpacity className="absolute top-12 right-5 z-10 p-2 bg-brand-dark/60 rounded-full" onPress={() => setIsScannerOpen(false)}>
+      <View className="flex-1 bg-black relative">
+        <CameraView
+          facing="back"
+          onBarcodeScanned={scannedCode ? undefined : handleBarcodeScanned}
+          style={{ flex: 1 }}
+        />
+        
+        <TouchableOpacity 
+          className="absolute top-12 right-5 z-20 p-2 bg-brand-dark/60 rounded-full"
+          onPress={() => setIsScannerOpen(false)}
+        >
           <Ionicons name="close" size={30} color="#E0AAFF" />
         </TouchableOpacity>
-        <View className="absolute inset-0 justify-center items-center pointer-events-none">
+        
+        <View className="absolute inset-0 justify-center items-center pointer-events-none z-10">
              <View className="w-64 h-48 border-2 border-brand-vivid rounded-2xl opacity-80" />
         </View>
-        <View className="absolute bottom-24 w-full items-center">
-          <Text className="text-brand-text bg-brand-dark/80 px-4 py-2 rounded-lg font-medium">Nakieruj na kod</Text>
+
+        <View className="absolute bottom-24 w-full items-center z-10">
+          <Text className="text-brand-text bg-brand-dark/80 px-4 py-2 rounded-lg font-medium overflow-hidden">
+            Nakieruj kamerę na kod kreskowy
+          </Text>
         </View>
       </View>
     );
@@ -113,9 +129,9 @@ export default function AddScreen() {
 
   return (
     <View className="flex-1 bg-brand-dark pt-12">
-
+      
       <View className="px-5 flex-row items-center mb-4">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-brand-card p-2 rounded-full">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-brand-card p-2 rounded-full border border-brand-accent">
           <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
         </TouchableOpacity>
         <Text className="text-brand-text text-2xl font-bold">Dodaj</Text>
@@ -188,7 +204,7 @@ export default function AddScreen() {
               />
             </View>
 
-            <Text className="text-brand-muted mt-2 ml-1 text-sm font-bold">Makroskładniki (opcjonalne)</Text>
+            <Text className="text-brand-text mt-2 ml-1 text-sm font-bold">Makroskładniki (opcjonalne)</Text>
             <View className="flex-row gap-3">
               <View className="flex-1">
                 <Text className="text-brand-muted text-xs mb-1 ml-1">Białko (g)</Text>
@@ -236,7 +252,7 @@ export default function AddScreen() {
               />
             </View>
 
-            <Text className="text-brand-muted mb-2 ml-1 font-bold">Wybierz składniki z historii:</Text>
+            <Text className="text-brand-text mb-2 ml-1 font-bold">Składniki z historii:</Text>
             
             {productHistory.length === 0 ? (
                <View className="p-6 bg-brand-card rounded-xl border border-dashed border-brand-accent items-center">
@@ -267,12 +283,24 @@ export default function AddScreen() {
 
             {selectedIngredients.length > 0 && (
                 <View className="mt-6 bg-brand-card p-4 rounded-xl border border-brand-accent">
-                   <Text className="text-brand-text text-center font-bold">Podsumowanie</Text>
-                   <View className="flex-row justify-around mt-2">
-                      <Text className="text-brand-muted">Kcal: <Text className="text-brand-text font-bold">{selectedIngredients.reduce((a,b)=>a+b.calories,0)}</Text></Text>
-                      <Text className="text-brand-muted">B: <Text className="text-brand-text font-bold">{selectedIngredients.reduce((a,b)=>a+(b.protein||0),0)}</Text></Text>
-                      <Text className="text-brand-muted">T: <Text className="text-brand-text font-bold">{selectedIngredients.reduce((a,b)=>a+(b.fat||0),0)}</Text></Text>
-                      <Text className="text-brand-muted">W: <Text className="text-brand-text font-bold">{selectedIngredients.reduce((a,b)=>a+(b.carbs||0),0)}</Text></Text>
+                   <Text className="text-brand-text text-center font-bold mb-2">Podsumowanie</Text>
+                   <View className="flex-row justify-around">
+                      <View className="items-center">
+                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+b.calories,0)}</Text>
+                        <Text className="text-brand-muted text-xs">Kcal</Text>
+                      </View>
+                      <View className="items-center">
+                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+(b.protein||0),0)}</Text>
+                        <Text className="text-brand-muted text-xs">Białko</Text>
+                      </View>
+                      <View className="items-center">
+                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+(b.fat||0),0)}</Text>
+                        <Text className="text-brand-muted text-xs">Tłuszcz</Text>
+                      </View>
+                      <View className="items-center">
+                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+(b.carbs||0),0)}</Text>
+                        <Text className="text-brand-muted text-xs">Węgle</Text>
+                      </View>
                    </View>
                 </View>
             )}

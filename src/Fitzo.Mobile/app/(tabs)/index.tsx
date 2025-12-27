@@ -1,15 +1,30 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../../Context/AuthContext';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { userToken, userData } = useAuth();
+
   return (
     // Tło: #10002B
     <SafeAreaView className="flex-1 bg-brand-dark">
       
       <View className="flex-row justify-between items-center px-5 py-3">
-        <TouchableOpacity className="bg-brand-card p-2 rounded-full border border-brand-accent">
-          <Ionicons name="person" size={24} color="white" />
+        
+        <TouchableOpacity 
+            onPress={() => router.push('/profile')}
+            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'}`}
+        >
+            {userToken && userData?.username ? (
+                <Text className="text-white font-bold text-lg">
+                    {userData.username.charAt(0).toUpperCase()}
+                </Text>
+            ) : (
+                <Ionicons name="person" size={20} color="white" />
+            )}
         </TouchableOpacity>
 
         <Text className="text-2xl font-black text-white tracking-tighter">
@@ -31,7 +46,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
         </View>
 
-        <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5">
+        <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5 border border-brand-accent">
             <View className="flex-row justify-between items-start mb-4">
                 <Text className="text-white text-lg font-bold">Kalorie</Text>
                 <Text className="text-brand-muted text-xs">Cel - Posiłki + Ćwicz.</Text>
@@ -92,10 +107,6 @@ export default function HomeScreen() {
                     
                     <View className="h-3 bg-brand-dark rounded-full overflow-hidden">
                         <View className="h-full w-[30%] bg-brand-flame rounded-full" />
-                        {/*<View 
-                        className="h-full bg-blue-500 rounded-full" 
-                        style={{ width: `${(zjedzone / cel) * 100}%` }}   DO LICZENIA PO PODŁĄCZENIU DB
-                        /> */}  
                     </View>
                 </View>
 
@@ -126,7 +137,6 @@ export default function HomeScreen() {
                 
                 <View className="gap-2">
                     <View className="flex-row items-center gap-2">
-                        {/* 🔥 ZMIANA: Kolor płomienia na brand-flame (#FF9100) */}
                         <Ionicons name="flame" size={22} color="#FF9100" />
                         <Text className="text-white text-lg font-bold">120 kcal</Text>
                     </View>

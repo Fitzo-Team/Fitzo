@@ -22,3 +22,15 @@ C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\refint\Fitzo.Shared.dll
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.pdb
 C:\Users\BLAZE\III SEM\ZTP PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\ref\Fitzo.Shared.dll
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\bin\Debug\net8.0\Fitzo.Shared.deps.json
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\bin\Debug\net8.0\Fitzo.Shared.dll
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\bin\Debug\net8.0\Fitzo.Shared.pdb
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.AssemblyInfoInputs.cache
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.AssemblyInfo.cs
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.csproj.CoreCompileInputs.cache
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.sourcelink.json
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.dll
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\refint\Fitzo.Shared.dll
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\Fitzo.Shared.pdb
+C:\Users\w-cim\Desktop\STUDIA\Semestr3\ZTP\PROJEKT\Fitzo\src\Fitzo.Shared\obj\Debug\net8.0\ref\Fitzo.Shared.dll

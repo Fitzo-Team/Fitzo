@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZR6uw7+6Dh1wSyBD4dGxQuPrwPxNKf+p3Or4JyfH0nw=",
+  "Hash": "D1GSFzvpzXjSPPXjkIlc25XUO3XvTgoDDxYxjcgIawU=",
   "Source": "Fitzo.API",
   "BasePath": "_content/Fitzo.API",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "Fitzo.API\\wwwroot",
       "Source": "Fitzo.API",
-      "ContentRoot": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\",
       "BasePath": "_content/Fitzo.API",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
+      "Identity": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
       "SourceId": "Fitzo.API",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\",
       "BasePath": "_content/Fitzo.API",
       "RelativePath": "index#[.{fingerprint}]?.html",
       "AssetKind": "All",
@@ -38,10 +38,10 @@
       "OriginalItemSpec": "wwwroot\\index.html"
     },
     {
-      "Identity": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
+      "Identity": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
       "SourceId": "Fitzo.API",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\",
       "BasePath": "_content/Fitzo.API",
       "RelativePath": "styles#[.{fingerprint}]?.css",
       "AssetKind": "All",
@@ -62,7 +62,7 @@
   "Endpoints": [
     {
       "Route": "index.html",
-      "AssetFile": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -83,7 +83,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 16 Dec 2025 17:18:23 GMT"
+          "Value": "Tue, 30 Dec 2025 08:19:22 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -99,7 +99,7 @@
     },
     {
       "Route": "index.pe859j596h.html",
-      "AssetFile": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -120,7 +120,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 16 Dec 2025 17:18:23 GMT"
+          "Value": "Tue, 30 Dec 2025 08:19:22 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -144,7 +144,7 @@
     },
     {
       "Route": "styles.2xcowihf7g.css",
-      "AssetFile": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -165,7 +165,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 16 Dec 2025 17:18:23 GMT"
+          "Value": "Tue, 30 Dec 2025 08:19:22 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -189,7 +189,7 @@
     },
     {
       "Route": "styles.css",
-      "AssetFile": "C:\\Users\\BLAZE\\III SEM\\ZTP PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -210,7 +210,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 16 Dec 2025 17:18:23 GMT"
+          "Value": "Tue, 30 Dec 2025 08:19:22 GMT"
         },
         {
           "Name": "Cache-Control",

@@ -1,1 +1,0 @@
-namespace Fitzo.Desktop.Services;

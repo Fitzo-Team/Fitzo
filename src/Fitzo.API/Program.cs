@@ -5,24 +5,29 @@ using Fitzo.API.Entities;
 using Fitzo.API.Interfaces;
 using Fitzo.API.Services;
 using Fitzo.API.Services.Bmr;
+using Fitzo.API.Services.Proxies;
 using Fitzo.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using Fitzo.API.Patterns;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. PODSTAWOWE USŁUGI API ---
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// --- 2. BAZA DANYCH ---
 var connectionsString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FitzoDbContext>(options => 
     options.UseNpgsql(connectionsString));
 
-// --- 3. KONFIGURACJA IDENTITY (Z KLUCZEM GUID) ---
-// Musimy użyć IdentityRole<Guid>, aby pasowało do UserIdentity : IdentityUser<Guid>
 builder.Services.AddIdentity<UserIdentity, IdentityRole<Guid>>(options =>
 {
     options.Password.RequireDigit = false;
@@ -36,7 +41,6 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole<Guid>>(options =>
 .AddEntityFrameworkStores<FitzoDbContext>()
 .AddDefaultTokenProviders();
 
-// --- 4. HTTP CLIENTY DLA ADAPTERÓW ---
 builder.Services.AddHttpClient<OffAdapter>(client =>
 {
     client.BaseAddress = new Uri("https://world.openfoodfacts.org/");
@@ -52,23 +56,33 @@ builder.Services.AddHttpClient<UsdaAdapter>(client =>
     client.BaseAddress = new Uri("https://api.nal.usda.gov/");
 });
 
-// --- 5. REJESTRACJA SERWISÓW I ADAPTERÓW ---
-// Rejestrujemy konkretne klasy adapterów, bo HybridNutritionProvider ich wymaga w konstruktorze
 builder.Services.AddScoped<UsdaAdapter>();
 builder.Services.AddScoped<OffAdapter>();
 builder.Services.AddScoped<INutritionProvider, HybridNutritionProvider>();
 
-// Serwis autoryzacji
 builder.Services.AddScoped<AuthService>();
 
-// --- 6. STRATEGIE I SERWIS BMR ---
 builder.Services.AddKeyedScoped<IBmrStrategy, MifflinStJeorStrategy>(BmrFormula.MifflinStJeor);
 builder.Services.AddKeyedScoped<IBmrStrategy, HarrisBenedictStrategy>(BmrFormula.HarrisBenedict);
 builder.Services.AddScoped<BmrService>();
 
+builder.Services.AddScoped<RecipeManager>();
+builder.Services.AddScoped<IRecipeManager>(provider =>
+{
+    var innerManager = provider.GetRequiredService<RecipeManager>();
+    var userContext = provider.GetRequiredService<IUserContextService>(); 
+
+    return new RecipeProtectionProxy(innerManager, userContext);
+});
+
+builder.Services.AddTransient<IRecipeBuilder, StandardRecipeBuilder>();
+builder.Services.AddTransient<RecipeDirector>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
+
 var app = builder.Build();
 
-// --- 7. MIDDLEWARE (KOLEJNOŚĆ JEST KLUCZOWA) ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -77,11 +91,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Serwowanie plików statycznych (jeśli potrzebne)
 app.UseDefaultFiles(); 
 app.UseStaticFiles(); 
 
-// Authentication musi być PRZED Authorization
 app.UseAuthentication(); 
 app.UseAuthorization();
 

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {}
+    "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {}
   },
   "projects": {
-    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
+    "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
+        "projectUniqueName": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
         "projectName": "Fitzo.API",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
-        "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\obj\\",
+        "projectPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj",
+        "packagesPath": "C:\\Users\\w-cim\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Kamil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\w-cim\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
-                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
+              "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+                "projectPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj"
               }
             }
           }
@@ -48,7 +48,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -100,24 +100,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
+    "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
+        "projectUniqueName": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
         "projectName": "Fitzo.Shared",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
-        "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.Shared\\obj\\",
+        "projectPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.Shared\\Fitzo.Shared.csproj",
+        "packagesPath": "C:\\Users\\w-cim\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Kamil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\w-cim\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -144,7 +144,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -165,24 +165,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {
+    "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
         "projectName": "Fitzo.API.Tests",
-        "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
-        "packagesPath": "C:\\Users\\Kamil\\.nuget\\packages\\",
-        "outputPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\tests\\Fitzo.API.Tests\\obj\\",
+        "projectPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\Fitzo.API.Tests.csproj",
+        "packagesPath": "C:\\Users\\w-cim\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\tests\\Fitzo.API.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Kamil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\w-cim\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -197,8 +197,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
-                "projectPath": "C:\\oddzielne\\Projekty\\ZTP_FIT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj"
+              "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj": {
+                "projectPath": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\Fitzo.API.csproj"
               }
             }
           }
@@ -213,7 +213,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -270,7 +270,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

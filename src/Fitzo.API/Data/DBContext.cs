@@ -11,5 +11,6 @@ public class FitzoDbContext : IdentityDbContext<UserIdentity, IdentityRole<Guid>
     {
     }
 
+    public DbSet<Recipe> Recipes { get; set; }
     public DbSet<UserProfile> UserProfiles { get; set; }
 }

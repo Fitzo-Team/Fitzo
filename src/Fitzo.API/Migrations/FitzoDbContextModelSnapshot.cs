@@ -22,6 +22,35 @@ namespace Fitzo.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Fitzo.API.Entities.RecipeComponent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("RecipeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("RecipeComponent");
+
+                    b.HasDiscriminator().HasValue("RecipeComponent");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("Fitzo.API.Entities.UserIdentity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -248,6 +277,30 @@ namespace Fitzo.API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Fitzo.API.Entities.Recipe", b =>
+                {
+                    b.HasBaseType("Fitzo.API.Entities.RecipeComponent");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int[]>("Tags")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
+                    b.HasDiscriminator().HasValue("Recipe");
+                });
+
+            modelBuilder.Entity("Fitzo.API.Entities.RecipeComponent", b =>
+                {
+                    b.HasOne("Fitzo.API.Entities.Recipe", null)
+                        .WithMany("Components")
+                        .HasForeignKey("RecipeId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -297,6 +350,11 @@ namespace Fitzo.API.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Fitzo.API.Entities.Recipe", b =>
+                {
+                    b.Navigation("Components");
                 });
 #pragma warning restore 612, 618
         }

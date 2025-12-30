@@ -10,55 +10,63 @@ public class RecipeProxyTests
 {
     private readonly Mock<IRecipeManager> _managerMock;
     private readonly Mock<IUserContextService> _userContextMock;
-    private readonly RecipeProtectionProxy _sut;
+    private readonly RecipeProtectionProxy _proxy;
 
     public RecipeProxyTests()
     {
         _managerMock = new Mock<IRecipeManager>();
         _userContextMock = new Mock<IUserContextService>();
-        
-        _sut = new RecipeProtectionProxy(_managerMock.Object, _userContextMock.Object);
+        _proxy = new RecipeProtectionProxy(_managerMock.Object, _userContextMock.Object);
     }
 
     [Fact]
-    public async Task Delete_ShouldThrowException_WhenUserIsNotOwner()
+    public async Task CreateRecipe_ShouldAssignOwnerId()
     {
 
+        var userId = Guid.NewGuid(); 
+        _userContextMock.Setup(x => x.GetCurrentUserId()).Returns(userId);
+
+        var recipe = new Recipe();
+
+        await _proxy.CreateRecipeAsync(recipe);
+
+        recipe.OwnerId.Should().Be(userId);
+        _managerMock.Verify(x => x.CreateRecipeAsync(recipe), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteRecipe_ShouldThrow_WhenUserIsNotOwner()
+    {
+        var userId = Guid.NewGuid();
+        var ownerId = Guid.NewGuid();
         var recipeId = Guid.NewGuid();
-        var ownerId = 100;
-        var attackerId = 666;
 
+        var recipe = new Recipe { Id = recipeId, OwnerId = ownerId };
 
-        _userContextMock.Setup(x => x.GetCurrentUserId()).Returns(attackerId);
+        _userContextMock.Setup(x => x.GetCurrentUserId()).Returns(userId);
         _userContextMock.Setup(x => x.GetCurrentUserRole()).Returns(UserRole.User);
-
-        var recipe = new Recipe { Id = recipeId, Name = "Secret Pizza", OwnerId = ownerId };
-        _managerMock.Setup(x => x.GetRecipeByIdAsync(recipeId))
-                    .ReturnsAsync(recipe);
+        
+        _managerMock.Setup(x => x.GetRecipeByIdAsync(recipeId)).ReturnsAsync(recipe);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => 
-            _sut.DeleteRecipeAsync(recipeId)
-        );
-
-        _managerMock.Verify(x => x.DeleteRecipeAsync(It.IsAny<Guid>()), Times.Never);
+            _proxy.DeleteRecipeAsync(recipeId));
     }
 
     [Fact]
-    public async Task Delete_ShouldSucceed_WhenUserIsOwner()
+    public async Task DeleteRecipe_ShouldSucceed_WhenUserIsOwner()
     {
+        var userId = Guid.NewGuid();
         var recipeId = Guid.NewGuid();
-        var myId = 123;
 
-        _userContextMock.Setup(x => x.GetCurrentUserId()).Returns(myId);
+        var recipe = new Recipe { Id = recipeId, OwnerId = userId };
+
+        _userContextMock.Setup(x => x.GetCurrentUserId()).Returns(userId);
         _userContextMock.Setup(x => x.GetCurrentUserRole()).Returns(UserRole.User);
-
-        var recipe = new Recipe { Id = recipeId, Name = "My Pizza", OwnerId = myId };
-        _managerMock.Setup(x => x.GetRecipeByIdAsync(recipeId))
-                    .ReturnsAsync(recipe);
-
-        await _sut.DeleteRecipeAsync(recipeId);
         
+        _managerMock.Setup(x => x.GetRecipeByIdAsync(recipeId)).ReturnsAsync(recipe);
+
+        await _proxy.DeleteRecipeAsync(recipeId);
+
         _managerMock.Verify(x => x.DeleteRecipeAsync(recipeId), Times.Once);
     }
 }
-

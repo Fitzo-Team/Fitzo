@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Fitzo.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4b1b614d7d74ad6045e30ba33da82988af892c24")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8b4b170cfb1507ee86ea659f777641effc191691")]
 [assembly: System.Reflection.AssemblyProductAttribute("Fitzo.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Fitzo.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

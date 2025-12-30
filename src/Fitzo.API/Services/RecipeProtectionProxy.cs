@@ -24,7 +24,7 @@ public class RecipeProtectionProxy : IRecipeManager
     {
         var currentUserId = _userContext.GetCurrentUserId();
         
-        recipe.OwnerId = currentUserId; 
+        recipe.OwnerId = currentUserId;
 
         await _innerManager.CreateRecipeAsync(recipe);
     }
@@ -53,8 +53,6 @@ public class RecipeProtectionProxy : IRecipeManager
             
             throw new UnauthorizedAccessException("Nie masz uprawnień do usunięcia tego przepisu.");
         }
-
         await _innerManager.DeleteRecipeAsync(id);
     }
 }
-

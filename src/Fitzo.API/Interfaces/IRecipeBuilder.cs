@@ -1,5 +1,6 @@
 using Fitzo.API.Entities;
 using Fitzo.Shared.Dtos;
+using Fitzo.Shared.Enums;
 
 namespace Fitzo.API.Interfaces
 {

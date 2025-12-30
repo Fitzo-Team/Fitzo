@@ -4,6 +4,7 @@ namespace Fitzo.API.Entities
 {
     public class Recipe : RecipeComponent
     {
+        public Guid OwnerId { get; set; }
         public string? ImageUrl { get; set; }
         public List<DietTag> Tags { get; set; } = new();
 

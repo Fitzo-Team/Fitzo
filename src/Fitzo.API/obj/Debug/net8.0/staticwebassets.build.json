@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "D1GSFzvpzXjSPPXjkIlc25XUO3XvTgoDDxYxjcgIawU=",
+  "Hash": "B2cws/nCOOveRsNQGQSlt8GXbSCy42U7lWBO4IwRuXY=",
   "Source": "Fitzo.API",
   "BasePath": "_content/Fitzo.API",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "Fitzo.API\\wwwroot",
       "Source": "Fitzo.API",
-      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\",
       "BasePath": "_content/Fitzo.API",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
+      "Identity": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
       "SourceId": "Fitzo.API",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\",
       "BasePath": "_content/Fitzo.API",
       "RelativePath": "index#[.{fingerprint}]?.html",
       "AssetKind": "All",
@@ -38,10 +38,10 @@
       "OriginalItemSpec": "wwwroot\\index.html"
     },
     {
-      "Identity": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
+      "Identity": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
       "SourceId": "Fitzo.API",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\",
       "BasePath": "_content/Fitzo.API",
       "RelativePath": "styles#[.{fingerprint}]?.css",
       "AssetKind": "All",
@@ -62,7 +62,7 @@
   "Endpoints": [
     {
       "Route": "index.html",
-      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -99,7 +99,7 @@
     },
     {
       "Route": "index.pe859j596h.html",
-      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -144,7 +144,7 @@
     },
     {
       "Route": "styles.2xcowihf7g.css",
-      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -189,7 +189,7 @@
     },
     {
       "Route": "styles.css",
-      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
+      "AssetFile": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
       "Selectors": [],
       "ResponseHeaders": [
         {

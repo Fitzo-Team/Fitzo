@@ -7,7 +7,7 @@ namespace Fitzo.API.Patterns
 {
     public class StandardRecipeBuilder : IRecipeBuilder
     {
-        private Recipe _recipe;
+        private Recipe _recipe = new();
 
         public StandardRecipeBuilder()
         {

@@ -1,11 +1,11 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\index.html",
+      "Id": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\index.html",
       "PackagePath": "staticwebassets\\index.html"
     },
     {
-      "Id": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\fitzo.api\\wwwroot\\styles.css",
+      "Id": "C:\\Users\\w-cim\\Desktop\\STUDIA\\Semestr3\\ZTP\\PROJEKT\\Fitzo\\src\\Fitzo.API\\wwwroot\\styles.css",
       "PackagePath": "staticwebassets\\styles.css"
     },
     {

@@ -4,6 +4,7 @@ namespace Fitzo.API.Interfaces;
 
 public interface IUserContextService
 {
-    int GetCurrentUserId();
+    Guid GetCurrentUserId(); 
+    
     UserRole GetCurrentUserRole();
 }

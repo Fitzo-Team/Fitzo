@@ -8,6 +8,8 @@ using Fitzo.API.Services.Bmr;
 using Fitzo.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using Fitzo.API.Patterns;
 
 var builder = WebApplication.CreateBuilder(args);
 

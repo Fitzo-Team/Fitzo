@@ -5,11 +5,14 @@ using Fitzo.API.Entities;
 using Fitzo.API.Interfaces;
 using Fitzo.API.Services;
 using Fitzo.API.Services.Bmr;
+using Fitzo.API.Services.Proxies;
 using Fitzo.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Fitzo.API.Patterns;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,8 +66,20 @@ builder.Services.AddKeyedScoped<IBmrStrategy, MifflinStJeorStrategy>(BmrFormula.
 builder.Services.AddKeyedScoped<IBmrStrategy, HarrisBenedictStrategy>(BmrFormula.HarrisBenedict);
 builder.Services.AddScoped<BmrService>();
 
+builder.Services.AddScoped<RecipeManager>();
+builder.Services.AddScoped<IRecipeManager>(provider =>
+{
+    var innerManager = provider.GetRequiredService<RecipeManager>();
+    var userContext = provider.GetRequiredService<IUserContextService>(); 
+
+    return new RecipeProtectionProxy(innerManager, userContext);
+});
+
 builder.Services.AddTransient<IRecipeBuilder, StandardRecipeBuilder>();
 builder.Services.AddTransient<RecipeDirector>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 
 var app = builder.Build();
 

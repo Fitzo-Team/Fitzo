@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Fitzo.API.Patterns;
-
+using Fitzo.API.Patterns.Validation;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,6 +80,16 @@ builder.Services.AddTransient<RecipeDirector>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContextService, UserContextService>();
+
+builder.Services.AddTransient<RecipeValidationHandler>(provider =>
+{
+    var head = new DataIntegrityValidator();
+    var second = new IngredientsCountValidator();
+    var third = new ImageValidator();
+    head.SetNext(second).SetNext(third);
+
+    return head;
+});
 
 var app = builder.Build();
 

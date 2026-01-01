@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     [DbContext(typeof(FitzoDbContext))]
-    [Migration("20251230171557_AddedRecipesTable")]
-    partial class AddedRecipesTable
+    [Migration("20260101165628_InitialVer")]
+    partial class InitialVer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

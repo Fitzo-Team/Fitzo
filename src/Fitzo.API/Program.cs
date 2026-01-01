@@ -56,8 +56,6 @@ builder.Services.AddHttpClient<UsdaAdapter>(client =>
     client.BaseAddress = new Uri("https://api.nal.usda.gov/");
 });
 
-builder.Services.AddScoped<UsdaAdapter>();
-builder.Services.AddScoped<OffAdapter>();
 builder.Services.AddScoped<INutritionProvider, HybridNutritionProvider>();
 
 builder.Services.AddScoped<AuthService>();

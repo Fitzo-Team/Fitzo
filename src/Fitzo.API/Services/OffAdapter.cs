@@ -39,4 +39,23 @@ public class OffAdapter : INutritionProvider
         Fat = offResponse.Product.Nutriments.Fat ?? 0
         };
     }
+
+    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string query)
+    {
+        var url = $"cgi/search.pl?search_terms={query}&search_simple=1&action=process&json=1&page_size=10";
+
+        var offresponse = await httpClient.GetFromJsonAsync<OffSearchResponse>(url);
+
+        if(offresponse.Products == null) return Enumerable.Empty<ProductDto>();
+
+        return offresponse.Products.Select(p => new ProductDto
+        {
+            ExternalId = p.Id,
+            Name = p.ProductName,
+            Calories = p.Nutriments?.Calories ?? 0,
+            Carbs = p.Nutriments?.Carbs ?? 0,
+            Protein = p.Nutriments?.Proteins ?? 0,
+            Fat = p.Nutriments?.Fat ?? 0
+        });
+    }
 }

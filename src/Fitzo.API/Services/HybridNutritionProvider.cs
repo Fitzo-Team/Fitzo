@@ -31,4 +31,30 @@ public class HybridNutritionProvider : INutritionProvider
             return await usdaAdapter.GetProductAsync(query);
         }
     }
+
+    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string query)
+    {
+        var offTask = SafeSearch(offAdapter, query);
+        var usdaTask = SafeSearch(usdaAdapter, query);
+
+        await Task.WhenAll(offTask, usdaTask);
+
+        var offResults = await offTask;
+        var usdaResults = await usdaTask;
+
+        return usdaResults.Concat(offResults);
+    }
+
+    public async Task<IEnumerable<ProductDto>> SafeSearch(INutritionProvider provider, string query)
+    {
+        try
+    {
+        return await provider.SearchProductsAsync(query);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[HybridProvider] Błąd w jednym z adapterów: {ex.Message}");
+        return Enumerable.Empty<ProductDto>();
+    }
+    }
 }

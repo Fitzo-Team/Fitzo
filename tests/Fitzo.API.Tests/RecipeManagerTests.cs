@@ -38,20 +38,41 @@ public class RecipeManagerTests
         var manager = new RecipeManager(context);
         var id = Guid.NewGuid();
 
-        var recipe = new Recipe { Id = id, Name = "Complex", OwnerId = Guid.NewGuid() };
+        var recipe = new Recipe 
+        { 
+            Id = id, 
+            Name = "Complex", 
+            OwnerId = Guid.NewGuid() 
+        };
         recipe.AddComponent(new Ingredient 
         { 
             Name = "Salt", 
             Amount = 10,
-            Product = new ProductDto { Name = "Salt", Calories = 0 }
+            Product = new ProductDto 
+            { 
+                ExternalId = "123",
+                Name = "Salt", 
+                Calories = 0, 
+                Protein = 0, 
+                Carbs = 0, 
+                Fat = 0 
+            }
         });
 
         context.Recipes.Add(recipe);
         await context.SaveChangesAsync();
 
+        context.ChangeTracker.Clear(); 
+
         var result = await manager.GetRecipeByIdAsync(id);
 
         result.Should().NotBeNull();
+        
         result!.Components.Should().HaveCount(1);
+        
+        result.Components.First().Should().BeOfType<Ingredient>();
+        
+        var ingredient = result.Components.First() as Ingredient;
+        ingredient!.Product.Name.Should().Be("Salt");
     }
 }

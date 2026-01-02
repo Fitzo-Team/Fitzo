@@ -13,4 +13,16 @@ public class FitzoDbContext : IdentityDbContext<UserIdentity, IdentityRole<Guid>
 
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<UserProfile> UserProfiles { get; set; }
+
+    public DbSet<MealPlanEntry> MealPlans { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Recipe>()
+                .HasMany(r => r.Components)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+        }
 }

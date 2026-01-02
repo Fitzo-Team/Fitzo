@@ -1,7 +1,13 @@
-namespace Fitzo.Shared.Dtos;
+using Fitzo.Shared.Enums;
 
-public class AddMealDto
+namespace Fitzo.Shared.Dtos
 {
-    public DateTime Date { get; set; }
-    public Guid RecipeId { get; set; }
+    public class AddMealDto
+    {
+        public Guid RecipeId { get; set; }
+        public DateTime Date { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public MealType Type { get; set; }
+    }
 }

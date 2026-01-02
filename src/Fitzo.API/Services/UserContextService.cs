@@ -17,16 +17,19 @@ namespace Fitzo.API.Services
         {
             var user = _httpContextAccessor.HttpContext?.User;
             
-            if (user == null) return Guid.Empty;
-
-            var idString = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (Guid.TryParse(idString, out var guidId))
+            if(user == null || user.Identity?.IsAuthenticated == false)
             {
-                return guidId;
+                throw new UnauthorizedAccessException("Ta operacja wymaga zalogowania");
             }
 
-            return Guid.Empty;
+            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if(Guid.TryParse(id, out var GuidId))
+            {
+                return GuidId;
+            }
+
+            throw new UnauthorizedAccessException("Błedne ID użytkownika");
         }
 
         public UserRole GetCurrentUserRole()

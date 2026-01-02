@@ -75,7 +75,7 @@ namespace Fitzo.API.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeComponent");
+                    b.ToTable("RecipeComponents");
 
                     b.HasDiscriminator().HasValue("RecipeComponent");
 
@@ -308,6 +308,16 @@ namespace Fitzo.API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Fitzo.API.Entities.Ingredient", b =>
+                {
+                    b.HasBaseType("Fitzo.API.Entities.RecipeComponent");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision");
+
+                    b.HasDiscriminator().HasValue("Ingredient");
+                });
+
             modelBuilder.Entity("Fitzo.API.Entities.Recipe", b =>
                 {
                     b.HasBaseType("Fitzo.API.Entities.RecipeComponent");
@@ -392,6 +402,45 @@ namespace Fitzo.API.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Fitzo.API.Entities.Ingredient", b =>
+                {
+                    b.OwnsOne("Fitzo.Shared.Dtos.ProductDto", "Product", b1 =>
+                        {
+                            b1.Property<Guid>("IngredientId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<double>("Calories")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double>("Carbs")
+                                .HasColumnType("double precision");
+
+                            b1.Property<string>("ExternalId")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<double>("Fat")
+                                .HasColumnType("double precision");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<double>("Protein")
+                                .HasColumnType("double precision");
+
+                            b1.HasKey("IngredientId");
+
+                            b1.ToTable("RecipeComponents");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IngredientId");
+                        });
+
+                    b.Navigation("Product")
                         .IsRequired();
                 });
 

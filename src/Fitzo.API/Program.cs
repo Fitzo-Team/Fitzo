@@ -14,6 +14,9 @@ using Fitzo.API.Patterns;
 using Fitzo.API.Patterns.Validation;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +43,35 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole<Guid>>(options =>
 })
 .AddEntityFrameworkStores<FitzoDbContext>()
 .AddDefaultTokenProviders();
+
+var jwtsettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtsettings.GetValue<string>("SecretKey");
+
+if (secretKey.IsNullOrEmpty())
+{
+    throw new InvalidOperationException("Brak SecretKey");
+}
+
+builder.Services.AddAuthentication(jwtOptions =>
+{
+    jwtOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    jwtOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwtOptions =>
+{
+	jwtOptions.TokenValidationParameters = new TokenValidationParameters
+	{
+		ValidateIssuer = true,
+		ValidateAudience = true,
+		ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        ValidIssuer = jwtsettings.GetValue<string>("Issuer"),
+        ValidAudience = jwtsettings.GetValue<string>("Audience"),
+	    
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+	};
+
+});
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<OffAdapter>(client =>

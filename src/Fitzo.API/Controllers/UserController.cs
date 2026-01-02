@@ -6,10 +6,12 @@ using Fitzo.API.Entities;
 using Fitzo.API.Data;     
 using Fitzo.API.Services; 
 using Fitzo.Shared.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Fitzo.API.Controllers; 
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
@@ -28,7 +30,6 @@ public class UsersController : ControllerBase
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
 
-        // Konwersja string -> Guid
         if (!Guid.TryParse(userIdString, out var userIdGuid))
         {
             return BadRequest("Nieprawidłowy format identyfikatora użytkownika.");
@@ -57,7 +58,6 @@ public class UsersController : ControllerBase
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
 
-        // Konwersja string -> Guid
         if (!Guid.TryParse(userIdString, out var userIdGuid))
         {
             return BadRequest("Nieprawidłowy format identyfikatora użytkownika.");

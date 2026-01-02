@@ -18,10 +18,10 @@ public class UsdaAdapter : INutritionProvider
 
     public virtual async Task<ProductDto> GetProductAsync(string query)
     {
-        var url = $"https://api.nal.usda.gov/fdc/v1/foods/search?api_key={apiKey}&query={query}&dataType=Foundation,SR Legacy&pageSize=1&requireAllWords=true";
+        var url = $"fdc/v1/foods/search?api_key={apiKey}&query={query}&dataType=Foundation,SR Legacy&pageSize=1&requireAllWords=true";
         var response = await httpClient.GetFromJsonAsync<UsdaSearchResult>(url);
 
-        if(response == null || !(response.Foods.Count() != 0))
+        if(response == null || response.Foods.Count == 0)
         {
             return null;
         }
@@ -36,11 +36,35 @@ public class UsdaAdapter : INutritionProvider
             Carbs = GetNutrientValue(usdaItem.FoodNutrients, "Carbohydrate, by difference"),
             Fat = GetNutrientValue(usdaItem.FoodNutrients, "Total lipid (fat)")
         };
-        }
+    }
 
         private double GetNutrientValue(List<UsdaNutrient> nutrients, string name)
         {
             var nutrient = nutrients.FirstOrDefault(n => n.NutrientName.Contains(name, StringComparison.OrdinalIgnoreCase));
             return nutrient?.Value ?? 0;
         }
+
+
+    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string query)
+    {
+        var request = new
+        {
+            query = query,
+            pageSize = 10,
+            dataType = new[] { "Foundation", "Survey (FNDDS)"}
+        };
+
+        var response = await httpClient.PostAsJsonAsync("fdc/v1/foods/search", request);
+        var data = await response.Content.ReadFromJsonAsync<UsdaSearchResult>();
+
+        return data.Foods.Select(f => new ProductDto
+        {
+            ExternalId = f.FdcId.ToString(),
+            Name = f.Description,
+            Calories = GetNutrientValue(f.FoodNutrients, "Energy"),
+            Protein = GetNutrientValue(f.FoodNutrients, "Protein"),
+            Carbs = GetNutrientValue(f.FoodNutrients, "Carbohydrate, by difference"),
+            Fat = GetNutrientValue(f.FoodNutrients, "Total lipid (fat)")
+        });
+    }
     }

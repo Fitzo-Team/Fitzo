@@ -40,14 +40,18 @@ public class CachingProxyTests
     [Fact]
     public async Task GetProduct_ShouldReturnFromCache_AndNotCallInnerService_WhenDataIsCached()
     {
-        string query = "banana";
-        string cacheKey = $"nutrition_{query}";
+        string query = "Banana";
+        
+        string cacheKey = $"product_{query.ToLower().Trim()}"; 
+        
         var cachedProduct = new ProductDto { Name = "Cached Banana", Calories = 999 };
 
         _realCache.Set(cacheKey, cachedProduct);
 
         var result = await _sut.GetProductAsync(query);
 
+        result.Should().NotBeNull(); 
+        
         result.Name.Should().Be("Cached Banana");
         result.Calories.Should().Be(999);
 

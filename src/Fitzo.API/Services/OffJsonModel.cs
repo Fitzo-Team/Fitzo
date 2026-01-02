@@ -34,3 +34,15 @@ public class OffNutriments
     [JsonPropertyName("fat_100g")]
     public double? Fat { get; set; }
 }
+
+public class OffSearchResponse
+{
+    [JsonPropertyName("count")]
+    public int Count {get; set;}
+    
+    [JsonPropertyName("page")]
+    public int Page {get; set;}
+    
+    [JsonPropertyName("products")]
+    public List<OffProduct> Products {get; set;} = new();
+}

@@ -41,6 +41,7 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole<Guid>>(options =>
 .AddEntityFrameworkStores<FitzoDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<OffAdapter>(client =>
 {
     client.BaseAddress = new Uri("https://world.openfoodfacts.org/");
@@ -56,9 +57,15 @@ builder.Services.AddHttpClient<UsdaAdapter>(client =>
     client.BaseAddress = new Uri("https://api.nal.usda.gov/");
 });
 
-builder.Services.AddScoped<UsdaAdapter>();
-builder.Services.AddScoped<OffAdapter>();
-builder.Services.AddScoped<INutritionProvider, HybridNutritionProvider>();
+builder.Services.AddScoped<HybridNutritionProvider>();
+builder.Services.AddScoped<INutritionProvider>(provider =>
+{
+    var hybridProvider = provider.GetRequiredService<HybridNutritionProvider>();
+    var memoryCache = provider.GetRequiredService<IMemoryCache>();
+
+    return new CachingNutritionProxy(hybridProvider, memoryCache);
+});
+
 
 builder.Services.AddScoped<AuthService>();
 

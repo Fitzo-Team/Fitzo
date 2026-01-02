@@ -5,4 +5,5 @@ namespace Fitzo.API.Interfaces;
 public interface INutritionProvider
 {
     Task<ProductDto> GetProductAsync(string query);
+    Task<IEnumerable<ProductDto>> SearchProductsAsync(string query);
 }

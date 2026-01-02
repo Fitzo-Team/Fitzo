@@ -33,12 +33,14 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var token = await _authService.LoginAsync(dto);
 
-        var success = await _authService.LoginAsync(dto);
-        
-        if (!success) return Unauthorized("Nieprawidłowy email lub hasło.");
+        if(token == null)
+        {
+            return Unauthorized("Błedne email lub hasło");
+        }
 
-        return Ok(new { Message = "Zalogowano pomyślnie." });
+
+        return Ok(new { Token = token});
     }
 }

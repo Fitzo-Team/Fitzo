@@ -13,6 +13,7 @@ using System.Text.Json.Serialization;
 using Fitzo.API.Patterns;
 using Fitzo.API.Patterns.Validation;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 

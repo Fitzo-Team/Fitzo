@@ -5,8 +5,7 @@ using Fitzo.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Fitzo.API.Controllers
-{
+namespace Fitzo.API.Controllers;
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -30,8 +29,9 @@ namespace Fitzo.API.Controllers
             var recipe = _director.Construct(dto);
 
             await _recipeManager.CreateRecipeAsync(recipe);
+            var responseDto = MapRecipeToDto(recipe);
 
-            return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, recipe);
+            return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, responseDto);
         }
 
         [HttpGet("{id}")]
@@ -44,7 +44,7 @@ namespace Fitzo.API.Controllers
                 return NotFound();
             }
 
-            return Ok(recipe);
+            return Ok(MapRecipeToDto(recipe));
         }
 
         [HttpDelete("{id}")]
@@ -60,5 +60,41 @@ namespace Fitzo.API.Controllers
                 return Forbid();
             }
         }
+
+        private object MapRecipeToDto(Recipe recipe)
+        {
+            return new
+            {
+                recipe.Id,
+                recipe.Name,
+                recipe.ImageUrl,
+                recipe.Tags,
+                
+                TotalCalories = recipe.CalculateCalories(),
+                TotalProtein = recipe.CalculateProtein(),
+                TotalFat = recipe.CalculateFat(),
+                TotalCarbs = recipe.CalculateCarbs(),
+
+                Components = recipe.Components.Select(c => 
+                {
+                    var ingredient = c as Ingredient;
+                    
+                    return new 
+                    {
+                        c.Id,
+                        c.Name,
+                        Type = c is Ingredient ? "Ingredient" : "Recipe",
+                        
+                        Amount = ingredient?.Amount ?? 0,
+                        Unit = ingredient?.Product?.ServingUnit ?? "g",
+
+                        Calories = c.CalculateCalories(),
+                        Protein = c.CalculateProtein(),
+                        Fat = c.CalculateFat(),
+                        Carbs = c.CalculateCarbs()
+                    };
+                })
+            };
+        }
+
     }
-}

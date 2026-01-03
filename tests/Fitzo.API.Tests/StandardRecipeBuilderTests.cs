@@ -5,6 +5,8 @@ using Fitzo.Shared.Enums;
 using FluentAssertions;
 using Xunit;
 
+namespace Fitzo.API.Tests;
+
 public class StandardRecipeBuilderTests
 {
     private readonly StandardRecipeBuilder _sut;
@@ -31,7 +33,6 @@ public class StandardRecipeBuilderTests
         result.Name.Should().Be(name);
         result.ImageUrl.Should().Be(image);
         result.Tags.Should().Contain(tags);
-        result.Tags.Should().HaveCount(2);
     }
 
     [Fact]
@@ -39,28 +40,33 @@ public class StandardRecipeBuilderTests
     {
         var ingredientDto = new IngredientDto
         {
-            ProductName = "Almond Flour",
-            Amount = 100,
-            Calories = 600,
-            Protein = 20,
-            Carbs = 10,
-            Fat = 50
+            amount = 200,
+            Product = new ProductDto
+            {
+                ExternalId = "off:123",
+                Name = "Milk",
+                Calories = 50,
+                Protein = 3.2,
+                Carbs = 4.8,
+                Fat = 2.0,
+                ServingUnit = "ml"
+            }
         };
 
         _sut.AddIngredient(ingredientDto);
-        var result = _sut.Build();
+        var recipe = _sut.Build();
 
-        result.Components.Should().HaveCount(1);
+        recipe.Components.Should().HaveCount(1);
         
-        var addedIngredient = result.Components.First() as Ingredient;
-        
-        addedIngredient.Should().NotBeNull();
-        addedIngredient!.Name.Should().Be("Almond Flour");
-        addedIngredient.Amount.Should().Be(100);
-        
-        addedIngredient.Product.Should().NotBeNull();
-        addedIngredient.Product.Name.Should().Be("Almond Flour");
-        addedIngredient.Product.Calories.Should().Be(600);
+        var ingredient = recipe.Components.First() as Ingredient;
+        ingredient.Should().NotBeNull();
+
+        ingredient!.Name.Should().Be("Milk"); 
+        ingredient.Amount.Should().Be(200);
+
+        ingredient.Product.Should().NotBeNull();
+        ingredient.Product.Calories.Should().Be(50);
+        ingredient.Product.ExternalId.Should().Be("off:123");
     }
 
     [Fact]

@@ -39,18 +39,14 @@ namespace Fitzo.API.Patterns
 
         public void AddIngredient(IngredientDto ingredientDto)
         {
+            if(ingredientDto.Product == null)
+                throw new ArgumentException("Skladnik musi zaawierac produkt");
+
             var ingredient = new Ingredient
             {
-                Name = ingredientDto.ProductName,
-                Amount = ingredientDto.Amount,
-                Product = new ProductDto 
-                { 
-                    Name = ingredientDto.ProductName,
-                    Calories = ingredientDto.Calories,
-                    Protein = ingredientDto.Protein,
-                    Carbs = ingredientDto.Carbs,
-                    Fat = ingredientDto.Fat
-                }
+                Name = ingredientDto.Product.Name,
+                Amount = ingredientDto.amount,
+                Product = ingredientDto.Product
             };
 
             _recipe.AddComponent(ingredient);

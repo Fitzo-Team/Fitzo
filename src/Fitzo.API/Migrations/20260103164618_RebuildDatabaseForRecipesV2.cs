@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -7,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     /// <inheritdoc />
-    public partial class RebuildDatabase : Migration
+    public partial class RebuildDatabaseForRecipesV2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,10 +63,21 @@ namespace Fitzo.API.Migrations
                     RecipeId = table.Column<Guid>(type: "uuid", nullable: true),
                     Product_ExternalId = table.Column<string>(type: "text", nullable: true),
                     Product_Name = table.Column<string>(type: "text", nullable: true),
+                    Product_brand = table.Column<string>(type: "text", nullable: true),
+                    Product_ImageUrl = table.Column<string>(type: "text", nullable: true),
                     Product_Calories = table.Column<double>(type: "double precision", nullable: true),
                     Product_Protein = table.Column<double>(type: "double precision", nullable: true),
                     Product_Fat = table.Column<double>(type: "double precision", nullable: true),
                     Product_Carbs = table.Column<double>(type: "double precision", nullable: true),
+                    Product_ServingSize = table.Column<double>(type: "double precision", nullable: true),
+                    Product_ServingUnit = table.Column<string>(type: "text", nullable: true),
+                    Product_NutriScore = table.Column<string>(type: "text", nullable: true),
+                    Product_EcoScore = table.Column<string>(type: "text", nullable: true),
+                    Product_HasPalmOil = table.Column<bool>(type: "boolean", nullable: true),
+                    Product_labels = table.Column<List<string>>(type: "text[]", nullable: true),
+                    Product_Allergens = table.Column<List<string>>(type: "text[]", nullable: true),
+                    Product_DataQualityMessages = table.Column<List<string>>(type: "text[]", nullable: true),
+                    Product_IsDataComplete = table.Column<bool>(type: "boolean", nullable: true),
                     Amount = table.Column<double>(type: "double precision", nullable: true),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: true),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),

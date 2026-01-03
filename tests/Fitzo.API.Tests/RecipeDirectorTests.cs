@@ -6,6 +6,8 @@ using Fitzo.Shared.Enums;
 using Moq;
 using Xunit;
 
+namespace Fitzo.API.Tests;
+
 public class RecipeDirectorTests
 {
     private readonly Mock<IRecipeBuilder> _builderMock;
@@ -27,7 +29,15 @@ public class RecipeDirectorTests
             Tags = new List<DietTag> { DietTag.Keto },
             Ingredients = new List<IngredientDto>
             {
-                new IngredientDto { ProductName = "Egg", Amount = 100 }
+                new IngredientDto 
+                { 
+                    amount = 100,
+                    Product = new ProductDto 
+                    { 
+                        Name = "Egg",
+                        Calories = 150 
+                    } 
+                }
             }
         };
 
@@ -36,12 +46,11 @@ public class RecipeDirectorTests
         _sut.Construct(dto);
 
         _builderMock.Verify(x => x.Reset(), Times.Once);
-
         _builderMock.Verify(x => x.SetName("Scrambled Eggs"), Times.Once);
         _builderMock.Verify(x => x.SetImage("eggs.jpg"), Times.Once);
         _builderMock.Verify(x => x.SetDietTags(dto.Tags), Times.Once);
 
-        _builderMock.Verify(x => x.AddIngredient(It.Is<IngredientDto>(i => i.ProductName == "Egg")), Times.Once);
+        _builderMock.Verify(x => x.AddIngredient(It.Is<IngredientDto>(i => i.Product.Name == "Egg")), Times.Once);
 
         _builderMock.Verify(x => x.Build(), Times.Once);
     }
@@ -68,5 +77,65 @@ public class RecipeDirectorTests
         _builderMock.Verify(x => x.AddIngredient(It.IsAny<IngredientDto>()), Times.Never);
         
         _builderMock.Verify(x => x.Build(), Times.Once);
+    }
+
+    [Fact]
+    public void Ingredient_CalculateCalories_ShouldReturnCorrectValue_BasedOnServingSize()
+    {
+        var product = new ProductDto 
+        { 
+            Calories = 100, 
+            Protein = 20 
+        };
+
+        var ingredient = new Ingredient
+        {
+            Amount = 50,
+            Product = product
+        };
+
+        var calories = ingredient.CalculateCalories();
+        var protein = ingredient.CalculateProtein();
+
+        Assert.Equal(50, calories);
+        Assert.Equal(10, protein);
+    }
+
+    [Fact]
+    public void Recipe_CalculateMacros_ShouldSumUpAllIngredients()
+    {
+        var recipe = new Recipe();
+
+        recipe.AddComponent(new Ingredient 
+        { 
+            Amount = 100, 
+            Product = new ProductDto { Calories = 200, Fat = 10 } 
+        });
+
+        recipe.AddComponent(new Ingredient 
+        { 
+            Amount = 100, 
+            Product = new ProductDto { Calories = 150, Fat = 5 } 
+        });
+
+        var totalCals = recipe.CalculateCalories();
+        var totalFat = recipe.CalculateFat();
+
+        Assert.Equal(350, totalCals);
+        Assert.Equal(15, totalFat);
+    }
+
+    [Fact]
+    public void Calculate_ShouldReturnZero_WhenProductIsNull()
+    {
+        var ingredient = new Ingredient
+        {
+            Amount = 100,
+            Product = null
+        };
+
+        var calories = ingredient.CalculateCalories();
+
+        Assert.Equal(0, calories);
     }
 }

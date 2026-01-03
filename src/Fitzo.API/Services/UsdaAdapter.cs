@@ -1,5 +1,4 @@
 using System.Net.Http.Json;
-using System.Net.Http.Headers;
 using Fitzo.API.Interfaces;
 using Fitzo.Shared.Dtos;
 using Microsoft.Extensions.Configuration;
@@ -8,63 +7,105 @@ namespace Fitzo.API.Services;
 
 public class UsdaAdapter : INutritionProvider
 {
-    public HttpClient httpClient;
-    private readonly string apiKey;
-    public UsdaAdapter(HttpClient _httpClient, IConfiguration configuration)
+    private readonly HttpClient _httpClient;
+    private readonly string _apiKey;
+
+    public UsdaAdapter(HttpClient httpClient, IConfiguration configuration)
     {
-        httpClient = _httpClient;
-        apiKey = configuration["UsdaApiKey"] ?? throw new ArgumentNullException("Brakuje klucza USDA API!");
+        _httpClient = httpClient;
+        _apiKey = configuration["UsdaApiKey"] ?? throw new ArgumentNullException("Brakuje klucza USDA API!");
     }
 
-    public virtual async Task<ProductDto> GetProductAsync(string query)
+    public virtual async Task<ProductDto?> GetProductAsync(string id)
     {
-        var url = $"fdc/v1/foods/search?api_key={apiKey}&query={query}&dataType=Foundation,SR Legacy&pageSize=1&requireAllWords=true";
-        var response = await httpClient.GetFromJsonAsync<UsdaSearchResult>(url);
+        var cleanId = id.StartsWith("usda:") ? id.Substring(5) : id;
 
-        if(response == null || response.Foods.Count == 0)
+        var url = $"fdc/v1/food/{cleanId}?api_key={_apiKey}";
+
+        try
+        {
+            var usdaItem = await _httpClient.GetFromJsonAsync<UsdaFoodItem>(url);
+
+            if (usdaItem == null) return null;
+
+            return MapToDto(usdaItem);
+        }
+        catch
         {
             return null;
         }
-
-        var usdaItem = response.Foods.First();
-
-        return new ProductDto
-        {
-            Name = usdaItem.Description,
-            Calories = GetNutrientValue(usdaItem.FoodNutrients, "Energy"),
-            Protein = GetNutrientValue(usdaItem.FoodNutrients, "Protein"),
-            Carbs = GetNutrientValue(usdaItem.FoodNutrients, "Carbohydrate, by difference"),
-            Fat = GetNutrientValue(usdaItem.FoodNutrients, "Total lipid (fat)")
-        };
     }
 
-        private double GetNutrientValue(List<UsdaNutrient> nutrients, string name)
+    public virtual async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
+    {
+        if (string.IsNullOrWhiteSpace(filter.Query))
         {
-            var nutrient = nutrients.FirstOrDefault(n => n.NutrientName.Contains(name, StringComparison.OrdinalIgnoreCase));
-            return nutrient?.Value ?? 0;
+            return Enumerable.Empty<ProductDto>();
         }
 
-
-    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string query)
-    {
         var request = new
         {
-            query = query,
-            pageSize = 10,
-            dataType = new[] { "Foundation", "Survey (FNDDS)"}
+            searchTerm = filter.Query,
+            pageSize = filter.PageSize,
+            pageNumber = filter.Page,
+            dataType = new[] { "Foundation", "Survey (FNDDS)", "SR Legacy" }
         };
 
-        var response = await httpClient.PostAsJsonAsync("fdc/v1/foods/search", request);
-        var data = await response.Content.ReadFromJsonAsync<UsdaSearchResult>();
+        var url = $"fdc/v1/foods/search?api_key={_apiKey}";
 
-        return data.Foods.Select(f => new ProductDto
+        try
         {
-            ExternalId = f.FdcId.ToString(),
-            Name = f.Description,
-            Calories = GetNutrientValue(f.FoodNutrients, "Energy"),
-            Protein = GetNutrientValue(f.FoodNutrients, "Protein"),
-            Carbs = GetNutrientValue(f.FoodNutrients, "Carbohydrate, by difference"),
-            Fat = GetNutrientValue(f.FoodNutrients, "Total lipid (fat)")
-        });
+            var response = await _httpClient.PostAsJsonAsync(url, request);
+            response.EnsureSuccessStatusCode();
+
+            var data = await response.Content.ReadFromJsonAsync<UsdaSearchResult>();
+
+            if (data?.Foods == null) return Enumerable.Empty<ProductDto>();
+
+            return data.Foods.Select(MapToDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"USDA Search Error: {ex.Message}");
+            return Enumerable.Empty<ProductDto>();
+        }
     }
+
+    private ProductDto MapToDto(UsdaFoodItem item)
+    {
+        return new ProductDto
+        {
+            ExternalId = $"usda:{item.FdcId}",
+            Name = item.Description ?? "Bez nazwy",
+            brand = item.BrandName ?? "USDA Generic",
+            
+            Calories = GetNutrientValue(item.FoodNutrients, "Energy"),
+            Protein = GetNutrientValue(item.FoodNutrients, "Protein"),
+            Carbs = GetNutrientValue(item.FoodNutrients, "Carbohydrate"),
+            Fat = GetNutrientValue(item.FoodNutrients, "Total fat"),
+
+            NutriScore = null,
+            EcoScore = null,
+            HasPalmOil = null,
+            labels = new List<string>(),
+            Allergens = new List<string>(),
+
+            IsDataComplete = true,
+            DataQualityMessages = new List<string> 
+            { 
+                "Produkt z bazy USDA (USA). Szczegółowe wskaźniki (Nutri-Score, Eco-Score) nie są dostępne dla tego regionu." 
+            }
+        };
     }
+
+    private double GetNutrientValue(List<UsdaNutrient> nutrients, string namePart)
+    {
+        if (nutrients == null) return 0;
+
+        var nutrient = nutrients.FirstOrDefault(n => 
+            n.NutrientName != null && 
+            n.NutrientName.Contains(namePart, StringComparison.OrdinalIgnoreCase));
+            
+        return nutrient?.Value ?? 0;
+    }
+}

@@ -50,12 +50,15 @@ public class RecipeManagerTests
             Amount = 10,
             Product = new ProductDto 
             { 
-                ExternalId = "123",
+                ExternalId = "12345",
                 Name = "Salt", 
-                Calories = 0, 
-                Protein = 0, 
-                Carbs = 0, 
-                Fat = 0 
+                Calories = 0,
+                Protein = 0,
+                Carbs = 0,
+                Fat = 0,
+                
+                ServingUnit = "g",
+                ServingSize = 100
             }
         });
 

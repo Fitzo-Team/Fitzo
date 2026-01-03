@@ -15,6 +15,21 @@ namespace Fitzo.API.Entities
             return Components.Sum(c => c.CalculateCalories());
         }
 
+        public override double CalculateProtein()
+        {
+            return Components.Sum(c => c.CalculateProtein());
+        }
+
+        public override double CalculateFat()
+        {
+            return Components.Sum(c => c.CalculateFat());
+        }
+
+        public override double CalculateCarbs()
+        {
+            return Components.Sum(c => c.CalculateCarbs());
+        }
+
         public void AddComponent(RecipeComponent component)
         {
             Components.Add(component);

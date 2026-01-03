@@ -38,7 +38,7 @@ public class OffAdapter : INutritionProvider
         }
     }
 
-    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
+    public virtual async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
     {
         var sb = new StringBuilder("cgi/search.pl?action=process&json=true");
 

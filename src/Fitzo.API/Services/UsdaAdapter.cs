@@ -16,7 +16,7 @@ public class UsdaAdapter : INutritionProvider
         _apiKey = configuration["UsdaApiKey"] ?? throw new ArgumentNullException("Brakuje klucza USDA API!");
     }
 
-    public async Task<ProductDto?> GetProductAsync(string id)
+    public virtual async Task<ProductDto?> GetProductAsync(string id)
     {
         var cleanId = id.StartsWith("usda:") ? id.Substring(5) : id;
 
@@ -36,7 +36,7 @@ public class UsdaAdapter : INutritionProvider
         }
     }
 
-    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
+    public virtual async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
     {
         if (string.IsNullOrWhiteSpace(filter.Query))
         {

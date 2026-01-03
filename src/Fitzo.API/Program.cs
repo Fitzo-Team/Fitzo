@@ -94,8 +94,9 @@ builder.Services.AddScoped<INutritionProvider>(provider =>
 {
     var hybridProvider = provider.GetRequiredService<HybridNutritionProvider>();
     var memoryCache = provider.GetRequiredService<IMemoryCache>();
+    var logger = provider.GetRequiredService<ILogger<CachingNutritionProxy>>();
 
-    return new CachingNutritionProxy(hybridProvider, memoryCache);
+    return new CachingNutritionProxy(hybridProvider, memoryCache, logger);
 });
 
 

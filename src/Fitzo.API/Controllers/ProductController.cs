@@ -1,7 +1,6 @@
 using Fitzo.API.Interfaces;
 using Fitzo.Shared.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Fitzo.API.Controllers;
 
@@ -9,31 +8,36 @@ namespace Fitzo.API.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-    private readonly INutritionProvider nutritionProvider;
+    private readonly INutritionProvider _nutritionProvider;
 
-    public ProductController(INutritionProvider _nutritionProvider)
+    public ProductController(INutritionProvider nutritionProvider)
     {
-        nutritionProvider = _nutritionProvider;
+        _nutritionProvider = nutritionProvider;
     }
 
-    [HttpGet("{query}")]
-    public async Task<IActionResult> GetProduct(string query)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProduct(string id)
     {
-        var Product = await nutritionProvider.GetProductAsync(query);
-        if(Product == null)
-            return NotFound($"Nie znaleziono produktu dla zapytania: {query}");
+        var decodedId = Uri.UnescapeDataString(id); 
 
-        return Ok(Product);
+        var product = await _nutritionProvider.GetProductAsync(decodedId);
+        
+        if (product == null)
+            return NotFound($"Nie znaleziono produktu o ID: {decodedId}");
+
+        return Ok(product);
     }
+
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string query)
+    public async Task<IActionResult> Search([FromQuery] ProductSearchFilterDto filter)
     {
-        if (query.IsNullOrEmpty())
+        if (string.IsNullOrWhiteSpace(filter.Query) && string.IsNullOrWhiteSpace(filter.Category))
         {
-            return BadRequest("Musisz podać nazwe produktu");
+            return BadRequest("Musisz podać nazwę produktu lub wybrać kategorię.");
         }
 
-        var results = await nutritionProvider.SearchProductsAsync(query);
+        var results = await _nutritionProvider.SearchProductsAsync(filter);
+        
         return Ok(results);
     }
 }

@@ -1,5 +1,3 @@
-using System.Net.Http.Json;
-using System.Net.Http.Headers;
 using Fitzo.API.Interfaces;
 using Fitzo.Shared.Dtos;
 
@@ -7,54 +5,59 @@ namespace Fitzo.API.Services;
 
 public class HybridNutritionProvider : INutritionProvider
 {
-    private readonly UsdaAdapter usdaAdapter;
-    private readonly OffAdapter offAdapter;
-    public HybridNutritionProvider(UsdaAdapter _usdaAdapter, OffAdapter _offAdapter)
+    private readonly UsdaAdapter _usdaAdapter;
+    private readonly OffAdapter _offAdapter;
+    private readonly ILogger<HybridNutritionProvider> _logger;
+
+    public HybridNutritionProvider(UsdaAdapter usdaAdapter, OffAdapter offAdapter, ILogger<HybridNutritionProvider> logger)
     {
-        usdaAdapter = _usdaAdapter;
-        offAdapter = _offAdapter;
+        _usdaAdapter = usdaAdapter;
+        _offAdapter = offAdapter;
+        _logger = logger;
     }
 
-    public async Task<ProductDto> GetProductAsync(string query)
+    public async Task<ProductDto?> GetProductAsync(string id)
     {
-        //kod kreskowy to same cyfry
-        bool isBarcode = long.TryParse(query, out _);
+        if (id.StartsWith("off:")) return await _offAdapter.GetProductAsync(id);
+        if (id.StartsWith("usda:")) return await _usdaAdapter.GetProductAsync(id);
+        
+        return null;
+    }
 
-        if (isBarcode)
+    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
+    {
+        var tasks = new List<Task<IEnumerable<ProductDto>>>();
+
+        tasks.Add(SafeSearch(_offAdapter, filter));
+
+        if (!filter.HasAdvancedFilters)
         {
-            Console.WriteLine($"[HybridProvider] Wykryto kod kreskowy: {query}. Używanie Off");
-            return await offAdapter.GetProductAsync(query);
+            tasks.Add(SafeSearch(_usdaAdapter, filter));
         }
-        else
+
+        await Task.WhenAll(tasks);
+
+        var results = new List<ProductDto>();
+
+        foreach (var task in tasks)
         {
-            Console.WriteLine($"[HybridProvider] Nie wykryto kodu kreskowego: {query}. Używanie usda");
-            return await usdaAdapter.GetProductAsync(query);
+            results.AddRange(task.Result);
         }
+
+        return results;
     }
 
-    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string query)
-    {
-        var offTask = SafeSearch(offAdapter, query);
-        var usdaTask = SafeSearch(usdaAdapter, query);
-
-        await Task.WhenAll(offTask, usdaTask);
-
-        var offResults = await offTask;
-        var usdaResults = await usdaTask;
-
-        return usdaResults.Concat(offResults);
-    }
-
-    public async Task<IEnumerable<ProductDto>> SafeSearch(INutritionProvider provider, string query)
+    private async Task<IEnumerable<ProductDto>> SafeSearch(INutritionProvider provider, ProductSearchFilterDto filter)
     {
         try
-    {
-        return await provider.SearchProductsAsync(query);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"[HybridProvider] Błąd w jednym z adapterów: {ex.Message}");
-        return Enumerable.Empty<ProductDto>();
-    }
+        {
+            return await provider.SearchProductsAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Błąd w adapterze {ProviderName}", provider.GetType().Name);
+            
+            return Enumerable.Empty<ProductDto>();
+        }
     }
 }

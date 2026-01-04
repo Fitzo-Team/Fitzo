@@ -17,6 +17,8 @@ public class FitzoDbContext : IdentityDbContext<UserIdentity, IdentityRole<Guid>
     public DbSet<UserProfile> UserProfiles { get; set; }
 
     public DbSet<MealPlanEntry> MealPlans { get; set; }
+    public DbSet<FoodEntry> FoodEntries { get; set; }
+    public DbSet<WeightEntry> WeightEntries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,5 +36,9 @@ public class FitzoDbContext : IdentityDbContext<UserIdentity, IdentityRole<Guid>
                 .HasMany(r => r.Components)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<FoodEntry>()
+                .OwnsOne(e => e.ProductEntry);
+
         }
 }

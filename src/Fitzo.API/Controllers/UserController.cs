@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Fitzo.Shared.Enums;
 using Fitzo.API.Entities;
-using Fitzo.API.Data;     
+using Fitzo.API.Data;
 using Fitzo.API.Services; 
 using Fitzo.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;

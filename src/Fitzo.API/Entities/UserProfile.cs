@@ -9,7 +9,7 @@ public class UserProfile
     [Key]
     public int Id { get; set; }
     public Guid UserId { get; set; }
-
+    public DateTime Createdate {get; set;} = DateTime.Now;
     public double Weight { get; set; } 
 
     public double Height { get; set; } 

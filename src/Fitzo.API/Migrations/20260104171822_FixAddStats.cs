@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     /// <inheritdoc />
-    public partial class RebuildDatabaseForRecipesV2 : Migration
+    public partial class FixAddStats : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,6 +54,41 @@ namespace Fitzo.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FoodEntries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    MealType = table.Column<int>(type: "integer", nullable: false),
+                    ProductEntry_ExternalId = table.Column<string>(type: "text", nullable: false),
+                    ProductEntry_Name = table.Column<string>(type: "text", nullable: false),
+                    ProductEntry_brand = table.Column<string>(type: "text", nullable: true),
+                    ProductEntry_ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    ProductEntry_Calories = table.Column<double>(type: "double precision", nullable: false),
+                    ProductEntry_Protein = table.Column<double>(type: "double precision", nullable: false),
+                    ProductEntry_Fat = table.Column<double>(type: "double precision", nullable: false),
+                    ProductEntry_Carbs = table.Column<double>(type: "double precision", nullable: false),
+                    ProductEntry_Category = table.Column<int>(type: "integer", nullable: false),
+                    ProductEntry_ServingSize = table.Column<double>(type: "double precision", nullable: true),
+                    ProductEntry_ServingUnit = table.Column<string>(type: "text", nullable: false),
+                    ProductEntry_NutriScore = table.Column<string>(type: "text", nullable: true),
+                    ProductEntry_EcoScore = table.Column<string>(type: "text", nullable: true),
+                    ProductEntry_HasPalmOil = table.Column<bool>(type: "boolean", nullable: true),
+                    ProductEntry_labels = table.Column<List<string>>(type: "text[]", nullable: false),
+                    ProductEntry_Allergens = table.Column<List<string>>(type: "text[]", nullable: false),
+                    ProductEntry_DataQualityMessages = table.Column<List<string>>(type: "text[]", nullable: false),
+                    ProductEntry_IsDataComplete = table.Column<bool>(type: "boolean", nullable: false),
+                    Amount = table.Column<double>(type: "double precision", nullable: false),
+                    OriginalRecipeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    OriginRecipeName = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodEntries", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RecipeComponents",
                 columns: table => new
                 {
@@ -69,6 +104,7 @@ namespace Fitzo.API.Migrations
                     Product_Protein = table.Column<double>(type: "double precision", nullable: true),
                     Product_Fat = table.Column<double>(type: "double precision", nullable: true),
                     Product_Carbs = table.Column<double>(type: "double precision", nullable: true),
+                    Product_Category = table.Column<int>(type: "integer", nullable: true),
                     Product_ServingSize = table.Column<double>(type: "double precision", nullable: true),
                     Product_ServingUnit = table.Column<string>(type: "text", nullable: true),
                     Product_NutriScore = table.Column<string>(type: "text", nullable: true),
@@ -101,6 +137,7 @@ namespace Fitzo.API.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Createdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Weight = table.Column<double>(type: "double precision", nullable: false),
                     Height = table.Column<double>(type: "double precision", nullable: false),
                     Age = table.Column<int>(type: "integer", nullable: false),
@@ -109,6 +146,20 @@ namespace Fitzo.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserProfiles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WeightEntries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Value = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WeightEntries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -307,10 +358,16 @@ namespace Fitzo.API.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "FoodEntries");
+
+            migrationBuilder.DropTable(
                 name: "MealPlans");
 
             migrationBuilder.DropTable(
                 name: "UserProfiles");
+
+            migrationBuilder.DropTable(
+                name: "WeightEntries");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

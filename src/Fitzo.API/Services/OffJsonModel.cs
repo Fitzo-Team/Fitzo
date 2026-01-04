@@ -37,6 +37,9 @@ public class OffProduct
     [JsonPropertyName("states_tags")]
     public List<string>? StatesTags { get; set; }
 
+    [JsonPropertyName("categories_tags")] 
+    public List<string>? CategoriesTags { get; set; }
+
     [JsonPropertyName("allergens_tags")]
     public List<string>? AllergensTags { get; set; }
 

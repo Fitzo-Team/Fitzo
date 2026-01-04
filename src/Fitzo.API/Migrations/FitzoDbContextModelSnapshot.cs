@@ -23,6 +23,35 @@ namespace Fitzo.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Fitzo.API.Entities.FoodEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MealType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("OriginRecipeName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("OriginalRecipeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FoodEntries");
+                });
+
             modelBuilder.Entity("Fitzo.API.Entities.MealPlanEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -162,6 +191,9 @@ namespace Fitzo.API.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Createdate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
@@ -177,6 +209,26 @@ namespace Fitzo.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("Fitzo.API.Entities.WeightEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WeightEntries");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -336,6 +388,85 @@ namespace Fitzo.API.Migrations
                     b.HasDiscriminator().HasValue("Recipe");
                 });
 
+            modelBuilder.Entity("Fitzo.API.Entities.FoodEntry", b =>
+                {
+                    b.OwnsOne("Fitzo.Shared.Dtos.ProductDto", "ProductEntry", b1 =>
+                        {
+                            b1.Property<Guid>("FoodEntryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<List<string>>("Allergens")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.Property<double>("Calories")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double>("Carbs")
+                                .HasColumnType("double precision");
+
+                            b1.Property<int>("Category")
+                                .HasColumnType("integer");
+
+                            b1.Property<List<string>>("DataQualityMessages")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.Property<string>("EcoScore")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("ExternalId")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<double>("Fat")
+                                .HasColumnType("double precision");
+
+                            b1.Property<bool?>("HasPalmOil")
+                                .HasColumnType("boolean");
+
+                            b1.Property<string>("ImageUrl")
+                                .HasColumnType("text");
+
+                            b1.Property<bool>("IsDataComplete")
+                                .HasColumnType("boolean");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("NutriScore")
+                                .HasColumnType("text");
+
+                            b1.Property<double>("Protein")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double?>("ServingSize")
+                                .HasColumnType("double precision");
+
+                            b1.Property<string>("ServingUnit")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("brand")
+                                .HasColumnType("text");
+
+                            b1.Property<List<string>>("labels")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.HasKey("FoodEntryId");
+
+                            b1.ToTable("FoodEntries");
+
+                            b1.WithOwner()
+                                .HasForeignKey("FoodEntryId");
+                        });
+
+                    b.Navigation("ProductEntry")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Fitzo.API.Entities.MealPlanEntry", b =>
                 {
                     b.HasOne("Fitzo.API.Entities.Recipe", "Recipe")
@@ -422,6 +553,9 @@ namespace Fitzo.API.Migrations
 
                             b1.Property<double>("Carbs")
                                 .HasColumnType("double precision");
+
+                            b1.Property<int>("Category")
+                                .HasColumnType("integer");
 
                             b1.Property<List<string>>("DataQualityMessages")
                                 .IsRequired()

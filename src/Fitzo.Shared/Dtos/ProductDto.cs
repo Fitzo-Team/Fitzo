@@ -2,7 +2,6 @@ using Fitzo.Shared.Enums;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Fitzo.Shared.Dtos;
-[ExcludeFromCodeCoverage]
 public class ProductDto
 {
     public string ExternalId { get; set; } = string.Empty;
@@ -15,6 +14,7 @@ public class ProductDto
     public double Protein { get; set; }
     public double Fat { get; set; }
     public double Carbs { get; set; }
+    public FoodCategories Category {get; set;} = FoodCategories.Unknown;
 
     public double? ServingSize {get; set;}
     public string ServingUnit {get; set;}

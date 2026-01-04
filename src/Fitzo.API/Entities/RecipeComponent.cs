@@ -1,5 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace Fitzo.API.Entities
 {
+    [JsonDerivedType(typeof(Recipe), typeDiscriminator: "Recipe")]
+    [JsonDerivedType(typeof(Ingredient), typeDiscriminator: "Ingredient")]
     public abstract class RecipeComponent
     {
         public Guid Id { get; set; } = Guid.NewGuid();

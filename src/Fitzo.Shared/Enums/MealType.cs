@@ -2,7 +2,10 @@ namespace Fitzo.Shared.Enums;
 
 public enum MealType
 {
-    Breakfast,
+    Breakfast = 0,
+    SecondBreakfast,
     Lunch,
-    Dinner
+    Dinner,
+    Snack,
+    Supper
 }

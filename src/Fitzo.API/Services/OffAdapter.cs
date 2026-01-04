@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using Fitzo.API.Interfaces;
 using Fitzo.Shared.Dtos;
 using System.Text;
+using Ftizo.API.Services;
 
 namespace Fitzo.API.Services;
 
@@ -19,7 +20,7 @@ public class OffAdapter : INutritionProvider
     {
         var cleanId = id.StartsWith("off:") ? id.Substring(4) : id;
 
-        var url = $"api/v0/product/{cleanId}.json?fields=code,product_name,brands,image_url,nutriments,nutrition_grades,ecoscore_grade,ingredients_from_palm_oil_n,allergens_tags,labels_tags,serving_quantity,states_tags";
+        var url = $"api/v0/product/{cleanId}.json?fields=code,product_name,brands,image_url,nutriments,nutrition_grades,ecoscore_grade,ingredients_from_palm_oil_n,allergens_tags,labels_tags,serving_quantity,states_tags,categories_tags";
 
         try
         {
@@ -108,7 +109,8 @@ public class OffAdapter : INutritionProvider
           ServingSize = source.ServingQuantity,
           ServingUnit = "g",
           DataQualityMessages = QualityMessages,
-          IsDataComplete = isComplete
+          IsDataComplete = isComplete,
+          Category = CategoryMapper.MapFromOffTags(source.CategoriesTags)
         };
     }
 

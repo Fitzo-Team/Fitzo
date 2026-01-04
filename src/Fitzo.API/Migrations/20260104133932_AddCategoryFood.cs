@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     /// <inheritdoc />
-    public partial class RebuildDatabaseForRecipesV2 : Migration
+    public partial class AddCategoryFood : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,6 +69,7 @@ namespace Fitzo.API.Migrations
                     Product_Protein = table.Column<double>(type: "double precision", nullable: true),
                     Product_Fat = table.Column<double>(type: "double precision", nullable: true),
                     Product_Carbs = table.Column<double>(type: "double precision", nullable: true),
+                    Product_Category = table.Column<int>(type: "integer", nullable: true),
                     Product_ServingSize = table.Column<double>(type: "double precision", nullable: true),
                     Product_ServingUnit = table.Column<string>(type: "text", nullable: true),
                     Product_NutriScore = table.Column<string>(type: "text", nullable: true),

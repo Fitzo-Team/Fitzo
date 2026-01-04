@@ -423,6 +423,9 @@ namespace Fitzo.API.Migrations
                             b1.Property<double>("Carbs")
                                 .HasColumnType("double precision");
 
+                            b1.Property<int>("Category")
+                                .HasColumnType("integer");
+
                             b1.Property<List<string>>("DataQualityMessages")
                                 .IsRequired()
                                 .HasColumnType("text[]");

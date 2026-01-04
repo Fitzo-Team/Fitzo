@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Fitzo.API.Interfaces;
 using Fitzo.Shared.Dtos;
+using Ftizo.API.Services;
 using Microsoft.Extensions.Configuration;
 
 namespace Fitzo.API.Services;
@@ -89,7 +90,7 @@ public class UsdaAdapter : INutritionProvider
             HasPalmOil = null,
             labels = new List<string>(),
             Allergens = new List<string>(),
-
+            Category = CategoryMapper.MapFromUsdaTags(item.FoodCategory),
             IsDataComplete = true,
             DataQualityMessages = new List<string> 
             { 

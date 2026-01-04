@@ -25,6 +25,9 @@ public class UsdaFoodItem
     [JsonPropertyName("brandName")]
     public string? BrandName { get; set; }
 
+    [JsonPropertyName("foodCategory")] 
+    public string? FoodCategory { get; set; }
+
     [JsonPropertyName("foodNutrients")]
     public List<UsdaNutrient> FoodNutrients { get; set; } = new();
 }

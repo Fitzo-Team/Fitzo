@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     [DbContext(typeof(FitzoDbContext))]
-    [Migration("20260103164618_RebuildDatabaseForRecipesV2")]
-    partial class RebuildDatabaseForRecipesV2
+    [Migration("20260104133932_AddCategoryFood")]
+    partial class AddCategoryFood
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -425,6 +425,9 @@ namespace Fitzo.API.Migrations
 
                             b1.Property<double>("Carbs")
                                 .HasColumnType("double precision");
+
+                            b1.Property<int>("Category")
+                                .HasColumnType("integer");
 
                             b1.Property<List<string>>("DataQualityMessages")
                                 .IsRequired()

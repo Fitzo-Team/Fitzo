@@ -7,6 +7,7 @@ namespace Fitzo.API.Entities
         public Guid OwnerId { get; set; }
         public string? ImageUrl { get; set; }
         public List<DietTag> Tags { get; set; } = new();
+        public string? Description { get; set; }
 
         public List<RecipeComponent> Components { get; set; } = new();
 

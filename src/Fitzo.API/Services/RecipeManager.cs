@@ -36,5 +36,19 @@ namespace Fitzo.API.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task UpdateRecipeImageAsync(Guid recipeId, string fileName)
+        {
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == recipeId);
+            
+            if (recipe is null)
+            {
+                throw new Exception("Nie znaleziono przepisu.");
+            }
+
+            recipe.ImageUrl = fileName;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

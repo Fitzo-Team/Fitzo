@@ -55,4 +55,31 @@ public class RecipeProtectionProxy : IRecipeManager
         }
         await _innerManager.DeleteRecipeAsync(id);
     }
+
+    public async Task UpdateRecipeImageAsync(Guid id, string fileName)
+    {
+        var role = _userContext.GetCurrentUserRole();
+        var currentUserId = _userContext.GetCurrentUserId();
+
+        if (role == UserRole.Admin)
+        {
+            await _innerManager.UpdateRecipeImageAsync(id, fileName);
+            return;
+        }
+
+        var recipe = await _innerManager.GetRecipeByIdAsync(id);
+
+        if (recipe == null)
+        {
+            return;
+        }
+
+        if (recipe.OwnerId != currentUserId)
+        {
+            Console.WriteLine($"[SECURITY] User {currentUserId} próbował zmienić zdjęcie przepisu {id} należącego do {recipe.OwnerId}");
+            throw new UnauthorizedAccessException("Nie masz uprawnień do edycji tego przepisu.");
+        }
+
+        await _innerManager.UpdateRecipeImageAsync(id, fileName);
+    }
 }

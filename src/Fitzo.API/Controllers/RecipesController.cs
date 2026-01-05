@@ -53,7 +53,7 @@ namespace Fitzo.API.Controllers;
         }
 
         [HttpDelete("{id}")]
-public async Task<IActionResult> DeleteRecipe(Guid id)
+        public async Task<IActionResult> DeleteRecipe(Guid id)
         {
             var recipe = await _recipeManager.GetRecipeByIdAsync(id);
 

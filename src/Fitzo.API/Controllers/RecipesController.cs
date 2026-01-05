@@ -53,11 +53,31 @@ namespace Fitzo.API.Controllers;
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRecipe(Guid id)
+public async Task<IActionResult> DeleteRecipe(Guid id)
         {
+            var recipe = await _recipeManager.GetRecipeByIdAsync(id);
+
+            if (recipe == null)
+            {
+                return NotFound();
+            }
+
             try
             {
                 await _recipeManager.DeleteRecipeAsync(id);
+
+                if (!string.IsNullOrEmpty(recipe.ImageUrl))
+                {
+                    try 
+                    {
+                        await _recipeService.DeleteRecipeImage(recipe.ImageUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[WARNING] Nie udało się usunąć obrazów dla przepisu {id}: {ex.Message}");
+                    }
+                }
+
                 return NoContent();
             }
             catch (UnauthorizedAccessException)

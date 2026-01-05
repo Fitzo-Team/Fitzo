@@ -11,7 +11,7 @@ public abstract class BlobStorageService
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task UploadBlobAsync(string containerName, string blobName, Stream data, string contentType)
+    public virtual async Task UploadBlobAsync(string containerName, string blobName, Stream data, string contentType)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         await containerClient.CreateIfNotExistsAsync();
@@ -29,14 +29,14 @@ public abstract class BlobStorageService
         });
     }
 
-    public async Task DownloadBlobAsync(string containerName, string blobName, Stream destination)
+    public virtual async Task DownloadBlobAsync(string containerName, string blobName, Stream destination)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = containerClient.GetBlobClient(blobName);
         await blobClient.DownloadToAsync(destination);
     }
 
-    public async Task DeleteBlobAsync(string containerName, string blobName)
+    public virtual async Task DeleteBlobAsync(string containerName, string blobName)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = containerClient.GetBlobClient(blobName);

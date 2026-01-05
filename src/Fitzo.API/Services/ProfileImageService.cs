@@ -11,7 +11,7 @@ public class ProfileImageService : BlobStorageService
     {
         
     }
-    public async Task EnsureContainerExistAsync()
+    public virtual async Task EnsureContainerExistAsync()
     {
         await _blobServiceClient.GetBlobContainerClient(UploadContainerName).CreateIfNotExistsAsync();
         

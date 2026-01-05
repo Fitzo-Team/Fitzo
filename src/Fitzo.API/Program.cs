@@ -148,6 +148,8 @@ builder.Services.AddTransient<RecipeValidationHandler>(provider =>
 builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<ExportImportService>();
 
+builder.Services.AddScoped<IShoppingListGenerator, ShoppingListGenerator>();
+
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Fitzo API", Version = "v1" });

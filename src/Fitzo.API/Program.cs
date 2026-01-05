@@ -98,7 +98,9 @@ builder.Services.AddAzureClients(clientBuilder =>
     clientBuilder.AddBlobServiceClient(builder.Configuration.GetConnectionString("AzureWebJobsStorage"));
 });
 builder.Services.AddScoped<RecipeImageService>();
+builder.Services.AddScoped<ProfileImageService>();
 builder.Services.AddScoped<RecipeService>();
+builder.Services.AddScoped<ImageAvatarService>();
 
 
 builder.Services.AddScoped<HybridNutritionProvider>();

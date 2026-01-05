@@ -60,7 +60,8 @@ public async Task<IdentityResult> RegisterAsync(RegisterDto dto)
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("picture", user.AvatarUrl ?? "")
         };
 
         var token = new JwtSecurityToken(

@@ -22,4 +22,13 @@ public class RecipeService
 
         return uniqueFileName;
     }
+
+    public async Task DeleteRecipeImage(string imageName)
+    {
+        if(imageName == null)
+            return;
+        
+        await _imageService.DeleteBlobAsync("uploads", imageName);
+        await _imageService.DeleteBlobAsync("uploads-thumbnails", imageName);
+    }
 }

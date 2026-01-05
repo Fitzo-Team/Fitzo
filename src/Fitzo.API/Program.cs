@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Encodings.Web;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +92,14 @@ builder.Services.AddHttpClient<UsdaAdapter>(client =>
 {
     client.BaseAddress = new Uri("https://api.nal.usda.gov/");
 });
+
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration.GetConnectionString("AzureWebJobsStorage"));
+});
+builder.Services.AddScoped<RecipeImageService>();
+builder.Services.AddScoped<RecipeService>();
+
 
 builder.Services.AddScoped<HybridNutritionProvider>();
 builder.Services.AddScoped<INutritionProvider>(provider =>

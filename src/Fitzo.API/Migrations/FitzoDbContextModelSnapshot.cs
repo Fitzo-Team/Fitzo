@@ -375,6 +375,9 @@ namespace Fitzo.API.Migrations
                 {
                     b.HasBaseType("Fitzo.API.Entities.RecipeComponent");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 

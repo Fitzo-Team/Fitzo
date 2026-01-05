@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     /// <inheritdoc />
-    public partial class FixAddStats : Migration
+    public partial class CleaningUp : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -117,7 +117,8 @@ namespace Fitzo.API.Migrations
                     Amount = table.Column<double>(type: "double precision", nullable: true),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: true),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    Tags = table.Column<int[]>(type: "integer[]", nullable: true)
+                    Tags = table.Column<int[]>(type: "integer[]", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

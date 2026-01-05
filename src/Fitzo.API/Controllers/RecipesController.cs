@@ -1,6 +1,7 @@
 using Fitzo.API.Entities;
 using Fitzo.API.Interfaces;
 using Fitzo.API.Patterns;
+using Fitzo.API.Services;
 using Fitzo.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,15 @@ namespace Fitzo.API.Controllers;
     {
         private readonly RecipeDirector _director;
         private readonly IRecipeManager _recipeManager;
+        private readonly RecipeService _recipeService;
+        private readonly IConfiguration _configuration;
 
-        public RecipesController(RecipeDirector director, IRecipeManager recipeManager)
+        public RecipesController(RecipeDirector director, IRecipeManager recipeManager, RecipeService recipeService, IConfiguration configuration)
         {
             _director = director;
             _recipeManager = recipeManager;
+            _recipeService = recipeService;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -61,13 +66,53 @@ namespace Fitzo.API.Controllers;
             }
         }
 
+        [HttpPost("{id}/image")]
+        public async Task<IActionResult> UploadImage([FromRoute] Guid id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Brak pliku do przesłania.");
+            }
+
+            var recipe = await _recipeManager.GetRecipeByIdAsync(id);
+            if (recipe == null)
+            {
+                return NotFound("Nie znaleziono przepisu.");
+            }
+
+            var uploadedFileName = await _recipeService.UploadRecipeImage(file);
+
+            await _recipeManager.UpdateRecipeImageAsync(id, uploadedFileName);
+
+            var fullUrl = GetFullBlobUrl(uploadedFileName);
+
+            return Ok(new { ImageUrl = fullUrl });
+        }
+
+        private string GetFullBlobUrl(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName)) return null;
+
+            var baseUrl = _configuration["BlobStorageSettings: ImagesUrl"];
+            //"http://127.0.0.1:10000/devstoreaccount1/uploads";
+            return $"{baseUrl}/{fileName}";
+        }
+
+        private string GetThumbnailBlobUrl(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName)) return null;
+
+            var baseUrl = _configuration["BlobStorageSettings:ThumbnailsUrl"];
+            return $"{baseUrl}/{fileName}";
+        }
         private object MapRecipeToDto(Recipe recipe)
         {
             return new
             {
                 recipe.Id,
                 recipe.Name,
-                recipe.ImageUrl,
+                ImageUrl = GetFullBlobUrl(recipe.ImageUrl),
+                ThumbnailUrl = GetThumbnailBlobUrl(recipe.ImageUrl),
                 recipe.Tags,
                 
                 TotalCalories = recipe.CalculateCalories(),

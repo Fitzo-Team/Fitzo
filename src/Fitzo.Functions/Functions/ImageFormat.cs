@@ -16,30 +16,31 @@ public class ImageResizer
 
     [Function(nameof(ImageResizer))]
     [BlobOutput("uploads-thumbnails/{name}")]
-    public async Task<byte[]> Run( [BlobTrigger("uploads/{name}")] byte[] imageBytes,string name)
+    public async Task<byte[]> Run(
+        [BlobTrigger("uploads/{name}")] byte[] imageStream, string name)
     {
-        logger.LogInformation($"Rozpoczynam przetwarzanie zdjęcia: {name} ({imageBytes.Length} bytes)");
+        logger.LogInformation($"Przetwarzanie: {name}");
 
         try
         {
-            using(Image image = Image.Load(imageBytes))
+            using (Image image = Image.Load(imageStream)) 
+            {
+                image.Mutate(x => x.Resize(new ResizeOptions
                 {
-                    image.Mutate(x => x.Resize(new ResizeOptions
-                    {
-                        Size = new Size(300, 300),
-                        Mode = ResizeMode.Max
-                    }));
+                    Size = new Size(300, 300),
+                    Mode = ResizeMode.Max
+                }));
 
-                    using (var ms = new MemoryStream())
-                    {
-                        await image.SaveAsJpegAsync(ms);
-                        return ms.ToArray();
-                    }
+                using (var ms = new MemoryStream())
+                {
+                    await image.SaveAsJpegAsync(ms);
+                    return ms.ToArray();
                 }
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError($"Blad podczas przetwarzania {name}: {ex.Message}");
+            logger.LogError($"Błąd: {ex.Message}");
             throw;
         }
     }

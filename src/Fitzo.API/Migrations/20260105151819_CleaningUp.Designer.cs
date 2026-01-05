@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fitzo.API.Migrations
 {
     [DbContext(typeof(FitzoDbContext))]
-    [Migration("20260104171822_FixAddStats")]
-    partial class FixAddStats
+    [Migration("20260105151819_CleaningUp")]
+    partial class CleaningUp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -377,6 +377,9 @@ namespace Fitzo.API.Migrations
             modelBuilder.Entity("Fitzo.API.Entities.Recipe", b =>
                 {
                     b.HasBaseType("Fitzo.API.Entities.RecipeComponent");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");

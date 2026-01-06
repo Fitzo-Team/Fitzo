@@ -14,7 +14,6 @@ namespace Fitzo.API.Controllers;
 public class WeightController : ControllerBase
 {
     private readonly FitzoDbContext _context;
-
     public WeightController(FitzoDbContext context)
     {
         _context = context;
@@ -29,7 +28,8 @@ public class WeightController : ControllerBase
         var entry = new WeightEntry
         {
             UserId = userId,
-            Date = dto.Date,
+            Date = dto.Date.Kind == DateTimeKind.Unspecified 
+            ? DateTime.SpecifyKind(dto.Date, DateTimeKind.Utc) : dto.Date.ToUniversalTime(),
             Value = dto.Weight
         };
 

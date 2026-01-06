@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;  
 using Fitzo.API.Data;
+using FluentAssertions;
 namespace Fitzo.API.Controllers
 {
     [Authorize]
@@ -46,6 +47,10 @@ namespace Fitzo.API.Controllers
         public async Task<IActionResult> GetWeeklyPlan([FromQuery] DateTime? date)
         {
             var referenceDate = date ?? DateTime.UtcNow;
+            if (referenceDate.Kind == DateTimeKind.Unspecified)
+            {
+                referenceDate = DateTime.SpecifyKind(referenceDate, DateTimeKind.Utc);
+            }
 
             var diff = referenceDate.DayOfWeek - DayOfWeek.Monday;
             if (diff < 0) diff += 7;
@@ -61,20 +66,25 @@ namespace Fitzo.API.Controllers
         [HttpGet("shopping-list")]
         public async Task<ActionResult<List<ShoppingListItem>>> GetShoppingList([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
-
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdString, out var userId))
             {
                 return Unauthorized();
             }
 
-            var start = startDate ?? DateTime.Today;
+            var start = startDate ?? DateTime.UtcNow.Date; 
+            if (start.Kind == DateTimeKind.Unspecified) 
+                start = DateTime.SpecifyKind(start, DateTimeKind.Utc);
+
             var end = endDate ?? start.AddDays(7);
+            if (end.Kind == DateTimeKind.Unspecified) 
+                end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
 
             var mealPlanEntries = await _context.MealPlans
                 .Where(mp => mp.UserId == userId && mp.Date >= start && mp.Date <= end)
                 .Include(mp => mp.Recipe)
                     .ThenInclude(r => r.Components)
+                        .ThenInclude(c => ((Ingredient)c).Product)
                 .ToListAsync();
 
             if (!mealPlanEntries.Any())

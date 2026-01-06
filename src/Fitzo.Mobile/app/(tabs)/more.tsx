@@ -49,21 +49,22 @@ export default function MoreScreen() {
       </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        
         <TouchableOpacity 
             className="flex-row items-center mx-5 p-4 bg-brand-card rounded-2xl border border-brand-accent mb-6 shadow-md"
             onPress={() => router.push('/profile')}
         >
             <View className="w-14 h-14 bg-brand-vivid rounded-full items-center justify-center border border-brand-light">
-                {userToken && userData ? (
-                   <Text className="text-white text-xl font-bold">{userData.username.charAt(0).toUpperCase()}</Text>
+                {userToken && userData?.username ? (
+                   <Text className="text-white text-xl font-bold">
+                     {userData.username.charAt(0).toUpperCase()}
+                   </Text>
                 ) : (
                    <Ionicons name="person" size={24} color="white" />
                 )}
             </View>
             <View className="ml-4 flex-1">
                 <Text className="text-brand-text font-bold text-lg">
-                    {userToken ? userData?.username : 'Profil Gościa'}
+                    {userToken ? (userData?.username || 'Użytkownik') : 'Profil Gościa'}
                 </Text>
                 <Text className="text-brand-muted text-xs">
                     {userToken ? 'Zobacz swój profil i statystyki' : 'Zaloguj się, aby zapisać dane'}
@@ -95,7 +96,12 @@ export default function MoreScreen() {
           title="Ustawienia"
           onPress={() => {}}
         />
-        
+         <MenuRow 
+          icon={<MaterialCommunityIcons name="star-four-points-outline" size={24} color="#FF9100" />}
+          title="Fitzo Premium"
+          subtitle="Dodatkowe funkcje AI"
+          onPress={() => {}}
+        />
          <MenuRow 
           icon={<Ionicons name="share-outline" size={24} color="#E0AAFF" />}
           title="Eksport danych"
@@ -112,7 +118,7 @@ export default function MoreScreen() {
           title="Zgody i prywatność"
           onPress={() => {}}
         />
-        
+
         {userToken && (
             <MenuRow 
             icon={<Ionicons name="log-out-outline" size={24} color="#EF4444" />}

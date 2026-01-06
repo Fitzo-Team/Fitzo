@@ -29,7 +29,8 @@ public class WeightController : ControllerBase
         var entry = new WeightEntry
         {
             UserId = userId,
-            Date = dto.Date,
+            Date = dto.Date.Kind == DateTimeKind.Unspecified 
+            ? DateTime.SpecifyKind(dto.Date, DateTimeKind.Utc) : dto.Date.ToUniversalTime(),
             Value = dto.Weight
         };
 

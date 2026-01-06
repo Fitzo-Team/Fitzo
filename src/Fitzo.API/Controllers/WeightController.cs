@@ -14,7 +14,6 @@ namespace Fitzo.API.Controllers;
 public class WeightController : ControllerBase
 {
     private readonly FitzoDbContext _context;
-
     public WeightController(FitzoDbContext context)
     {
         _context = context;

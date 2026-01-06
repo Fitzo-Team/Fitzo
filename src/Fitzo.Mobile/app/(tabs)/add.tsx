@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useFood, MealType, FoodItem } from '../../Context/FoodContext';
+import { MealType, FoodItem } from '../../Types/Api';
+import { useFood } from '../../Context/FoodContext';
 
 export default function AddScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { addFood, scannedCode, setScannedCode, productHistory } = useFood();
+  const { 
+    addFood, 
+    scannedCode, 
+    setScannedCode, 
+    productHistory, 
+    searchProduct, 
+    searchResults, 
+    isLoading 
+  } = useFood();
   
   const initialMeal = (params.initialMeal as MealType) || 'Breakfast';
   const autoScan = params.startScanning === 'true';
@@ -36,31 +45,43 @@ export default function AddScreen() {
   }, []);
 
   useEffect(() => {
-    if (scannedCode) {
-      setFoodName(`Produkt (Kod: ${scannedCode})`);
-      setCalories('250'); 
-      setProtein('20'); 
-      setFat('10'); 
-      setCarbs('30');
-      
-      setIsScannerOpen(false);
-      setActiveTab('product');
-    }
+    const handleScan = async () => {
+        if (scannedCode) {
+            setIsScannerOpen(false);
+            setActiveTab('product');
+            await searchProduct(scannedCode);
+        }
+    };
+    handleScan();
   }, [scannedCode]);
+
+  useEffect(() => {
+    if (searchResults && searchResults.length > 0) {
+        const product = searchResults[0];
+        setFoodName(product.name || '');
+        setCalories(product.calories?.toString() || '0');
+        setProtein(product.protein?.toString() || '0');
+        setFat(product.fat?.toString() || '0');
+        setCarbs(product.carbs?.toString() || '0');
+    }
+  }, [searchResults]);
 
   const handleBarcodeScanned = ({ data }: { data: string }) => {
     if (!scannedCode) setScannedCode(data);
   };
 
-  const handleSaveProduct = () => {
-    if (!foodName || !calories) return;
+  const handleSaveProduct = async () => {
+    if (!foodName || !calories) {
+        Alert.alert("Wymagane dane", "Podaj nazwę i kalorie");
+        return;
+    }
     
-    addFood('2023-10-27', selectedMeal, {
+    await addFood('2023-10-27', selectedMeal, {
       name: foodName,
       calories: parseInt(calories),
-      protein: protein ? parseInt(protein) : 0,
-      fat: fat ? parseInt(fat) : 0,
-      carbs: carbs ? parseInt(carbs) : 0,
+      protein: parseFloat(protein) || 0,
+      fat: parseFloat(fat) || 0,
+      carbs: parseFloat(carbs) || 0,
       barcode: scannedCode || undefined
     });
 
@@ -68,7 +89,7 @@ export default function AddScreen() {
     router.back();
   };
 
-  const handleSaveRecipe = () => {
+  const handleSaveRecipe = async () => {
     if (!recipeName || selectedIngredients.length === 0) return;
     
     const totalCals = selectedIngredients.reduce((acc, curr) => acc + curr.calories, 0);
@@ -76,7 +97,7 @@ export default function AddScreen() {
     const totalFat = selectedIngredients.reduce((acc, curr) => acc + (curr.fat || 0), 0);
     const totalCarbs = selectedIngredients.reduce((acc, curr) => acc + (curr.carbs || 0), 0);
 
-    addFood('2023-10-27', selectedMeal, {
+    await addFood('2023-10-27', selectedMeal, {
       name: `Przepis: ${recipeName}`,
       calories: totalCals,
       protein: totalProt,
@@ -235,8 +256,13 @@ export default function AddScreen() {
             <TouchableOpacity 
               className="mt-8 bg-brand-primary p-4 rounded-xl items-center shadow-lg active:bg-brand-vivid"
               onPress={handleSaveProduct}
+              disabled={isLoading}
             >
-              <Text className="text-brand-text font-bold text-lg">Dodaj produkt</Text>
+              {isLoading ? (
+                  <ActivityIndicator color="white" />
+              ) : (
+                  <Text className="text-brand-text font-bold text-lg">Dodaj produkt</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -310,7 +336,7 @@ export default function AddScreen() {
               onPress={handleSaveRecipe}
               disabled={selectedIngredients.length === 0}
             >
-              <Text className="text-brand-text font-bold text-lg">Zapisz przepis</Text>
+              {isLoading ? <ActivityIndicator color="white" /> : <Text className="text-brand-text font-bold text-lg">Zapisz przepis</Text>}
             </TouchableOpacity>
           </View>
         )}

@@ -1,12 +1,12 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import apiClient from '../Services/ApiClient';
+import { UserProfileDto } from '../Types/Api';
 
-interface UserData {
-  username: string;
+interface UserData extends Partial<UserProfileDto> {
+  username?: string;
   email: string;
-  age?: string;
-  weight?: string;
-  height?: string;
   goal?: string;
 }
 
@@ -14,8 +14,8 @@ interface AuthContextType {
   userToken: string | null;
   userData: UserData | null;
   isLoading: boolean;
-  login: (token: string, data?: UserData) => void;
-  register: (token: string, data: UserData) => void;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, profileData: UserData) => Promise<void>;
   logout: () => void;
 }
 
@@ -27,27 +27,84 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const login = (token: string, data: UserData = { username: 'Użytkownik', email: 'demo@fitzo.pl' }) => {
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('jwt_token');
+        if (token) {
+          setUserToken(token);
+        }
+      } catch (e) {
+        console.log('Restoring token failed');
+      }
+    };
+
+    bootstrapAsync();
+  }, []);
+
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await apiClient.post('/api/Auth/login', { email, password });
+      
+      const token = response.data.token || response.data; 
+
+      if (token) {
+        await SecureStore.setItemAsync('jwt_token', token);
+        setUserToken(token);
+        setUserData({ email });
+        router.replace('/(tabs)/journal');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Błąd logowania. Sprawdź dane.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (email: string, password: string, profileData: UserData) => {
+    setIsLoading(true);
+    try {
+      await apiClient.post('/api/Auth/register', { 
+        email, 
+        password, 
+        confirmPassword: password 
+      });
+
+      const loginRes = await apiClient.post('/api/Auth/login', { email, password });
+      const token = loginRes.data.token || loginRes.data;
+      
+      await SecureStore.setItemAsync('jwt_token', token);
       setUserToken(token);
-      setUserData(data);
+
+      const profileDto: UserProfileDto = {
+        weight: Number(profileData.weight) || 70,
+        height: Number(profileData.height) || 175,
+        age: Number(profileData.age) || 25,
+        gender: 'Male'
+      };
+
+      await apiClient.post('/api/Users/profile', profileDto);
+      
+      setUserData({ ...profileData, email });
+      router.replace('/(tabs)/journal');
+
+    } catch (error) {
+      console.error(error);
+      alert('Błąd rejestracji.');
+    } finally {
       setIsLoading(false);
-      router.replace('/(tabs)/profile');
-    }, 1000);
+    }
   };
 
-  const register = (token: string, data: UserData) => {
-    login(token, data);
-  };
-
-  const logout = () => {
+  const logout = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setUserToken(null);
-      setUserData(null);
-      setIsLoading(false);
-    }, 500);
+    await SecureStore.deleteItemAsync('jwt_token');
+    setUserToken(null);
+    setUserData(null);
+    setIsLoading(false);
+    // router.replace('/login');
   };
 
   return (

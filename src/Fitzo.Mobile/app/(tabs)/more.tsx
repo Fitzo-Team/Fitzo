@@ -3,44 +3,26 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../Context/AuthContext';
+import { useFood } from '../../Context/FoodContext';
 
-const MenuRow = ({ 
-  icon, 
-  title, 
-  subtitle, 
-  isDestructive = false, 
-  onPress,
-  rightElement
-}: { 
-  icon: any, 
-  title: string, 
-  subtitle?: string, 
-  isDestructive?: boolean, 
-  onPress?: () => void,
-  rightElement?: React.ReactNode
-}) => (
+const MenuRow = ({ icon, title, subtitle, isDestructive = false, onPress, rightElement }: any) => (
   <TouchableOpacity 
     className="flex-row items-center p-4 py-5 bg-brand-dark border-b border-brand-card active:bg-brand-card"
     onPress={onPress}
   >
-    <View className="w-8 items-center">
-      {icon}
-    </View>
+    <View className="w-8 items-center">{icon}</View>
     <View className="flex-1 ml-3">
-      <Text className={`text-base font-medium ${isDestructive ? 'text-red-500' : 'text-brand-text'}`}>
-        {title}
-      </Text>
+      <Text className={`text-base font-medium ${isDestructive ? 'text-red-500' : 'text-brand-text'}`}>{title}</Text>
       {subtitle && <Text className="text-brand-muted text-xs">{subtitle}</Text>}
     </View>
-    {rightElement ? rightElement : (
-      <Ionicons name="chevron-forward" size={20} color="#666" />
-    )}
+    {rightElement ? rightElement : <Ionicons name="chevron-forward" size={20} color="#666" />}
   </TouchableOpacity>
 );
 
 export default function MoreScreen() {
   const router = useRouter();
   const { logout, userData, userToken } = useAuth();
+  const { exportData, importData } = useFood();
 
   return (
     <View className="flex-1 bg-brand-dark pt-12">
@@ -67,7 +49,7 @@ export default function MoreScreen() {
                     {userToken ? (userData?.username || 'Użytkownik') : 'Profil Gościa'}
                 </Text>
                 <Text className="text-brand-muted text-xs">
-                    {userToken ? 'Zobacz swój profil i statystyki' : 'Zaloguj się, aby zapisać dane'}
+                    {userToken ? 'Edytuj profil i cel' : 'Zaloguj się'}
                 </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#C77DFF" />
@@ -76,17 +58,20 @@ export default function MoreScreen() {
         <MenuRow 
           icon={<Ionicons name="cart-outline" size={24} color="#E0AAFF" />}
           title="Lista zakupów"
-          onPress={() => {}}
+          onPress={() => router.push('/shopping-list' as any)}
+        />
+        
+        <View className="h-6" />
+
+        <MenuRow 
+          icon={<Ionicons name="share-outline" size={24} color="#E0AAFF" />}
+          title="Eksportuj dane (JSON)"
+          onPress={exportData}
         />
         <MenuRow 
-          icon={<Ionicons name="infinite-outline" size={24} color="#E0AAFF" />}
-          title="Nawyki"
-          onPress={() => {}}
-        />
-         <MenuRow 
-          icon={<MaterialCommunityIcons name="timer-sand" size={24} color="#E0AAFF" />}
-          title="Post przerywany"
-          onPress={() => {}}
+          icon={<Ionicons name="download-outline" size={24} color="#E0AAFF" />}
+          title="Importuj dane"
+          onPress={importData}
         />
 
         <View className="h-6" />
@@ -96,45 +81,16 @@ export default function MoreScreen() {
           title="Ustawienia"
           onPress={() => {}}
         />
-         <MenuRow 
-          icon={<MaterialCommunityIcons name="star-four-points-outline" size={24} color="#FF9100" />}
-          title="Fitzo Premium"
-          subtitle="Dodatkowe funkcje AI"
-          onPress={() => {}}
-        />
-         <MenuRow 
-          icon={<Ionicons name="share-outline" size={24} color="#E0AAFF" />}
-          title="Eksport danych"
-          subtitle="Pobierz swoje dane CSV/PDF"
-          onPress={() => {
-              alert('Eksport danych w przygotowaniu');
-          }}
-        />
-
-        <View className="h-6" />
-
-        <MenuRow 
-          icon={<Ionicons name="shield-checkmark-outline" size={24} color="#E0AAFF" />}
-          title="Zgody i prywatność"
-          onPress={() => {}}
-        />
 
         {userToken && (
             <MenuRow 
             icon={<Ionicons name="log-out-outline" size={24} color="#EF4444" />}
             title="Wyloguj się"
             isDestructive
-            rightElement={<View />}
-            onPress={() => {
-                logout();
-            }}
+            onPress={logout}
             />
         )}
         
-        <View className="items-center py-8">
-            <Text className="text-brand-muted text-xs">Wersja aplikacji 1.0.0 (Beta)</Text>
-        </View>
-
         <View className="h-20" />
       </ScrollView>
     </View>

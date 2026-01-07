@@ -2,21 +2,31 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import apiClient from '../Services/ApiClient';
-import { UserProfileDto } from '../Types/Api';
+import { UserProfileDto, AddWeightDto } from '../Types/Api';
+import { Alert } from 'react-native';
 
 interface UserData extends Partial<UserProfileDto> {
   username?: string;
   email: string;
   goal?: string;
 }
+export interface WeightEntry {
+    id?: string;
+    weight: number;
+    date: string;
+}
 
 interface AuthContextType {
   userToken: string | null;
   userData: UserData | null;
+  weightHistory: WeightEntry[];
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, profileData: UserData) => Promise<void>;
   logout: () => void;
+  addWeight: (weight: number, date: Date) => Promise<void>;
+  fetchWeightHistory: () => Promise<void>;
+  updateProfile: (profile: UserProfileDto) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -24,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]); // <--- NOWE
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -46,7 +57,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     setIsLoading(true);
     try {
       const response = await apiClient.post('/api/Auth/login', { email, password });
-      
       const token = response.data.token || response.data; 
 
       if (token) {
@@ -57,7 +67,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
     } catch (error) {
       console.error(error);
-      alert('Błąd logowania. Sprawdź dane.');
+      Alert.alert('Błąd', 'Błąd logowania. Sprawdź dane.');
     } finally {
       setIsLoading(false);
     }
@@ -86,13 +96,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       };
 
       await apiClient.post('/api/Users/profile', profileDto);
-      
       setUserData({ ...profileData, email });
       router.replace('/(tabs)/journal');
 
     } catch (error) {
       console.error(error);
-      alert('Błąd rejestracji.');
+      Alert.alert('Błąd', 'Błąd rejestracji.');
     } finally {
       setIsLoading(false);
     }
@@ -104,11 +113,63 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     setUserToken(null);
     setUserData(null);
     setIsLoading(false);
-    // router.replace('/login');
+    router.replace('/login');
+  };
+
+  const fetchWeightHistory = async () => {
+      try {
+          const res = await apiClient.get('/api/Weight');
+          const sorted = (res.data || []).sort((a: any, b: any) => 
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+          setWeightHistory(sorted);
+      } catch (e) {
+          console.error("Błąd pobierania historii wagi", e);
+      }
+  };
+
+  const addWeight = async (weight: number, date: Date) => {
+    setIsLoading(true);
+    try {
+      const payload: AddWeightDto = {
+        weight: weight,
+        date: date.toISOString()
+      };
+      await apiClient.post('/api/Weight', payload);
+      
+      if (userData) {
+          setUserData({ ...userData, weight });
+      }
+      
+      await fetchWeightHistory();
+      
+      Alert.alert("Sukces", "Zapisano nową wagę");
+    } catch (e) {
+      console.error("Błąd zapisu wagi", e);
+      Alert.alert("Błąd", "Nie udało się zapisać wagi");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateProfile = async (profile: UserProfileDto) => {
+      setIsLoading(true);
+      try {
+          await apiClient.post('/api/Users/profile', profile);
+          setUserData((prev: any) => ({ ...prev, ...profile }));
+          Alert.alert("Sukces", "Profil zaktualizowany");
+      } catch (e) {
+          console.error("Błąd profilu", e);
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   return (
-    <AuthContext.Provider value={{ userToken, userData, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+        userToken, userData, weightHistory, isLoading, 
+        login, register, logout, addWeight, fetchWeightHistory, updateProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../Context/AuthContext';
+import { TextInput, Alert } from 'react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { userToken, userData, logout } = useAuth();
+const [newWeight, setNewWeight] = useState('');
+const { addWeight } = useAuth();
 
+const handleUpdateWeight = async () => {
+    const w = parseFloat(newWeight);
+    if (!w || isNaN(w)) {
+        Alert.alert("Błąd", "Podaj poprawną wagę");
+        return;
+    }
+    await addWeight(w, new Date());
+    setNewWeight('');
+};
+
+// ... w JSX w sekcji statystyk wagi
+<View className="bg-brand-card p-4 rounded-2xl border border-brand-accent mt-4">
+    <Text className="text-brand-text font-bold mb-2">Zaktualizuj wagę</Text>
+    <View className="flex-row gap-2">
+        <TextInput 
+            className="flex-1 bg-brand-dark text-white p-3 rounded-xl border border-brand-accent"
+            placeholder="np. 76.5"
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+            value={newWeight}
+            onChangeText={setNewWeight}
+        />
+        <TouchableOpacity 
+            className="bg-brand-primary justify-center px-4 rounded-xl"
+            onPress={handleUpdateWeight}
+        >
+            <Ionicons name="save-outline" size={24} color="white" />
+        </TouchableOpacity>
+    </View>
+</View>
   if (!userToken) {
     return (
       <View className="flex-1 bg-brand-dark justify-center items-center px-6">

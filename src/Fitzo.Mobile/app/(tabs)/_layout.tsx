@@ -100,6 +100,13 @@ export default function TabLayout() {
           href: null,
         }}
       />
+
+      <Tabs.Screen
+        name="ShoppingList"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

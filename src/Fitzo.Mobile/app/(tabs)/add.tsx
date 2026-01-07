@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { MealType, FoodItem } from '../../Types/Api';
+import { Ionicons } from '@expo/vector-icons';
 import { useFood } from '../../Context/FoodContext';
+import { MealType, FoodItem, ProductDto } from '../../Types/Api';
 
 export default function AddScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  
   const { 
     addFood, 
+    createRecipe, 
     scannedCode, 
     setScannedCode, 
     productHistory, 
     searchProduct, 
+    searchProductsApi,
     searchResults, 
     isLoading 
   } = useFood();
@@ -30,12 +33,17 @@ export default function AddScreen() {
   const [protein, setProtein] = useState('');
   const [fat, setFat] = useState('');
   const [carbs, setCarbs] = useState('');
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [apiResults, setApiResults] = useState<ProductDto[]>([]);
+  const [showSearchList, setShowSearchList] = useState(false);
 
   const [recipeName, setRecipeName] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState<FoodItem[]>([]);
 
   const [isScannerOpen, setIsScannerOpen] = useState(autoScan);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scannedLock, setScannedLock] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -48,6 +56,7 @@ export default function AddScreen() {
     const handleScan = async () => {
         if (scannedCode) {
             setIsScannerOpen(false);
+            setScannedLock(false);
             setActiveTab('product');
             await searchProduct(scannedCode);
         }
@@ -58,16 +67,31 @@ export default function AddScreen() {
   useEffect(() => {
     if (searchResults && searchResults.length > 0) {
         const product = searchResults[0];
-        setFoodName(product.name || '');
-        setCalories(product.calories?.toString() || '0');
-        setProtein(product.protein?.toString() || '0');
-        setFat(product.fat?.toString() || '0');
-        setCarbs(product.carbs?.toString() || '0');
+        fillForm(product);
     }
   }, [searchResults]);
 
+  const fillForm = (product: ProductDto) => {
+      setFoodName(product.name || '');
+      setCalories(product.calories?.toString() || '0');
+      setProtein(product.protein?.toString() || '0');
+      setFat(product.fat?.toString() || '0');
+      setCarbs(product.carbs?.toString() || '0');
+      setShowSearchList(false);
+  };
+
   const handleBarcodeScanned = ({ data }: { data: string }) => {
-    if (!scannedCode) setScannedCode(data);
+    if (!scannedLock) {
+        setScannedLock(true);
+        setScannedCode(data);
+    }
+  };
+
+  const handleSearchApi = async () => {
+      if (searchQuery.length < 2) return;
+      setShowSearchList(true);
+      const results = await searchProductsApi(searchQuery);
+      setApiResults(results);
   };
 
   const handleSaveProduct = async () => {
@@ -76,36 +100,32 @@ export default function AddScreen() {
         return;
     }
     
-    await addFood('2023-10-27', selectedMeal, {
+    const cals = parseFloat(calories);
+    const prot = parseFloat(protein) || 0;
+    const ft = parseFloat(fat) || 0;
+    const carb = parseFloat(carbs) || 0;
+
+    await addFood('2023-10-27', selectedMeal, { // TODO: Podmienić datę na wybraną w kalendarzu
       name: foodName,
-      calories: parseInt(calories),
-      protein: parseFloat(protein) || 0,
-      fat: parseFloat(fat) || 0,
-      carbs: parseFloat(carbs) || 0,
+      calories: cals,
+      protein: prot,
+      fat: ft,
+      carbs: carb,
       barcode: scannedCode || undefined
     });
 
     setScannedCode(null);
-    router.back();
+    setSearchQuery('');
+    router.navigate('/(tabs)/journal');
   };
 
   const handleSaveRecipe = async () => {
-    if (!recipeName || selectedIngredients.length === 0) return;
-    
-    const totalCals = selectedIngredients.reduce((acc, curr) => acc + curr.calories, 0);
-    const totalProt = selectedIngredients.reduce((acc, curr) => acc + (curr.protein || 0), 0);
-    const totalFat = selectedIngredients.reduce((acc, curr) => acc + (curr.fat || 0), 0);
-    const totalCarbs = selectedIngredients.reduce((acc, curr) => acc + (curr.carbs || 0), 0);
-
-    await addFood('2023-10-27', selectedMeal, {
-      name: `Przepis: ${recipeName}`,
-      calories: totalCals,
-      protein: totalProt,
-      fat: totalFat,
-      carbs: totalCarbs,
-    });
-    
-    router.back();
+    if (!recipeName || selectedIngredients.length === 0) {
+        Alert.alert("Błąd", "Podaj nazwę i dodaj składniki");
+        return;
+    }
+    await createRecipe(recipeName, selectedIngredients);
+    router.navigate('/(tabs)/journal');
   };
 
   const toggleIngredient = (item: FoodItem) => {
@@ -118,27 +138,24 @@ export default function AddScreen() {
 
   if (isScannerOpen) {
     if (hasPermission === null) return <View className="flex-1 bg-brand-dark justify-center items-center"><Text className="text-brand-text">Proszę czekać...</Text></View>;
-    if (hasPermission === false) return <View className="flex-1 bg-brand-dark justify-center items-center"><Text className="text-brand-text">Brak dostępu do kamery. Sprawdź ustawienia.</Text></View>;
+    if (hasPermission === false) return <View className="flex-1 bg-brand-dark justify-center items-center"><Text className="text-brand-text">Brak dostępu do kamery.</Text></View>;
     
     return (
       <View className="flex-1 bg-black relative">
         <CameraView
           facing="back"
-          onBarcodeScanned={scannedCode ? undefined : handleBarcodeScanned}
+          onBarcodeScanned={scannedLock ? undefined : handleBarcodeScanned}
           style={{ flex: 1 }}
         />
-        
         <TouchableOpacity 
           className="absolute top-12 right-5 z-20 p-2 bg-brand-dark/60 rounded-full"
-          onPress={() => setIsScannerOpen(false)}
+          onPress={() => { setIsScannerOpen(false); setScannedLock(false); }}
         >
           <Ionicons name="close" size={30} color="#E0AAFF" />
         </TouchableOpacity>
-        
         <View className="absolute inset-0 justify-center items-center pointer-events-none z-10">
              <View className="w-64 h-48 border-2 border-brand-vivid rounded-2xl opacity-80" />
         </View>
-
         <View className="absolute bottom-24 w-full items-center z-10">
           <Text className="text-brand-text bg-brand-dark/80 px-4 py-2 rounded-lg font-medium overflow-hidden">
             Nakieruj kamerę na kod kreskowy
@@ -150,7 +167,7 @@ export default function AddScreen() {
 
   return (
     <View className="flex-1 bg-brand-dark pt-12">
-      
+
       <View className="px-5 flex-row items-center mb-4">
         <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-brand-card p-2 rounded-full border border-brand-accent">
           <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
@@ -189,29 +206,56 @@ export default function AddScreen() {
         })}
       </View>
 
-      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
         {activeTab === 'product' && (
           <View className="space-y-4 pb-10">
-            <View className="flex-row gap-3 mb-2">
-                <TouchableOpacity 
-                  className="flex-1 bg-brand-card border border-brand-primary p-4 rounded-xl items-center justify-center"
-                  onPress={() => { setScannedCode(null); setIsScannerOpen(true); }}
-                >
-                  <Ionicons name="barcode-outline" size={24} color="#9D4EDD" />
-                  <Text className="text-brand-light font-semibold mt-1 text-xs">Skanuj kod</Text>
+            
+            <View className="flex-row gap-2 mb-2">
+                <TextInput 
+                    className="flex-1 bg-brand-card text-white p-4 rounded-xl border border-brand-accent"
+                    placeholder="Szukaj produktu..."
+                    placeholderTextColor="#666"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={handleSearchApi}
+                />
+                <TouchableOpacity onPress={handleSearchApi} className="bg-brand-primary justify-center px-4 rounded-xl">
+                    <Ionicons name="search" size={24} color="white" />
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-1 bg-brand-card border border-brand-accent p-4 rounded-xl items-center justify-center">
-                   <Ionicons name="search" size={24} color="#C77DFF" />
-                   <Text className="text-brand-muted font-semibold mt-1 text-xs">Szukaj online</Text>
+                <TouchableOpacity onPress={() => { setScannedCode(null); setScannedLock(false); setIsScannerOpen(true); }} className="bg-brand-card border border-brand-primary justify-center px-4 rounded-xl">
+                    <Ionicons name="barcode-outline" size={24} color="#9D4EDD" />
                 </TouchableOpacity>
             </View>
+
+            {showSearchList && apiResults.length > 0 && (
+                <View className="bg-brand-card rounded-xl border border-brand-accent mb-4 max-h-60 overflow-hidden">
+                    <ScrollView nestedScrollEnabled>
+                        {apiResults.map((item, index) => (
+                            <TouchableOpacity 
+                                key={index} 
+                                className="p-3 border-b border-brand-dark flex-row justify-between items-center"
+                                onPress={() => fillForm(item)}
+                            >
+                                <View>
+                                    <Text className="text-white font-bold">{item.name}</Text>
+                                    <Text className="text-brand-muted text-xs">{item.calories} kcal</Text>
+                                </View>
+                                <Ionicons name="add-circle" size={24} color="#E0AAFF" />
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                    <TouchableOpacity onPress={() => setShowSearchList(false)} className="p-2 items-center bg-brand-dark">
+                        <Text className="text-brand-muted text-xs">Zamknij listę</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
 
             <View>
               <Text className="text-brand-muted mb-2 ml-1">Nazwa produktu</Text>
               <TextInput 
                 className="bg-brand-card text-brand-text p-4 rounded-xl text-base border border-brand-accent"
-                placeholder="np. Pierś z kurczaka" placeholderTextColor="#C77DFF"
+                placeholder="np. Banan" placeholderTextColor="#C77DFF"
                 value={foodName} onChangeText={setFoodName}
               />
             </View>
@@ -228,7 +272,7 @@ export default function AddScreen() {
             <Text className="text-brand-text mt-2 ml-1 text-sm font-bold">Makroskładniki (opcjonalne)</Text>
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Text className="text-brand-muted text-xs mb-1 ml-1">Białko (g)</Text>
+                <Text className="text-brand-muted text-xs mb-1 ml-1">B (g)</Text>
                 <TextInput 
                   className="bg-brand-card text-brand-text p-3 rounded-xl border border-brand-accent text-center"
                   placeholder="0" placeholderTextColor="#666" keyboardType="numeric"
@@ -236,7 +280,7 @@ export default function AddScreen() {
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-brand-muted text-xs mb-1 ml-1">Tłuszcz (g)</Text>
+                <Text className="text-brand-muted text-xs mb-1 ml-1">T (g)</Text>
                 <TextInput 
                   className="bg-brand-card text-brand-text p-3 rounded-xl border border-brand-accent text-center"
                   placeholder="0" placeholderTextColor="#666" keyboardType="numeric"
@@ -244,7 +288,7 @@ export default function AddScreen() {
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-brand-muted text-xs mb-1 ml-1">Węgle (g)</Text>
+                <Text className="text-brand-muted text-xs mb-1 ml-1">W (g)</Text>
                 <TextInput 
                   className="bg-brand-card text-brand-text p-3 rounded-xl border border-brand-accent text-center"
                   placeholder="0" placeholderTextColor="#666" keyboardType="numeric"
@@ -278,15 +322,9 @@ export default function AddScreen() {
               />
             </View>
 
-            <Text className="text-brand-text mb-2 ml-1 font-bold">Składniki z historii:</Text>
-            
-            {productHistory.length === 0 ? (
-               <View className="p-6 bg-brand-card rounded-xl border border-dashed border-brand-accent items-center">
-                  <Text className="text-brand-muted text-center">Brak produktów w historii.{'\n'}Dodaj najpierw pojedyncze produkty.</Text>
-               </View>
-            ) : (
-               <View className="bg-brand-card rounded-xl border border-brand-accent overflow-hidden">
-                 {productHistory.map((item, index) => {
+            <Text className="text-brand-text mb-2 ml-1 font-bold">Wybierz składniki z historii:</Text>
+            <View className="bg-brand-card rounded-xl border border-brand-accent overflow-hidden mt-2">
+                 {productHistory.slice(0, 5).map((item, index) => {
                     const isSelected = selectedIngredients.some(i => i.id === item.id);
                     return (
                       <TouchableOpacity 
@@ -294,47 +332,17 @@ export default function AddScreen() {
                         onPress={() => toggleIngredient(item)}
                         className={`p-4 flex-row justify-between items-center border-b border-brand-dark ${isSelected ? 'bg-brand-primary/20' : ''}`}
                       >
-                        <View className="flex-1">
-                          <Text className={`font-medium ${isSelected ? 'text-brand-text' : 'text-gray-400'}`}>{item.name}</Text>
-                          <Text className="text-xs text-brand-muted">{item.calories} kcal</Text>
-                        </View>
-                        <View className={`w-6 h-6 rounded-full border items-center justify-center ${isSelected ? 'bg-brand-vivid border-brand-vivid' : 'border-brand-muted'}`}>
-                           {isSelected && <Ionicons name="checkmark" size={16} color="white" />}
-                        </View>
+                        <Text className={`font-medium flex-1 ${isSelected ? 'text-brand-text' : 'text-gray-400'}`}>{item.name}</Text>
+                        {isSelected && <Ionicons name="checkmark" size={16} color="white" />}
                       </TouchableOpacity>
                     )
                  })}
-               </View>
-            )}
-
-            {selectedIngredients.length > 0 && (
-                <View className="mt-6 bg-brand-card p-4 rounded-xl border border-brand-accent">
-                   <Text className="text-brand-text text-center font-bold mb-2">Podsumowanie</Text>
-                   <View className="flex-row justify-around">
-                      <View className="items-center">
-                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+b.calories,0)}</Text>
-                        <Text className="text-brand-muted text-xs">Kcal</Text>
-                      </View>
-                      <View className="items-center">
-                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+(b.protein||0),0)}</Text>
-                        <Text className="text-brand-muted text-xs">Białko</Text>
-                      </View>
-                      <View className="items-center">
-                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+(b.fat||0),0)}</Text>
-                        <Text className="text-brand-muted text-xs">Tłuszcz</Text>
-                      </View>
-                      <View className="items-center">
-                        <Text className="text-brand-text font-bold text-lg">{selectedIngredients.reduce((a,b)=>a+(b.carbs||0),0)}</Text>
-                        <Text className="text-brand-muted text-xs">Węgle</Text>
-                      </View>
-                   </View>
-                </View>
-            )}
+            </View>
 
             <TouchableOpacity 
               className={`mt-6 p-4 rounded-xl items-center shadow-lg ${selectedIngredients.length > 0 ? 'bg-brand-primary' : 'bg-brand-card opacity-50'}`}
               onPress={handleSaveRecipe}
-              disabled={selectedIngredients.length === 0}
+              disabled={selectedIngredients.length === 0 || isLoading}
             >
               {isLoading ? <ActivityIndicator color="white" /> : <Text className="text-brand-text font-bold text-lg">Zapisz przepis</Text>}
             </TouchableOpacity>

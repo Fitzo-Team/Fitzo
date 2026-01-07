@@ -58,3 +58,55 @@ export interface FoodItem extends ProductDto {
   amount?: number;
   barcode?: string;
 }
+
+export interface AddWeightDto {
+  weight: number;
+  date: string;
+}
+
+export interface ShoppingListItem {
+  productId?: string;
+  name?: string;
+  totalAmount: number;
+  unit?: string;
+  category?: string;
+  isBought: boolean;
+}
+
+export enum DietTag {
+  Vegan = 'Vegan',
+  Vegetarian = 'Vegetarian',
+  Keto = 'Keto',
+  HighProtein = 'HighProtein'
+}
+
+export interface IngredientDto {
+  product: ProductDto;
+  amount: number;
+}
+
+export interface CreateRecipeDto {
+  name: string;
+  imageUrl?: string;
+  tags?: string[];
+  ingredients: IngredientDto[];
+}
+
+export interface WeightEntryDto {
+  id?: string;
+  weight: number;
+  date: string;
+}
+export interface UserStatsDto {
+    caloriesConsumed: number;
+    caloriesTarget: number;
+    proteins: number;
+    carbs: number;
+    fats: number;
+    proteinsTarget: number;
+    carbsTarget: number;
+    fatsTarget: number;
+    steps: number;
+    stepsTarget: number;
+    weightCurrent: number;
+}

@@ -1,46 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Alert, Keyboard, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../Context/AuthContext';
-import { TextInput, Alert } from 'react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { userToken, userData, logout } = useAuth();
-const [newWeight, setNewWeight] = useState('');
-const { addWeight } = useAuth();
+  const { userToken, userData, logout, addWeight, isLoading } = useAuth();
+  const [newWeight, setNewWeight] = useState('');
 
-const handleUpdateWeight = async () => {
-    const w = parseFloat(newWeight);
-    if (!w || isNaN(w)) {
-        Alert.alert("Błąd", "Podaj poprawną wagę");
-        return;
+  const handleUpdateWeight = async () => {
+
+    const w = parseFloat(newWeight.replace(',', '.'));
+    
+    if (!w || isNaN(w) || w <= 0 || w > 300) {
+      Alert.alert("Błąd", "Podaj poprawną wagę (np. 76.5)");
+      return;
     }
-    await addWeight(w, new Date());
-    setNewWeight('');
-};
 
-// ... w JSX w sekcji statystyk wagi
-<View className="bg-brand-card p-4 rounded-2xl border border-brand-accent mt-4">
-    <Text className="text-brand-text font-bold mb-2">Zaktualizuj wagę</Text>
-    <View className="flex-row gap-2">
-        <TextInput 
-            className="flex-1 bg-brand-dark text-white p-3 rounded-xl border border-brand-accent"
-            placeholder="np. 76.5"
-            placeholderTextColor="#666"
-            keyboardType="numeric"
-            value={newWeight}
-            onChangeText={setNewWeight}
-        />
-        <TouchableOpacity 
-            className="bg-brand-primary justify-center px-4 rounded-xl"
-            onPress={handleUpdateWeight}
-        >
-            <Ionicons name="save-outline" size={24} color="white" />
-        </TouchableOpacity>
-    </View>
-</View>
+    await addWeight(w, new Date());
+
+    setNewWeight('');
+    Keyboard.dismiss();
+  };
+
   if (!userToken) {
     return (
       <View className="flex-1 bg-brand-dark justify-center items-center px-6">
@@ -63,11 +46,23 @@ const handleUpdateWeight = async () => {
 
   return (
     <View className="flex-1 bg-brand-dark pt-12">
-      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
-        
-        <View className="flex-row items-center mb-8">
+      
+      <View className="px-5 mb-2 flex-row items-center">
+          {router.canGoBack() && (
+            <TouchableOpacity onPress={() => router.back()} className="mr-4">
+                <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
+            </TouchableOpacity>
+          )}
+          <Text className="text-brand-text text-3xl font-bold">Mój Profil</Text>
+      </View>
+
+      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+
+        <View className="flex-row items-center mb-8 mt-4">
           <View className="w-20 h-20 bg-brand-vivid rounded-full items-center justify-center border-2 border-brand-light">
-             <Text className="text-white text-3xl font-bold">{userData?.username?.charAt(0).toUpperCase()}</Text>
+             <Text className="text-white text-3xl font-bold">
+               {userData?.username ? userData.username.charAt(0).toUpperCase() : 'U'}
+             </Text>
           </View>
           <View className="ml-4 flex-1">
              <Text className="text-brand-text text-2xl font-bold">{userData?.username}</Text>
@@ -94,6 +89,31 @@ const handleUpdateWeight = async () => {
               <Text className="text-brand-text font-bold text-xl mt-2">{userData?.height || '--'}</Text>
               <Text className="text-brand-muted text-xs">Wzrost cm</Text>
            </View>
+        </View>
+
+        <View className="bg-brand-card p-4 rounded-2xl border border-brand-accent mb-6">
+            <Text className="text-brand-text font-bold mb-2">Zaktualizuj wagę</Text>
+            <View className="flex-row gap-2">
+                <TextInput 
+                    className="flex-1 bg-brand-dark text-white p-3 rounded-xl border border-brand-accent"
+                    placeholder="np. 76.5"
+                    placeholderTextColor="#666"
+                    keyboardType="numeric"
+                    value={newWeight}
+                    onChangeText={setNewWeight}
+                />
+                <TouchableOpacity 
+                    className="bg-brand-primary justify-center px-4 rounded-xl"
+                    onPress={handleUpdateWeight}
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Ionicons name="save-outline" size={24} color="white" />
+                    )}
+                </TouchableOpacity>
+            </View>
         </View>
 
         <View className="bg-brand-card p-5 rounded-2xl border border-brand-accent mb-6">

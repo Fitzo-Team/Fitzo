@@ -10,6 +10,7 @@ interface UserData extends Partial<UserProfileDto> {
   email: string;
   goal?: string;
 }
+
 export interface WeightEntry {
     id?: string;
     weight: number;
@@ -27,6 +28,7 @@ interface AuthContextType {
   addWeight: (weight: number, date: Date) => Promise<void>;
   fetchWeightHistory: () => Promise<void>;
   updateProfile: (profile: UserProfileDto) => Promise<void>;
+  fetchBMR: () => Promise<number>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -34,7 +36,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]); // <--- NOWE
+  const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -142,7 +144,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
       
       await fetchWeightHistory();
-      
       Alert.alert("Sukces", "Zapisano nową wagę");
     } catch (e) {
       console.error("Błąd zapisu wagi", e);
@@ -165,10 +166,22 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
   };
 
+const fetchBMR = async (): Promise<number> => {
+    try {
+      const res = await apiClient.get('/api/Users/bmr', {
+        params: { formula: 'MifflinStJeor' }
+      });
+      return Number(res.data) || 2500;
+    } catch (e) {
+      console.log("BMR fetch failed (using default 2500):", e);
+      return 2500;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
         userToken, userData, weightHistory, isLoading, 
-        login, register, logout, addWeight, fetchWeightHistory, updateProfile 
+        login, register, logout, addWeight, fetchWeightHistory, updateProfile, fetchBMR 
     }}>
       {children}
     </AuthContext.Provider>

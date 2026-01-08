@@ -17,7 +17,7 @@ export default function AddScreen() {
     setScannedCode, 
     productHistory, 
     searchProduct, 
-    searchProductsApi,
+    searchProductsApi, 
     searchResults, 
     isLoading 
   } = useFood();
@@ -67,17 +67,20 @@ export default function AddScreen() {
   useEffect(() => {
     if (searchResults && searchResults.length > 0) {
         const product = searchResults[0];
-        fillForm(product);
+        goToDetails(product);
+        setScannedCode(null);
     }
   }, [searchResults]);
 
-  const fillForm = (product: ProductDto) => {
-      setFoodName(product.name || '');
-      setCalories(product.calories?.toString() || '0');
-      setProtein(product.protein?.toString() || '0');
-      setFat(product.fat?.toString() || '0');
-      setCarbs(product.carbs?.toString() || '0');
-      setShowSearchList(false);
+  const goToDetails = (product: ProductDto) => {
+      router.push({
+          pathname: '/product-details',
+          params: {
+              product: JSON.stringify(product),
+              mealType: selectedMeal,
+              date: new Date().toISOString() 
+          }
+      });
   };
 
   const handleBarcodeScanned = ({ data }: { data: string }) => {
@@ -100,22 +103,15 @@ export default function AddScreen() {
         return;
     }
     
-    const cals = parseFloat(calories);
-    const prot = parseFloat(protein) || 0;
-    const ft = parseFloat(fat) || 0;
-    const carb = parseFloat(carbs) || 0;
-
-    await addFood('2023-10-27', selectedMeal, { // TODO: Podmienić datę na wybraną w kalendarzu
+    await addFood('2023-10-27', selectedMeal, {
       name: foodName,
-      calories: cals,
-      protein: prot,
-      fat: ft,
-      carbs: carb,
+      calories: parseFloat(calories),
+      protein: parseFloat(protein) || 0,
+      fat: parseFloat(fat) || 0,
+      carbs: parseFloat(carbs) || 0,
       barcode: scannedCode || undefined
     });
 
-    setScannedCode(null);
-    setSearchQuery('');
     router.navigate('/(tabs)/journal');
   };
 
@@ -167,7 +163,7 @@ export default function AddScreen() {
 
   return (
     <View className="flex-1 bg-brand-dark pt-12">
-
+      
       <View className="px-5 flex-row items-center mb-4">
         <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-brand-card p-2 rounded-full border border-brand-accent">
           <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
@@ -235,13 +231,13 @@ export default function AddScreen() {
                             <TouchableOpacity 
                                 key={index} 
                                 className="p-3 border-b border-brand-dark flex-row justify-between items-center"
-                                onPress={() => fillForm(item)}
+                                onPress={() => goToDetails(item)}
                             >
                                 <View>
                                     <Text className="text-white font-bold">{item.name}</Text>
                                     <Text className="text-brand-muted text-xs">{item.calories} kcal</Text>
                                 </View>
-                                <Ionicons name="add-circle" size={24} color="#E0AAFF" />
+                                <Ionicons name="chevron-forward" size={24} color="#E0AAFF" />
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -251,6 +247,24 @@ export default function AddScreen() {
                 </View>
             )}
 
+            <Text className="text-brand-text mb-2 ml-1 font-bold">Ostatnio używane:</Text>
+            <View className="bg-brand-card rounded-xl border border-brand-accent overflow-hidden mb-4">
+                 {productHistory.slice(0, 5).map((item, index) => (
+                      <TouchableOpacity 
+                        key={`${item.id}_${index}`}
+                        onPress={() => goToDetails(item)}
+                        className="p-4 flex-row justify-between items-center border-b border-brand-dark"
+                      >
+                        <Text className="font-medium flex-1 text-brand-text">{item.name}</Text>
+                        <Ionicons name="add-circle-outline" size={24} color="#E0AAFF" />
+                      </TouchableOpacity>
+                 ))}
+                 {productHistory.length === 0 && (
+                     <Text className="p-4 text-brand-muted text-center">Brak historii</Text>
+                 )}
+            </View>
+
+            <Text className="text-brand-muted text-center my-2">Lub dodaj ręcznie:</Text>
             <View>
               <Text className="text-brand-muted mb-2 ml-1">Nazwa produktu</Text>
               <TextInput 
@@ -305,7 +319,7 @@ export default function AddScreen() {
               {isLoading ? (
                   <ActivityIndicator color="white" />
               ) : (
-                  <Text className="text-brand-text font-bold text-lg">Dodaj produkt</Text>
+                  <Text className="text-brand-text font-bold text-lg">Dodaj własny produkt</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -324,7 +338,7 @@ export default function AddScreen() {
 
             <Text className="text-brand-text mb-2 ml-1 font-bold">Wybierz składniki z historii:</Text>
             <View className="bg-brand-card rounded-xl border border-brand-accent overflow-hidden mt-2">
-                 {productHistory.slice(0, 5).map((item, index) => {
+                 {productHistory.slice(0, 10).map((item, index) => {
                     const isSelected = selectedIngredients.some(i => i.id === item.id);
                     return (
                       <TouchableOpacity 

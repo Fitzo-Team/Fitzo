@@ -31,6 +31,7 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -50,7 +51,6 @@ export default function LoginScreen() {
 
   const handleAuth = async () => {
     try {
-      console.log("Próba autoryzacji...");
       if (isLoginMode) {
         if (!email || !password) {
             Alert.alert("Błąd", "Podaj email i hasło");
@@ -66,11 +66,9 @@ export default function LoginScreen() {
             height: parseFloat(height) || 0, 
             goal 
         };
-        console.log("Wysyłane dane rejestracji:", profileData);
         await register(email, password, profileData);
       }
     } catch (error: any) {
-        console.error("Błąd Auth:", error);
         const msg = error.response?.data?.message || "Wystąpił błąd połączenia";
         Alert.alert("Błąd", msg);
     }
@@ -78,16 +76,27 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 bg-brand-dark pt-12 px-6">
-
-      <TouchableOpacity onPress={() => router.back()} className="mb-6 w-10 h-10 bg-brand-card rounded-full items-center justify-center">
-        <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
-      </TouchableOpacity>
+      
+      {router.canGoBack() ? (
+        <TouchableOpacity onPress={() => router.back()} className="mb-6 w-10 h-10 bg-brand-card rounded-full items-center justify-center">
+            <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
+        </TouchableOpacity>
+      ) : (
+        <View className="mb-6 h-10" />
+      )}
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="items-center mb-8">
+          <Text className="text-brand-text text-3xl font-bold">
+            {isLoginMode ? 'Witaj ponownie!' : step === 1 ? 'Utwórz konto' : 'Opowiedz o sobie'}
+          </Text>
+          <Text className="text-brand-muted mt-2 text-center">
+            {isLoginMode ? 'Zaloguj się, aby synchronizować dane.' : step === 1 ? 'Dołącz do społeczności Fitzo.' : 'Dostosujemy aplikację do Ciebie.'}
+          </Text>
+        </View>
 
         {isLoginMode && (
           <View>
-             {/* To teraz zadziała poprawnie: */}
              <InputField label="Email" val={email} setVal={setEmail} place="jan@fitzo.pl" />
              <InputField label="Hasło" val={password} setVal={setPassword} secure place="••••••" />
              

@@ -20,6 +20,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Azure;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()

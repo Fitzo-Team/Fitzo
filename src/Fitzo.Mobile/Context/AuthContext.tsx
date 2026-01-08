@@ -28,7 +28,8 @@ interface AuthContextType {
   addWeight: (weight: number, date: Date) => Promise<void>;
   fetchWeightHistory: () => Promise<void>;
   updateProfile: (profile: UserProfileDto) => Promise<void>;
-  fetchBMR: () => Promise<number>;
+  fetchBMR: (forceRefresh?: boolean) => Promise<number>;
+  fetchProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -37,6 +38,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [userToken, setUserToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
+  const [userBmr, setUserBmr] = useState<number | null>(null); 
+  
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -46,6 +49,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
         const token = await SecureStore.getItemAsync('jwt_token');
         if (token) {
           setUserToken(token);
+          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          await fetchProfileInternal(); 
         }
       } catch (e) {
         console.log('Restoring token failed');
@@ -55,6 +60,18 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     bootstrapAsync();
   }, []);
 
+  const fetchProfileInternal = async () => {
+      try {
+          await fetchWeightHistoryInternal();
+          
+          // Symulacja odzyskania emaila (w prawdziwej apce dekodujesz JWT)
+          setUserData(prev => ({ ...prev, email: 'Zalogowany' }));
+
+      } catch (e) {
+          console.error("Nie udało się odświeżyć profilu", e);
+      }
+  };
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -63,8 +80,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
       if (token) {
         await SecureStore.setItemAsync('jwt_token', token);
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setUserToken(token);
         setUserData({ email });
+        
+        await fetchWeightHistoryInternal();
+        
         router.replace('/(tabs)/journal');
       }
     } catch (error) {
@@ -88,6 +109,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       const token = loginRes.data.token || loginRes.data;
       
       await SecureStore.setItemAsync('jwt_token', token);
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUserToken(token);
 
       const profileDto: UserProfileDto = {
@@ -112,13 +134,17 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const logout = async () => {
     setIsLoading(true);
     await SecureStore.deleteItemAsync('jwt_token');
+    delete apiClient.defaults.headers.common['Authorization'];
+    
     setUserToken(null);
     setUserData(null);
+    setUserBmr(null);
+    setWeightHistory([]);
     setIsLoading(false);
     router.replace('/login');
   };
 
-  const fetchWeightHistory = async () => {
+  const fetchWeightHistoryInternal = async () => {
       try {
           const res = await apiClient.get('/api/Weight');
           const sorted = (res.data || []).sort((a: any, b: any) => 
@@ -126,8 +152,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
           );
           setWeightHistory(sorted);
       } catch (e) {
-          console.error("Błąd pobierania historii wagi", e);
+          console.error("Błąd historii wagi", e);
       }
+  };
+
+  const fetchWeightHistory = async () => {
+      await fetchWeightHistoryInternal();
   };
 
   const addWeight = async (weight: number, date: Date) => {
@@ -143,7 +173,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
           setUserData({ ...userData, weight });
       }
       
-      await fetchWeightHistory();
+      setUserBmr(null); 
+
+      await fetchWeightHistoryInternal();
       Alert.alert("Sukces", "Zapisano nową wagę");
     } catch (e) {
       console.error("Błąd zapisu wagi", e);
@@ -158,6 +190,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       try {
           await apiClient.post('/api/Users/profile', profile);
           setUserData((prev: any) => ({ ...prev, ...profile }));
+          setUserBmr(null);
           Alert.alert("Sukces", "Profil zaktualizowany");
       } catch (e) {
           console.error("Błąd profilu", e);
@@ -166,22 +199,42 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
   };
 
-const fetchBMR = async (): Promise<number> => {
+  const fetchBMR = async (forceRefresh = false): Promise<number> => {
+    if (userBmr !== null && !forceRefresh) {
+        console.log(`[CACHE] Używam BMR: ${userBmr}`);
+        return userBmr;
+    }
+
     try {
+      console.log("[API] Pobieram BMR..."); 
       const res = await apiClient.get('/api/Users/bmr', {
         params: { formula: 'MifflinStJeor' }
       });
-      return Number(res.data) || 2500;
-    } catch (e) {
-      console.log("BMR fetch failed (using default 2500):", e);
+      
+      const value = res.data?.bmr || res.data?.Bmr;
+
+      if (value) {
+          const numValue = Number(value);
+          setUserBmr(numValue); 
+          return numValue;
+      }
+      return 2500;
+    } catch (e: any) {
+      if (e.response && e.response.status === 400) {
+          console.log("Brak profilu w bazie (Błąd 400).");
+      }
       return 2500;
     }
+  };
+
+  const fetchProfile = async () => {
+      await fetchProfileInternal();
   };
 
   return (
     <AuthContext.Provider value={{ 
         userToken, userData, weightHistory, isLoading, 
-        login, register, logout, addWeight, fetchWeightHistory, updateProfile, fetchBMR 
+        login, register, logout, addWeight, fetchWeightHistory, updateProfile, fetchBMR, fetchProfile 
     }}>
       {children}
     </AuthContext.Provider>

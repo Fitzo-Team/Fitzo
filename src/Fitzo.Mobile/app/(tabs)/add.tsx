@@ -21,8 +21,10 @@ export default function AddScreen() {
     searchResults, 
     isLoading 
   } = useFood();
-  
+
   const initialMeal = (params.initialMeal as MealType) || 'Breakfast';
+  const targetDate = params.date ? params.date.toString() : new Date().toISOString();
+  
   const autoScan = params.startScanning === 'true';
 
   const [activeTab, setActiveTab] = useState<'product' | 'recipe'>('product');
@@ -68,7 +70,7 @@ export default function AddScreen() {
     if (searchResults && searchResults.length > 0) {
         const product = searchResults[0];
         goToDetails(product);
-        setScannedCode(null);
+        setScannedCode(null); 
     }
   }, [searchResults]);
 
@@ -78,7 +80,7 @@ export default function AddScreen() {
           params: {
               product: JSON.stringify(product),
               mealType: selectedMeal,
-              date: new Date().toISOString() 
+              date: targetDate
           }
       });
   };
@@ -103,13 +105,13 @@ export default function AddScreen() {
         return;
     }
     
-    await addFood('2023-10-27', selectedMeal, {
+    await addFood(targetDate, selectedMeal, {
       name: foodName,
       calories: parseFloat(calories),
       protein: parseFloat(protein) || 0,
       fat: parseFloat(fat) || 0,
       carbs: parseFloat(carbs) || 0,
-      barcode: scannedCode || undefined
+      barcode: undefined 
     });
 
     router.navigate('/(tabs)/journal');

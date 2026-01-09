@@ -1,9 +1,9 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import apiClient from '../Services/ApiClient';
 import { FoodItem, ProductDto, MealType, AddFoodEntryDto,
-         CreateRecipeDto, IngredientDto, ShoppingListItem} from '../Types/Api';
+         CreateRecipeDto, IngredientDto, ShoppingListItem, Recipe } from '../Types/Api';
 import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { cacheDirectory, writeAsStringAsync } from 'expo-file-system/legacy';
@@ -13,10 +13,15 @@ interface FoodContextType {
   dailyMeals: Record<string, FoodItem[]>;
   searchResults: FoodItem[];
   productHistory: FoodItem[];
+  recipes: Recipe[];
+
   searchProduct: (query: string) => Promise<void>;
   addFood: (date: string, mealType: MealType, food: Omit<FoodItem, 'id'>) => Promise<void>;
+  addRecipeToDiary: (date: string, mealType: MealType, recipe: Recipe) => Promise<void>;
   fetchDailyMeals: (date: string) => Promise<void>;
+  fetchRecipes: () => Promise<void>;
   removeFood: (date: string, mealType: MealType, id: string) => void;
+  
   scannedCode: string | null;
   setScannedCode: (code: string | null) => void;
   isLoading: boolean;
@@ -35,11 +40,25 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [dailyMeals, setDailyMeals] = useState<Record<string, FoodItem[]>>({});
   const [productHistory, setProductHistory] = useState<FoodItem[]>([]);
   const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]); // NOWE
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
 
   const getDateKey = (dateStr: string) => dateStr.split('T')[0];
+
+  const fetchRecipes = async () => {
+      try {
+          const res = await apiClient.get('/api/Recipes');
+          setRecipes(res.data || []);
+      } catch (e) {
+          console.log("Błąd pobierania przepisów", e);
+      }
+  };
+
+  useEffect(() => {
+      fetchRecipes();
+  }, []);
 
   const fetchDailyMeals = async (date: string) => {
     try {
@@ -51,23 +70,25 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
       if (Array.isArray(entries)) {
         entries.forEach((entry: any) => {
-          if (!entry.product) return;
+          const productData = entry.product;
+          if (!productData) return;
+
           const entryDateKey = entry.date ? getDateKey(entry.date) : dateKey;
           const key = `${entryDateKey}_${entry.mealType}`;
           if (!newMealsForDate[key]) newMealsForDate[key] = [];
-
+          
           const amount = entry.amount || 100;
           const factor = amount / 100;
 
           const item: FoodItem = {
             id: entry.id || uuidv4(),
-            name: entry.product.name || 'Nieznany produkt',
-            calories: entry.product.calories ? (entry.product.calories * factor) : 0,
-            protein: entry.product.protein ? (entry.product.protein * factor) : 0,
-            fat: entry.product.fat ? (entry.product.fat * factor) : 0,
-            carbs: entry.product.carbs ? (entry.product.carbs * factor) : 0,
+            name: productData.name || 'Nieznany',
+            calories: (productData.calories || 0) * factor,
+            protein: (productData.protein || 0) * factor,
+            fat: (productData.fat || 0) * factor,
+            carbs: (productData.carbs || 0) * factor,
             amount: amount,
-            ...entry.product
+            ...productData
           };
           newMealsForDate[key].push(item);
         });
@@ -101,7 +122,7 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
     setIsLoading(true);
     const dateKey = getDateKey(date);
     const key = `${dateKey}_${mealType}`;
-
+    
     const amount = Number(food.amount) || 100;
     const factor = amount / 100;
 
@@ -119,11 +140,6 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
       ...prev,
       [key]: [...(prev[key] || []), newItem]
     }));
-
-    setProductHistory(prev => {
-      const exists = prev.find(p => (p.name || '').toLowerCase() === (food.name || '').toLowerCase());
-      return exists ? prev : [newItem, ...prev];
-    });
 
     try {
       const payload: AddFoodEntryDto = {
@@ -145,34 +161,109 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
       };
 
       await apiClient.post('/api/DiaryCotroller', payload);
-
     } catch (e: any) {
-      console.error("Błąd zapisu w API", e);
+      console.error("Błąd zapisu", e);
       if (e.response && e.response.status === 400) {
-          Alert.alert("Błąd walidacji", "Sprawdź dane produktu.");
+          Alert.alert("Błąd walidacji", "Serwer odrzucił dane.");
       } else {
-          Alert.alert('Błąd', 'Nie udało się zsynchronizować z serwerem');
+          Alert.alert("Błąd", "Nie udało się zapisać.");
       }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const addRecipeToDiary = async (date: string, mealType: MealType, recipe: Recipe) => {
+      setIsLoading(true);
+      const dateKey = getDateKey(date);
+      const key = `${dateKey}_${mealType}`;
+
+      let totalKcal = 0;
+      if (recipe.components) {
+      }
+
+      const newItem: FoodItem = {
+          id: uuidv4(),
+          name: recipe.name || "Przepis",
+          calories: 0,
+          protein: 0,
+          fat: 0,
+          carbs: 0,
+          amount: 1,
+      };
+
+      setDailyMeals(prev => ({
+          ...prev,
+          [key]: [...(prev[key] || []), newItem]
+      }));
+
+      try {
+          const payload: AddFoodEntryDto = {
+              date: new Date(date).toISOString(),
+              mealType: mealType,
+              amount: 1,
+              recipeId: recipe.id,
+              product: {
+                  name: recipe.name || "Przepis",
+                  calories: 0, 
+                  protein: 0, 
+                  fat: 0, 
+                  carbs: 0,
+                  servingUnit: "portion",
+                  servingSize: 1
+              }
+          };
+
+          await apiClient.post('/api/DiaryCotroller', payload);
+          await fetchDailyMeals(date);
+
+      } catch (e: any) {
+          console.error("Błąd dodawania przepisu", e);
+          Alert.alert("Błąd", "Nie udało się dodać przepisu.");
+      } finally {
+          setIsLoading(false);
+      }
+  };
+
   const createRecipe = async (name: string, ingredients: FoodItem[]) => {
     setIsLoading(true);
     try {
       const ingredientsDto: IngredientDto[] = ingredients.map(item => ({
-        amount: item.amount || 100,
+        amount: Number(item.amount) || 100,
         product: {
-            name: item.name, calories: item.calories, protein: item.protein || 0,
-            fat: item.fat || 0, carbs: item.carbs || 0,
+            name: item.name || "Składnik",
+            calories: Number(item.calories) || 0,
+            protein: Number(item.protein) || 0,
+            fat: Number(item.fat) || 0,
+            carbs: Number(item.carbs) || 0,
+            servingUnit: "g",
+            servingSize: 100,
+            brand: item.brand || "",
+            imageUrl: item.imageUrl || "",
+            externalId: item.externalId || undefined
         }
       }));
-      await apiClient.post('/api/Recipes', { name, ingredients: ingredientsDto, tags: [] });
+
+      const payload: CreateRecipeDto = {
+        name,
+        ingredients: ingredientsDto,
+        tags: [] 
+      };
+
+      await apiClient.post('/api/Recipes', payload);
       Alert.alert("Sukces", "Przepis utworzony!");
-    } catch (e) {
-      Alert.alert("Błąd", "Nie udało się zapisać przepisu");
-    } finally { setIsLoading(false); }
+      await fetchRecipes();
+      
+    } catch (e: any) {
+      console.error("Błąd tworzenia przepisu", e);
+      if (e.response && e.response.status === 400) {
+          Alert.alert("Błąd walidacji", "Sprawdź dane przepisu.");
+      } else {
+          Alert.alert("Błąd", "Nie udało się zapisać przepisu.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const fetchShoppingList = async (start: Date, end: Date) => {
@@ -236,7 +327,8 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
     <FoodContext.Provider value={{ 
       dailyMeals, productHistory, searchResults, addFood, removeFood, searchProduct, fetchDailyMeals,
       scannedCode, setScannedCode, isLoading, createRecipe, shoppingList, fetchShoppingList,
-      searchProductsApi, getProductDetails, exportData, importData
+      searchProductsApi, getProductDetails, exportData, importData,
+      recipes, fetchRecipes, addRecipeToDiary
     }}>
       {children}
     </FoodContext.Provider>

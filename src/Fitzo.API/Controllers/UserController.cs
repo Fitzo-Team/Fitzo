@@ -52,6 +52,39 @@ public class UsersController : ControllerBase
         return Ok(profile);
     }
 
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
+
+        if (!Guid.TryParse(userIdString, out var userIdGuid))
+        {
+            return BadRequest("Nieprawidłowy format ID w tokenie.");
+        }
+
+        var profileDto = await _context.UserProfiles
+            .Where(x => x.UserId == userIdGuid)
+            .Select(x => new UserProfileDto 
+            {
+                Age = x.Age,
+                Weight = x.Weight,
+                Height = x.Height,
+                Gender = x.Gender
+            })
+            .FirstOrDefaultAsync();
+
+        if (profileDto == null)
+        {
+            return NotFound("Profil nie został jeszcze uzupełniony.");
+        }
+
+        return Ok(profileDto);
+    }
+
     [HttpGet("bmr")]
     public async Task<IActionResult> GetBmr([FromQuery] BmrFormula formula = BmrFormula.MifflinStJeor)
     {

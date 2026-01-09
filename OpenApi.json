@@ -603,6 +603,16 @@
             "description": "Success"
           }
         }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/api/Users/bmr": {

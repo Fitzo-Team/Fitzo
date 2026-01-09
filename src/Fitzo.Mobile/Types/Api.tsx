@@ -110,3 +110,13 @@ export interface UserStatsDto {
     stepsTarget: number;
     weightCurrent: number;
 }
+
+export interface Recipe {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  description?: string;
+  tags?: string[];
+  ingredients?: IngredientDto[]; 
+  components?: any[]; 
+}

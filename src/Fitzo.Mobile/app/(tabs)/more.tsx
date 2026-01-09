@@ -58,7 +58,7 @@ export default function MoreScreen() {
         <MenuRow 
           icon={<Ionicons name="cart-outline" size={24} color="#E0AAFF" />}
           title="Lista zakupów"
-          onPress={() => router.push('/shopping-list' as any)}
+          onPress={() => router.push('/ShoppingList' as any)}
         />
         
         <View className="h-6" />

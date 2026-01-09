@@ -43,11 +43,31 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+        await SecureStore.deleteItemAsync('jwt_token');
+    } catch (e) {
+        console.log("Błąd usuwania tokena", e);
+    }
+    
+    delete apiClient.defaults.headers.common['Authorization'];
+    
+    setUserToken(null);
+    setUserData(null);
+    setUserBmr(null);
+    setWeightHistory([]);
+    setIsLoading(false);
+    
+    router.replace('/login');
+  };
+
   useEffect(() => {
     const bootstrapAsync = async () => {
       try {
         const token = await SecureStore.getItemAsync('jwt_token');
         if (token) {
+          console.log("Znaleziono token, przywracanie sesji...");
           setUserToken(token);
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           await fetchProfileInternal(); 
@@ -60,15 +80,39 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     bootstrapAsync();
   }, []);
 
+  const fetchWeightHistoryInternal = async () => {
+      try {
+          const res = await apiClient.get('/api/Weight');
+          const sorted = (res.data || []).sort((a: any, b: any) => 
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+          setWeightHistory(sorted);
+      } catch (e) {
+          console.log("Błąd historii wagi (może brak danych)");
+      }
+  };
+
   const fetchProfileInternal = async () => {
       try {
-          await fetchWeightHistoryInternal();
+          console.log("Pobieram profil użytkownika...");
+          const profileRes = await apiClient.get('/api/Users/profile');
           
-          // Symulacja odzyskania emaila (w prawdziwej apce dekodujesz JWT)
-          setUserData(prev => ({ ...prev, email: 'Zalogowany' }));
+          if (profileRes.data) {
+              setUserData(prev => ({ 
+                  ...prev, 
+                  ...profileRes.data,
+                  email: prev?.email || 'Użytkownik' 
+              }));
+          }
+          await fetchWeightHistoryInternal();
 
-      } catch (e) {
-          console.error("Nie udało się odświeżyć profilu", e);
+      } catch (e: any) {
+          console.error("Błąd pobierania profilu:", e.response?.status);
+          
+          if (e.response && e.response.status === 401) {
+              console.log("Token wygasł - automatyczne wylogowanie.");
+              await logout();
+          }
       }
   };
 
@@ -84,13 +128,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
         setUserToken(token);
         setUserData({ email });
         
-        await fetchWeightHistoryInternal();
+        await fetchProfileInternal();
         
         router.replace('/(tabs)/journal');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      Alert.alert('Błąd', 'Błąd logowania. Sprawdź dane.');
+      const msg = error.response?.status === 401 ? "Nieprawidłowe dane logowania" : "Błąd połączenia";
+      Alert.alert('Błąd', msg);
     } finally {
       setIsLoading(false);
     }
@@ -120,40 +165,21 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       };
 
       await apiClient.post('/api/Users/profile', profileDto);
+      
       setUserData({ ...profileData, email });
+      
+      await fetchWeightHistoryInternal(); 
+      setUserBmr(null);
+
       router.replace('/(tabs)/journal');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      Alert.alert('Błąd', 'Błąd rejestracji.');
+      const msg = error.response?.data?.message || "Błąd rejestracji";
+      Alert.alert('Błąd', msg);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const logout = async () => {
-    setIsLoading(true);
-    await SecureStore.deleteItemAsync('jwt_token');
-    delete apiClient.defaults.headers.common['Authorization'];
-    
-    setUserToken(null);
-    setUserData(null);
-    setUserBmr(null);
-    setWeightHistory([]);
-    setIsLoading(false);
-    router.replace('/login');
-  };
-
-  const fetchWeightHistoryInternal = async () => {
-      try {
-          const res = await apiClient.get('/api/Weight');
-          const sorted = (res.data || []).sort((a: any, b: any) => 
-            new Date(a.date).getTime() - new Date(b.date).getTime()
-          );
-          setWeightHistory(sorted);
-      } catch (e) {
-          console.error("Błąd historii wagi", e);
-      }
   };
 
   const fetchWeightHistory = async () => {
@@ -174,7 +200,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
       
       setUserBmr(null); 
-
       await fetchWeightHistoryInternal();
       Alert.alert("Sukces", "Zapisano nową wagę");
     } catch (e) {
@@ -201,11 +226,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
   const fetchBMR = async (forceRefresh = false): Promise<number> => {
     if (userBmr !== null && !forceRefresh) {
-        console.log(`[CACHE] Używam BMR: ${userBmr}`);
         return userBmr;
     }
 
     try {
+      if (!userData?.weight) {
+      }
+
       console.log("[API] Pobieram BMR..."); 
       const res = await apiClient.get('/api/Users/bmr', {
         params: { formula: 'MifflinStJeor' }
@@ -220,9 +247,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
       return 2500;
     } catch (e: any) {
-      if (e.response && e.response.status === 400) {
-          console.log("Brak profilu w bazie (Błąd 400).");
-      }
       return 2500;
     }
   };

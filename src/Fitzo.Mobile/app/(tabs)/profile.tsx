@@ -42,7 +42,7 @@ export default function ProfileScreen() {
 
   let canGoBack = false;
   try {
-      canGoBack = router.canGoBack();
+      canGoBack = router.canGoBack(); 
   } catch (e) {
       canGoBack = false;
   }

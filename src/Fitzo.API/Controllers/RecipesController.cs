@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Fitzo.API.Entities;
 using Fitzo.API.Interfaces;
 using Fitzo.API.Patterns;
@@ -50,6 +51,21 @@ namespace Fitzo.API.Controllers;
             }
 
             return Ok(MapRecipeToDto(recipe));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GetRecipes()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(!Guid.TryParse(userId, out var userGuid))
+            {
+                return Unauthorized();
+            }
+
+            var recipes = await _recipeManager.GetRecipes(userGuid);
+            var result = recipes.Select(r => MapRecipeToDto(r));
+        
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -140,26 +156,25 @@ namespace Fitzo.API.Controllers;
                 TotalFat = recipe.CalculateFat(),
                 TotalCarbs = recipe.CalculateCarbs(),
 
-                Components = recipe.Components.Select(c => 
-                {
-                    var ingredient = c as Ingredient;
-                    
-                    return new 
+                Ingredients = recipe.Components
+                    .OfType<Ingredient>()
+                    .Select(i => new 
                     {
-                        c.Id,
-                        c.Name,
-                        Type = c is Ingredient ? "Ingredient" : "Recipe",
-                        
-                        Amount = ingredient?.Amount ?? 0,
-                        Unit = ingredient?.Product?.ServingUnit ?? "g",
-
-                        Calories = c.CalculateCalories(),
-                        Protein = c.CalculateProtein(),
-                        Fat = c.CalculateFat(),
-                        Carbs = c.CalculateCarbs()
-                    };
-                })
+                        Amount = i.Amount,
+                        Product = new 
+                        {
+                            Name = i.Product.Name,
+                            Calories = i.Product.Calories,
+                            Protein = i.Product.Protein,
+                            Fat = i.Product.Fat,
+                            Carbs = i.Product.Carbs,
+                            ServingUnit = i.Product.ServingUnit,
+                            ServingSize = i.Product.ServingSize,
+                            Brand = i.Product.brand,
+                            ImageUrl = i.Product.ImageUrl,
+                            ExternalId = i.Product.ExternalId
+                        }
+                    })
             };
         }
-
     }

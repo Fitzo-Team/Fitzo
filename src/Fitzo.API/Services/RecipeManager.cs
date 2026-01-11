@@ -21,6 +21,16 @@ namespace Fitzo.API.Services
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
+        public async Task<IEnumerable<Recipe>> GetRecipes(Guid id)
+        {
+                return await _context.Recipes
+                .Where(r => r.OwnerId == id)
+                .Include(r => r.Components)
+                .ThenInclude(c => (c as Ingredient).Product)
+                .ToListAsync();
+
+        }
+
         public async Task CreateRecipeAsync(Recipe recipe)
         {
             _context.Recipes.Add(recipe);

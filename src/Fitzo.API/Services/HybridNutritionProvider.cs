@@ -20,17 +20,31 @@ public class HybridNutritionProvider : INutritionProvider
     {
         if (id.StartsWith("off:")) return await _offAdapter.GetProductAsync(id);
         if (id.StartsWith("usda:")) return await _usdaAdapter.GetProductAsync(id);
+
+        if (id.All(char.IsDigit) && !string.IsNullOrEmpty(id))
+        {
+            return await _offAdapter.GetProductAsync($"off:{id}");
+        }
         
         return null;
     }
 
     public async Task<IEnumerable<ProductDto>> SearchProductsAsync(ProductSearchFilterDto filter)
     {
+        if (string.IsNullOrWhiteSpace(filter.Query))
+        {
+            return Enumerable.Empty<ProductDto>();
+        }
+
+        var query = filter.Query.Trim();
+        
+        bool isBarcode = query.All(char.IsDigit) && query.Length > 0;
+
         var tasks = new List<Task<IEnumerable<ProductDto>>>();
 
         tasks.Add(SafeSearch(_offAdapter, filter));
 
-        if (!filter.HasAdvancedFilters)
+        if (!isBarcode && !filter.HasAdvancedFilters)
         {
             tasks.Add(SafeSearch(_usdaAdapter, filter));
         }
@@ -38,7 +52,6 @@ public class HybridNutritionProvider : INutritionProvider
         await Task.WhenAll(tasks);
 
         var results = new List<ProductDto>();
-
         foreach (var task in tasks)
         {
             results.AddRange(task.Result);
@@ -46,7 +59,6 @@ public class HybridNutritionProvider : INutritionProvider
 
         return results;
     }
-
     private async Task<IEnumerable<ProductDto>> SafeSearch(INutritionProvider provider, ProductSearchFilterDto filter)
     {
         try

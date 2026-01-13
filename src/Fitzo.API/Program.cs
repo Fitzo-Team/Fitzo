@@ -82,7 +82,7 @@ builder.Services.AddAuthentication(jwtOptions =>
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<OffAdapter>(client =>
 {
-    client.BaseAddress = new Uri("https://world.openfoodfacts.org/");
+    client.BaseAddress = new Uri("https://pl.openfoodfacts.org/");
     client.DefaultRequestHeaders.Add("User-Agent", "FitzoApp - StudentProject - version 1.0");
 
     var authString = "off:off";

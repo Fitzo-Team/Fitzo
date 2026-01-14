@@ -8,20 +8,19 @@ import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { cacheDirectory, writeAsStringAsync } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface FoodContextType {
   dailyMeals: Record<string, FoodItem[]>;
   searchResults: FoodItem[];
   productHistory: FoodItem[];
   recipes: Recipe[];
-
   searchProduct: (query: string) => Promise<void>;
   addFood: (date: string, mealType: MealType, food: Omit<FoodItem, 'id'>) => Promise<void>;
-  addRecipeToDiary: (date: string, mealType: MealType, recipe: Recipe) => Promise<void>;
+  addRecipeToDiary: (date: string, mealType: MealType, recipe: Recipe, quantity: number) => Promise<void>;
   fetchDailyMeals: (date: string) => Promise<void>;
   fetchRecipes: () => Promise<void>;
   removeFood: (date: string, mealType: MealType, id: string) => void;
-  
   scannedCode: string | null;
   setScannedCode: (code: string | null) => void;
   isLoading: boolean;
@@ -40,32 +39,58 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [dailyMeals, setDailyMeals] = useState<Record<string, FoodItem[]>>({});
   const [productHistory, setProductHistory] = useState<FoodItem[]>([]);
   const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
-  const [recipes, setRecipes] = useState<Recipe[]>([]); // NOWE
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
 
   const getDateKey = (dateStr: string) => dateStr.split('T')[0];
 
+  useEffect(() => {
+    const loadHistory = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@product_history');
+            if (jsonValue != null) {
+                setProductHistory(JSON.parse(jsonValue));
+            }
+        } catch(e: any) {
+             console.log("Błąd ładowania historii", e);
+        }
+    };
+    loadHistory();
+    fetchRecipes();
+  }, []);
+
+  const saveHistory = async (newItem: FoodItem) => {
+      setProductHistory(prev => {
+          const filtered = prev.filter(p => (p.name || '').toLowerCase() !== (newItem.name || '').toLowerCase());
+          const newHistory = [newItem, ...filtered].slice(0, 20);
+          AsyncStorage.setItem('@product_history', JSON.stringify(newHistory)).catch((e: any) => console.log(e));
+          return newHistory;
+      });
+  };
+
   const fetchRecipes = async () => {
       try {
           const res = await apiClient.get('/api/Recipes');
-          setRecipes(res.data || []);
-      } catch (e) {
-          console.log("Błąd pobierania przepisów", e);
+          // Obsługa formatu tablicy LUB paginacji
+          const data = Array.isArray(res.data) ? res.data : (res.data?.items || []);
+          setRecipes(data);
+      } catch (e: any) { 
+          console.log("Błąd pobierania przepisów:", e.message); 
       }
   };
-
-  useEffect(() => {
-      fetchRecipes();
-  }, []);
 
   const fetchDailyMeals = async (date: string) => {
     try {
       const dateKey = getDateKey(date);
       const isoDate = new Date(date).toISOString();
       const res = await apiClient.get('/api/DiaryCotroller', { params: { date: isoDate } });
-      const entries = res.data; 
+      
+      // Obsługa formatu: czysta tablica lub obiekt { items: [] }
+      const rawData = res.data;
+      const entries = Array.isArray(rawData) ? rawData : (rawData?.items || []);
+
       const newMealsForDate: Record<string, FoodItem[]> = {};
 
       if (Array.isArray(entries)) {
@@ -77,16 +102,22 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
           const key = `${entryDateKey}_${entry.mealType}`;
           if (!newMealsForDate[key]) newMealsForDate[key] = [];
           
-          const amount = entry.amount || 100;
-          const factor = amount / 100;
+          const amount = entry.amount || 0;
+          let conversionFactor: number;
+
+          if (productData.servingUnit === 'portion') {
+              conversionFactor = amount; 
+          } else {
+              conversionFactor = amount / 100; 
+          }
 
           const item: FoodItem = {
             id: entry.id || uuidv4(),
             name: productData.name || 'Nieznany',
-            calories: (productData.calories || 0) * factor,
-            protein: (productData.protein || 0) * factor,
-            fat: (productData.fat || 0) * factor,
-            carbs: (productData.carbs || 0) * factor,
+            calories: productData.calories * conversionFactor,
+            protein: productData.protein * conversionFactor,
+            fat: productData.fat * conversionFactor,
+            carbs: productData.carbs * conversionFactor,
             amount: amount,
             ...productData
           };
@@ -94,28 +125,77 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
         });
         setDailyMeals(prev => ({ ...prev, ...newMealsForDate }));
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Błąd pobierania dziennika", e);
     }
   };
 
-  const searchProduct = async (query: string) => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient.get('/api/Product/search', {
-        params: { Query: query, Page: 1, PageSize: 20 }
-      });
-      const products: FoodItem[] = (res.data || []).map((p: ProductDto) => ({
-        ...p,
-        id: uuidv4(),
-        name: p.name || 'Bez nazwy',
+  const addRecipeToDiary = async (date: string, mealType: MealType, recipe: Recipe, quantity: number = 1) => {
+      setIsLoading(true);
+      const dateKey = getDateKey(date);
+      const key = `${dateKey}_${mealType}`;
+
+      let kcalPerPortion = 0;
+      let pPerPortion = 0;
+      let fPerPortion = 0;
+      let cPerPortion = 0;
+
+      if (recipe.ingredients) {
+          recipe.ingredients.forEach(ing => {
+               const factor = ing.amount / 100;
+               kcalPerPortion += (ing.product.calories * factor);
+               pPerPortion += (ing.product.protein * factor);
+               fPerPortion += (ing.product.fat * factor);
+               cPerPortion += (ing.product.carbs * factor);
+          });
+      } else if ((recipe as any).totalCalories) {
+          kcalPerPortion = (recipe as any).totalCalories;
+          pPerPortion = (recipe as any).totalProtein;
+          fPerPortion = (recipe as any).totalFat;
+          cPerPortion = (recipe as any).totalCarbs;
+      }
+
+      const newItem: FoodItem = {
+          id: uuidv4(),
+          name: recipe.name || "Przepis",
+          calories: kcalPerPortion * quantity,
+          protein: pPerPortion * quantity,
+          fat: fPerPortion * quantity,
+          carbs: cPerPortion * quantity,
+          amount: quantity,
+          servingUnit: 'portion', 
+          servingSize: 1
+      };
+
+      setDailyMeals(prev => ({
+          ...prev,
+          [key]: [...(prev[key] || []), newItem]
       }));
-      setSearchResults(products);
-    } catch (e) {
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
-    }
+
+      try {
+          const payload: AddFoodEntryDto = {
+              date: new Date(date).toISOString(),
+              mealType: mealType,
+              amount: quantity, 
+              recipeId: recipe.id, 
+              product: {
+                  name: recipe.name || "Przepis",
+                  calories: 0, 
+                  protein: 0, fat: 0, carbs: 0,
+                  servingUnit: "portion",
+                  servingSize: 1
+              }
+          };
+
+          await apiClient.post('/api/DiaryCotroller', payload);
+          await fetchDailyMeals(date);
+
+      } catch (e: any) {
+          console.error("Błąd dodawania przepisu", e);
+          Alert.alert("Błąd", "Nie udało się dodać przepisu.");
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   const addFood = async (date: string, mealType: MealType, food: Omit<FoodItem, 'id'>) => {
@@ -136,10 +216,8 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
         amount: amount 
     };
 
-    setDailyMeals(prev => ({
-      ...prev,
-      [key]: [...(prev[key] || []), newItem]
-    }));
+    setDailyMeals(prev => ({ ...prev, [key]: [...(prev[key] || []), newItem] }));
+    saveHistory(newItem);
 
     try {
       const payload: AddFoodEntryDto = {
@@ -162,67 +240,10 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
       await apiClient.post('/api/DiaryCotroller', payload);
     } catch (e: any) {
-      console.error("Błąd zapisu", e);
-      if (e.response && e.response.status === 400) {
-          Alert.alert("Błąd walidacji", "Serwer odrzucił dane.");
-      } else {
-          Alert.alert("Błąd", "Nie udało się zapisać.");
-      }
+      if (e.response && e.response.status === 400) Alert.alert("Błąd walidacji");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const addRecipeToDiary = async (date: string, mealType: MealType, recipe: Recipe) => {
-      setIsLoading(true);
-      const dateKey = getDateKey(date);
-      const key = `${dateKey}_${mealType}`;
-
-      let totalKcal = 0;
-      if (recipe.components) {
-      }
-
-      const newItem: FoodItem = {
-          id: uuidv4(),
-          name: recipe.name || "Przepis",
-          calories: 0,
-          protein: 0,
-          fat: 0,
-          carbs: 0,
-          amount: 1,
-      };
-
-      setDailyMeals(prev => ({
-          ...prev,
-          [key]: [...(prev[key] || []), newItem]
-      }));
-
-      try {
-          const payload: AddFoodEntryDto = {
-              date: new Date(date).toISOString(),
-              mealType: mealType,
-              amount: 1,
-              recipeId: recipe.id,
-              product: {
-                  name: recipe.name || "Przepis",
-                  calories: 0, 
-                  protein: 0, 
-                  fat: 0, 
-                  carbs: 0,
-                  servingUnit: "portion",
-                  servingSize: 1
-              }
-          };
-
-          await apiClient.post('/api/DiaryCotroller', payload);
-          await fetchDailyMeals(date);
-
-      } catch (e: any) {
-          console.error("Błąd dodawania przepisu", e);
-          Alert.alert("Błąd", "Nie udało się dodać przepisu.");
-      } finally {
-          setIsLoading(false);
-      }
   };
 
   const createRecipe = async (name: string, ingredients: FoodItem[]) => {
@@ -244,58 +265,76 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
         }
       }));
 
-      const payload: CreateRecipeDto = {
-        name,
-        ingredients: ingredientsDto,
-        tags: [] 
-      };
-
+      const payload: CreateRecipeDto = { name, ingredients: ingredientsDto, tags: [] };
       await apiClient.post('/api/Recipes', payload);
       Alert.alert("Sukces", "Przepis utworzony!");
-      await fetchRecipes();
-      
+      await fetchRecipes(); 
     } catch (e: any) {
-      console.error("Błąd tworzenia przepisu", e);
-      if (e.response && e.response.status === 400) {
-          Alert.alert("Błąd walidacji", "Sprawdź dane przepisu.");
-      } else {
-          Alert.alert("Błąd", "Nie udało się zapisać przepisu.");
-      }
+      if (e.response && e.response.status === 400) Alert.alert("Błąd walidacji");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchShoppingList = async (start: Date, end: Date) => {
-      try {
-          const res = await apiClient.get('/api/Planning/shopping-list', {
-              params: { startDate: start.toISOString(), endDate: end.toISOString() }
-          });
-          setShoppingList(res.data);
-      } catch (e) { console.error("Błąd listy zakupów", e); }
-  };
+  // --- NAPRAWIONE FUNKCJE WYSZUKIWANIA I POMOCNICZE ---
 
-  const removeFood = (date: string, mealType: MealType, id: string) => {
-    const dateKey = getDateKey(date);
-    const key = `${dateKey}_${mealType}`;
-    setDailyMeals(prev => ({
-      ...prev,
-      [key]: prev[key] ? prev[key].filter(item => item.id !== id) : []
-    }));
+  const searchProduct = async (query: string) => {
+      setIsLoading(true);
+      try {
+          // Dodajemy logowanie, żebyś widział co wraca z backendu
+          const res = await apiClient.get('/api/Product/search', { params: { Query: query, Page: 1, PageSize: 20 } });
+          console.log("Wynik wyszukiwania (scan):", res.data);
+          
+          // UODPORNIENIE NA FORMAT: Czy to tablica, czy obiekt z items?
+          const rawData = res.data;
+          const dataArray = Array.isArray(rawData) ? rawData : (rawData?.items || []);
+
+          const products: FoodItem[] = dataArray.map((p: ProductDto) => ({
+              ...p,
+              id: uuidv4(),
+              name: p.name || 'Bez nazwy',
+          }));
+          setSearchResults(products);
+      } catch (e: any) {
+          console.log("Błąd szukania produktu:", e);
+          setSearchResults([]);
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   const searchProductsApi = async (query: string): Promise<ProductDto[]> => {
-    try {
-      const res = await apiClient.get('/api/Product/search', { params: { Query: query, Page: 1, PageSize: 50 } });
-      return res.data || [];
-    } catch (e) { return []; }
+      try {
+          const res = await apiClient.get('/api/Product/search', { params: { Query: query, Page: 1, PageSize: 50 } });
+          console.log("Wynik wyszukiwania (text):", res.data);
+          
+          // UODPORNIENIE NA FORMAT
+          const rawData = res.data;
+          return Array.isArray(rawData) ? rawData : (rawData?.items || []);
+      } catch (e: any) {
+          console.log("Błąd searchProductsApi:", e);
+          return [];
+      }
   };
 
   const getProductDetails = async (id: string): Promise<ProductDto | null> => {
       try {
           const res = await apiClient.get(`/api/Product/${id}`);
           return res.data;
-      } catch(e) { return null; }
+      } catch(e: any) { return null; }
+  };
+
+  const fetchShoppingList = async (start: Date, end: Date) => {
+      try {
+          const res = await apiClient.get('/api/Planning/shopping-list', { params: { startDate: start.toISOString(), endDate: end.toISOString() } });
+          setShoppingList(res.data);
+      } catch (e: any) { }
+  };
+
+  const removeFood = (date: string, mealType: MealType, id: string) => {
+      const dateKey = getDateKey(date);
+      const key = `${dateKey}_${mealType}`;
+      setDailyMeals(prev => ({ ...prev, [key]: prev[key] ? prev[key].filter(item => item.id !== id) : [] }));
   };
 
   const exportData = async () => {
@@ -307,7 +346,7 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
           const fileUri = cacheDirectory + 'fitzo_data.json';
           await writeAsStringAsync(fileUri, dataStr);
           await Sharing.shareAsync(fileUri);
-      } catch (e) { Alert.alert("Błąd", "Eksport nieudany"); } finally { setIsLoading(false); }
+      } catch (e: any) { Alert.alert("Błąd", "Eksport nieudany"); } finally { setIsLoading(false); }
   };
 
   const importData = async () => {
@@ -320,7 +359,7 @@ export const FoodProvider: React.FC<{children: React.ReactNode}> = ({ children }
           setIsLoading(true);
           await apiClient.post('/api/Export/import/json', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
           Alert.alert("Sukces", "Dane zaimportowane!");
-      } catch (e) { Alert.alert("Błąd", "Import nieudany"); } finally { setIsLoading(false); }
+      } catch (e: any) { Alert.alert("Błąd", "Import nieudany"); } finally { setIsLoading(false); }
   };
 
   return (

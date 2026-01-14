@@ -64,7 +64,8 @@ public class DiaryCotroller: ControllerBase
                 Fat = recipe.CalculateFat(),
                 Carbs = recipe.CalculateCarbs(),
                 
-                ServingUnit = "g",
+                ServingUnit = "portion",
+                ServingSize = 1,
                 Category = FoodCategories.Unknown,
                 IsDataComplete = true
             };

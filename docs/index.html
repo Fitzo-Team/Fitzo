@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitzo - Twój Inteligentny Planer</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">Fitzo<span class="dot">.</span></div>
+            <ul class="nav-links">
+                <li><a href="#features">Funkcje</a></li>
+                <li><a href="#how-it-works">Jak to działa</a></li>
+                <li><a href="#download" class="btn-cta">Pobierz</a></li>
+            </ul>
+            <div class="burger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <div class="hero-text" data-aos="fade-right" data-aos-duration="1000">
+                <h1>Zadbaj o formę <br> <span class="text-highlight">Inteligentnie</span></h1>
+                <p>Planuj posiłki, generuj listy zakupów jednym kliknięciem i śledź swoje postępy. Wszystko w jednym miejscu.</p>
+                <div class="hero-buttons">
+                    <a href="#download" class="btn-cta pulse-anim">Rozpocznij teraz <i class="fas fa-arrow-right"></i></a>
+                    <a href="#features" class="btn-outline">Zobacz więcej</a>
+                </div>
+                
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <h3>500+</h3>
+                        <p>Przepisów</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>100%</h3>
+                        <p>Darmowe</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image" data-aos="zoom-in" data-aos-duration="1200">
+                <div class="phone-mockup">
+                    <img src="images/IMG_0963.PNG" alt="Fitzo App Screenshot">
+                    <div class="glow-effect"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Dlaczego <span class="text-brand">Fitzo?</span></h2>
+                <p>Nie tylko licznik kalorii. To Twój asystent.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-box">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                    <h3>Lista zakupów</h3>
+                    <p>Twórz listę zakupów na podstawie własnego kalendarza z posiłkami. Koniec z chaosem.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-box">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Planer Posiłków</h3>
+                    <p>Przeciągaj i upuszczaj posiłki w kalendarzu. Planuj cały tydzień w 5 minut.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon-box">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Złożone Przepisy</h3>
+                    <p>Twórz własne przepisy i szybko dodawaj je do własnego kalendarza</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="download-section">
+        <div class="container download-content" data-aos="zoom-in">
+            <h2>Pobierz <span class="text-flame">Fitzo</span> już dziś</h2>
+            <p>Dostępne na system Android oraz IOS. Przejmij kontrolę nad swoją dietą.</p>
+            <div class="store-buttons">
+                <a href="#" class="store-btn">
+                    <i class="fab fa-google-play"></i>
+                    <div>
+                        <span>Pobierz z</span>
+                        <strong>Google Play</strong>
+                    </div>
+                </a>
+                </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-logo">Fitzo.</div>
+            <p>&copy; 2026 Fitzo Team. Built for fitness.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            once: true, // Animacja odtwarza się tylko raz
+            offset: 100 // Uruchom animację 100px przed elementem
+        });
+    </script>
+</body>
+</html>

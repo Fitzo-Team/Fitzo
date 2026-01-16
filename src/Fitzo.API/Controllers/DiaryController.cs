@@ -139,10 +139,15 @@ public class DiaryCotroller: ControllerBase
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
-        var entries = await context.FoodEntries
-            .Where(e => e.UserId == userId && e.Date.Date == date.Date)
-            .OrderBy(e => e.MealType)
-            .ToListAsync();
+            var startOfDay = date.Date; 
+            var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
+
+            var entries = await context.FoodEntries
+                .Where( e => e.UserId == userId && 
+                        e.Date >= startOfDay && 
+                        e.Date <= endOfDay)
+                .OrderBy(e => e.MealType)
+                .ToListAsync();
 
         return Ok(entries);
     }

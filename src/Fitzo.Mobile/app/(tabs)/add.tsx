@@ -24,7 +24,8 @@ export default function AddScreen() {
   const { 
     addFood, createRecipe, addRecipeToDiary, recipes, fetchRecipes,
     scannedCode, setScannedCode, productHistory, searchProduct, 
-    searchProductsApi, searchResults, isLoading 
+    searchProductsApi, searchResults, isLoading,
+    addToHistory
   } = useFood();
   
   const initialMeal = (params.initialMeal as MealType) || MealType.Breakfast;
@@ -83,6 +84,13 @@ export default function AddScreen() {
   }, [searchResults]);
 
   const goToDetails = (product: ProductDto) => {
+      const itemToHistory: FoodItem = {
+          ...product,
+          id: product.externalId || Math.random().toString(),
+          name: product.name || "Bez nazwy"
+      };
+      addToHistory(itemToHistory);
+
       router.push({
           pathname: '/product-details',
           params: {
@@ -109,7 +117,7 @@ export default function AddScreen() {
       
       setApiResults(results);
       setShowSearchList(true);
-      Keyboard.dismiss();
+      Keyboard.dismiss(); 
   };
 
   const handleSaveProduct = async () => {
@@ -238,7 +246,7 @@ export default function AddScreen() {
                     className="flex-1 bg-brand-card text-white p-4 rounded-xl border border-brand-accent" 
                     placeholder="Szukaj produktu..." placeholderTextColor="#666" 
                     value={searchQuery} onChangeText={setSearchQuery} 
-                    onSubmitEditing={handleSearchApi}
+                    onSubmitEditing={handleSearchApi} 
                 />
                 <TouchableOpacity onPress={handleSearchApi} className="bg-brand-primary justify-center px-4 rounded-xl"><Ionicons name="search" size={24} color="white" /></TouchableOpacity>
                 <TouchableOpacity onPress={() => { setScannedCode(null); setScannedLock(false); setIsScannerOpen(true); }} className="bg-brand-card border border-brand-primary justify-center px-4 rounded-xl"><Ionicons name="barcode-outline" size={24} color="#9D4EDD" /></TouchableOpacity>
@@ -256,12 +264,8 @@ export default function AddScreen() {
                             onPress={() => goToDetails(item)}
                         >
                             <View className="flex-1 mr-2">
-                                <Text className="text-white font-bold" numberOfLines={1}>
-                                    {item.name || "Produkt bez nazwy"}
-                                </Text>
-                                <Text className="text-brand-muted text-xs">
-                                    {item.calories} kcal • {item.brand || "Brak marki"}
-                                </Text>
+                                <Text className="text-white font-bold" numberOfLines={1}>{item.name || "Produkt bez nazwy"}</Text>
+                                <Text className="text-brand-muted text-xs">{item.calories} kcal • {item.brand || "Brak marki"}</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={24} color="#E0AAFF" />
                         </TouchableOpacity>
@@ -272,15 +276,15 @@ export default function AddScreen() {
                 </View>
             )}
 
-            <Text className="text-brand-text mb-2 ml-1 font-bold">Ostatnio używane (Lokalnie):</Text>
+            <Text className="text-brand-text mb-2 ml-1 font-bold">Ostatnio używane:</Text>
             <View className="bg-brand-card rounded-xl border border-brand-accent overflow-hidden mb-4">
-                 {productHistory.slice(0, 5).map((item, index) => (
+                 {productHistory.slice(0, 10).map((item, index) => (
                       <TouchableOpacity key={`${item.id}_${index}`} onPress={() => goToDetails(item)} className="p-4 flex-row justify-between items-center border-b border-brand-dark">
                         <Text className="font-medium flex-1 text-brand-text">{item.name}</Text>
                         <Ionicons name="add-circle-outline" size={24} color="#E0AAFF" />
                       </TouchableOpacity>
                  ))}
-                 {productHistory.length === 0 && <Text className="p-4 text-brand-muted text-center">Brak historii w telefonie</Text>}
+                 {productHistory.length === 0 && <Text className="p-4 text-brand-muted text-center">Brak historii</Text>}
             </View>
 
             <Text className="text-brand-muted text-center my-2">Lub dodaj ręcznie:</Text>

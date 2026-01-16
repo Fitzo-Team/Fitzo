@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../Context/AuthContext';
 import { useFood } from '../../Context/FoodContext';
@@ -33,12 +33,12 @@ export default function MoreScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <TouchableOpacity 
             className="flex-row items-center mx-5 p-4 bg-brand-card rounded-2xl border border-brand-accent mb-6 shadow-md"
-            onPress={() => router.push('/profile')}
+            onPress={() => router.push('/settings')} // Profil jest teraz częścią ustawień/konta
         >
             <View className="w-14 h-14 bg-brand-vivid rounded-full items-center justify-center border border-brand-light">
-                {userToken && userData?.username ? (
+                {userToken && userData?.email ? (
                    <Text className="text-white text-xl font-bold">
-                     {userData.username.charAt(0).toUpperCase()}
+                     {userData.email.charAt(0).toUpperCase()}
                    </Text>
                 ) : (
                    <Ionicons name="person" size={24} color="white" />
@@ -46,19 +46,26 @@ export default function MoreScreen() {
             </View>
             <View className="ml-4 flex-1">
                 <Text className="text-brand-text font-bold text-lg">
-                    {userToken ? (userData?.username || 'Użytkownik') : 'Profil Gościa'}
+                    {userToken ? (userData?.username || userData?.email || 'Użytkownik') : 'Profil Gościa'}
                 </Text>
                 <Text className="text-brand-muted text-xs">
-                    {userToken ? 'Edytuj profil i cel' : 'Zaloguj się'}
+                    {userToken ? 'Zarządzaj kontem' : 'Zaloguj się'}
                 </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#C77DFF" />
         </TouchableOpacity>
 
         <MenuRow 
+          icon={<Ionicons name="bar-chart-outline" size={24} color="#C77DFF" />}
+          title="Statystyki"
+          subtitle="Postępy i makroskładniki"
+          onPress={() => router.push('/stats')}
+        />
+
+        <MenuRow 
           icon={<Ionicons name="cart-outline" size={24} color="#E0AAFF" />}
           title="Lista zakupów"
-          onPress={() => router.push('/ShoppingList' as any)}
+          onPress={() => router.push('/ShoppingList')} // Upewnij się, że masz plik app/shopping.tsx lub app/(tabs)/shopping.tsx
         />
         
         <View className="h-6" />
@@ -79,7 +86,8 @@ export default function MoreScreen() {
         <MenuRow 
           icon={<Ionicons name="settings-outline" size={24} color="#E0AAFF" />}
           title="Ustawienia"
-          onPress={() => {}}
+          subtitle="BMR, Wzory, Aplikacja"
+          onPress={() => router.push('/settings')}
         />
 
         {userToken && (

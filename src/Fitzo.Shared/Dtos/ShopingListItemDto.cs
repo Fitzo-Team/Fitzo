@@ -8,5 +8,6 @@ namespace Fitzo.Shared.Dtos
         public string Unit { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public bool IsBought { get; set; } = false;
+        public List<string> Sources { get; set; } = new List<string>();
     }
 }

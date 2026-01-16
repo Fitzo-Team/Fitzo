@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFood } from '../../Context/FoodContext';
 import { useAuth } from '../../Context/AuthContext';
@@ -32,11 +32,14 @@ export default function JournalScreen() {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
       const dateStr = currentDate.toISOString().split('T')[0];
-      fetchDailyMeals(dateStr);
+      fetchDailyMeals(currentDate.toISOString()); 
+      
       fetchBMR().then(bmr => setTargetCalories(bmr));
-  }, [currentDate]);
+    }, [currentDate])
+  );
 
   const calendarDays = useMemo(() => {
       const days = [];
@@ -78,13 +81,13 @@ export default function JournalScreen() {
             <Text className="text-brand-muted text-xs">{totalCals.toFixed(0)} kcal</Text>
           </View>
           <TouchableOpacity onPress={() => goToAdd(mealType)}>
-             <Ionicons name="add-circle" size={32} color="#E0AAFF" />
+              <Ionicons name="add-circle" size={32} color="#E0AAFF" />
           </TouchableOpacity>
         </View>
 
         {items.length === 0 ? (
           <TouchableOpacity onPress={() => goToAdd(mealType)} className="py-4 bg-brand-card/30 rounded-2xl border border-dashed border-brand-accent/50 items-center justify-center">
-             <Text className="text-brand-muted text-sm font-medium">Dodaj produkt</Text>
+              <Text className="text-brand-muted text-sm font-medium">Dodaj produkt</Text>
           </TouchableOpacity>
         ) : (
           items.map((item, index) => (
@@ -92,7 +95,7 @@ export default function JournalScreen() {
               <View className="flex-1 mr-4">
                 <Text className="text-brand-text font-bold text-base" numberOfLines={1}>{item.name}</Text>
                 <Text className="text-brand-muted text-xs mt-1">
-                    {item.amount}g  •  <Text className="text-brand-vivid">{item.calories?.toFixed(0)} kcal</Text>
+                    {item.amount} {item.servingUnit === 'portion' ? 'porcji' : 'g'}  •  <Text className="text-brand-vivid">{item.calories?.toFixed(0)} kcal</Text>
                 </Text>
               </View>
               <TouchableOpacity 

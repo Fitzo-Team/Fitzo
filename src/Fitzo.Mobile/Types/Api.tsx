@@ -71,6 +71,7 @@ export interface ShoppingListItem {
   unit?: string;
   category?: string;
   isBought: boolean;
+  sources: string[];
 }
 
 export enum DietTag {

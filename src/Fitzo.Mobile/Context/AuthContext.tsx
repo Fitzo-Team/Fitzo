@@ -1,9 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../Services/ApiClient';
 import { UserProfileDto, AddWeightDto } from '../Types/Api';
 import { Alert } from 'react-native';
+
+export type BmrFormula = 'MifflinStJeor' | 'HarrisBenedict';
 
 interface UserData extends Partial<UserProfileDto> {
   username?: string;
@@ -22,6 +25,8 @@ interface AuthContextType {
   userData: UserData | null;
   weightHistory: WeightEntry[];
   isLoading: boolean;
+  bmrFormula: BmrFormula;
+  
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, profileData: UserData) => Promise<void>;
   logout: () => void;
@@ -30,6 +35,7 @@ interface AuthContextType {
   updateProfile: (profile: UserProfileDto) => Promise<void>;
   fetchBMR: (forceRefresh?: boolean) => Promise<number>;
   fetchProfile: () => Promise<void>;
+  setBmrFormula: (formula: BmrFormula) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -40,8 +46,34 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
   const [userBmr, setUserBmr] = useState<number | null>(null); 
   
+  const [bmrFormula, setBmrFormulaState] = useState<BmrFormula>('MifflinStJeor');
+  
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('jwt_token');
+        if (token) {
+          console.log("Znaleziono token, weryfikacja sesji...");
+          setUserToken(token);
+          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          await fetchProfileInternal(); 
+        }
+
+        const storedFormula = await AsyncStorage.getItem('bmr_formula');
+        if (storedFormula) {
+            setBmrFormulaState(storedFormula as BmrFormula);
+        }
+
+      } catch (e) {
+        console.log('Restoring token failed');
+      }
+    };
+
+    bootstrapAsync();
+  }, []);
 
   const logout = async () => {
     setIsLoading(true);
@@ -69,8 +101,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
             new Date(a.date).getTime() - new Date(b.date).getTime()
           );
           setWeightHistory(sorted);
-      } catch (e) {
-      }
+      } catch (e) { }
   };
 
   const fetchProfileInternal = async () => {
@@ -97,26 +128,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
   };
 
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      try {
-        const token = await SecureStore.getItemAsync('jwt_token');
-        if (token) {
-          console.log("Znaleziono token, weryfikacja sesji...");
-          setUserToken(token);
-          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
-          await fetchProfileInternal(); 
-        }
-      } catch (e) {
-        console.log('Restoring token failed');
-      }
-    };
-
-    bootstrapAsync();
-  }, []);
-
-
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -130,7 +141,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
         setUserData({ email });
         
         await fetchProfileInternal();
-        
         router.replace('/(tabs)/journal');
       }
     } catch (error: any) {
@@ -145,12 +155,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const register = async (email: string, password: string, profileData: UserData) => {
     setIsLoading(true);
     try {
-      await apiClient.post('/api/Auth/register', { 
-        email, 
-        password, 
-        confirmPassword: password 
-      });
-
+      await apiClient.post('/api/Auth/register', { email, password, confirmPassword: password });
       const loginRes = await apiClient.post('/api/Auth/login', { email, password });
       const token = loginRes.data.token || loginRes.data;
       
@@ -166,7 +171,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       };
 
       await apiClient.post('/api/Users/profile', profileDto);
-      
       setUserData({ ...profileData, email });
       await fetchWeightHistoryInternal(); 
       setUserBmr(null);
@@ -182,22 +186,15 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     }
   };
 
-  const fetchWeightHistory = async () => {
-      await fetchWeightHistoryInternal();
-  };
+  const fetchWeightHistory = async () => { await fetchWeightHistoryInternal(); };
 
   const addWeight = async (weight: number, date: Date) => {
     setIsLoading(true);
     try {
-      const payload: AddWeightDto = {
-        weight: weight,
-        date: date.toISOString()
-      };
+      const payload: AddWeightDto = { weight: weight, date: date.toISOString() };
       await apiClient.post('/api/Weight', payload);
       
-      if (userData) {
-          setUserData({ ...userData, weight });
-      }
+      if (userData) { setUserData({ ...userData, weight }); }
       
       setUserBmr(null); 
       await fetchWeightHistoryInternal();
@@ -230,12 +227,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     }
 
     try {
-      console.log("[API] Pobieram BMR..."); 
+      console.log(`[API] Pobieram BMR (Formuła: ${bmrFormula})...`); 
+      
       const res = await apiClient.get('/api/Users/bmr', {
-        params: { formula: 'MifflinStJeor' }
+        params: { formula: bmrFormula }
       });
       
-      const value = res.data?.bmr || res.data?.Bmr;
+      const value = res.data?.bmr || res.data?.Bmr || res.data; 
 
       if (value) {
           const numValue = Number(value);
@@ -244,18 +242,24 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       }
       return 2500;
     } catch (e: any) {
+      console.log("Błąd BMR:", e);
       return 2500;
     }
   };
 
-  const fetchProfile = async () => {
-      await fetchProfileInternal();
+  const setBmrFormula = async (formula: BmrFormula) => {
+      setBmrFormulaState(formula);
+      await AsyncStorage.setItem('bmr_formula', formula);
+      setUserBmr(null); 
   };
+
+  const fetchProfile = async () => { await fetchProfileInternal(); };
 
   return (
     <AuthContext.Provider value={{ 
         userToken, userData, weightHistory, isLoading, 
-        login, register, logout, addWeight, fetchWeightHistory, updateProfile, fetchBMR, fetchProfile 
+        login, register, logout, addWeight, fetchWeightHistory, updateProfile, fetchBMR, fetchProfile,
+        bmrFormula, setBmrFormula
     }}>
       {children}
     </AuthContext.Provider>

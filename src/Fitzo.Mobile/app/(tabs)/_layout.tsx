@@ -107,6 +107,18 @@ export default function TabLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="stats"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Alert, Modal, Keyboard } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Alert, Modal, Keyboard, Image } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useFood } from '../../Context/FoodContext';
 import { MealType, FoodItem, ProductDto, Recipe } from '../../Types/Api';
+import * as ImagePicker from 'expo-image-picker';
+import { uploadImage } from '../../Services/ImageService';
+import apiClient from '../../Services/ApiClient';
 
 const ALL_MEAL_TYPES: MealType[] = [
   MealType.Breakfast, MealType.SecondBreakfast, MealType.Lunch, 
@@ -22,7 +25,7 @@ export default function AddScreen() {
   const params = useLocalSearchParams();
   
   const { 
-    addFood, createRecipe, addRecipeToDiary, recipes, fetchRecipes,
+    addFood, addRecipeToDiary, recipes, fetchRecipes,
     scannedCode, setScannedCode, productHistory, searchProduct, 
     searchProductsApi, searchResults, isLoading,
     addToHistory
@@ -47,6 +50,7 @@ export default function AddScreen() {
 
   const [recipeName, setRecipeName] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState<FoodItem[]>([]);
+  const [recipeImage, setRecipeImage] = useState<string | null>(null);
 
   const [selectedRecipeToAdd, setSelectedRecipeToAdd] = useState<Recipe | null>(null);
   const [recipePortions, setRecipePortions] = useState('1');
@@ -163,14 +167,65 @@ export default function AddScreen() {
       }, { kcal: 0, p: 0, f: 0, c: 0 });
   }, [selectedIngredients]);
 
+  const pickImage = async () => {
+      const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.7,
+      });
+
+      if (!result.canceled) {
+          setRecipeImage(result.assets[0].uri);
+      }
+  };
+
   const handleSaveRecipe = async () => {
     if (!recipeName || selectedIngredients.length === 0) {
         Alert.alert("Błąd", "Podaj nazwę i dodaj składniki");
         return;
     }
-    await createRecipe(recipeName, selectedIngredients);
-    setRecipeName('');
-    setSelectedIngredients([]);
+
+    try {
+        const ingredientsDto = selectedIngredients.map(item => ({
+            amount: Number(item.amount) || 100,
+            product: {
+                name: item.name || "Składnik",
+                calories: Number(item.calories) || 0,
+                protein: Number(item.protein) || 0,
+                fat: Number(item.fat) || 0,
+                carbs: Number(item.carbs) || 0,
+                servingUnit: "g",
+                servingSize: 100,
+                brand: item.brand || "",
+                imageUrl: item.imageUrl || "",
+                externalId: item.externalId || undefined
+            }
+        }));
+
+        const res = await apiClient.post('/api/Recipes', { 
+            name: recipeName, 
+            ingredients: ingredientsDto, 
+            tags: [] 
+        });
+        
+        const createdRecipeId = res.data?.id; 
+
+        if (createdRecipeId && recipeImage) {
+            await uploadImage(`/api/Recipes/${createdRecipeId}/image`, recipeImage);
+        }
+
+        Alert.alert("Sukces", "Przepis utworzony!");
+
+        setRecipeName('');
+        setSelectedIngredients([]);
+        setRecipeImage(null);
+        fetchRecipes();
+
+    } catch (e: any) {
+        console.error(e);
+        Alert.alert("Błąd", "Nie udało się zapisać przepisu");
+    }
   };
 
   const openRecipeModal = (recipe: Recipe) => {
@@ -317,6 +372,18 @@ export default function AddScreen() {
           <View className="pb-20">
             <View className="mb-8">
                 <Text className="text-brand-text text-xl font-bold mb-4">Utwórz nowy</Text>
+                
+                <TouchableOpacity onPress={pickImage} className="w-full h-40 bg-brand-card rounded-2xl border border-dashed border-brand-accent mb-4 items-center justify-center overflow-hidden">
+                    {recipeImage ? (
+                        <Image source={{ uri: recipeImage }} className="w-full h-full" resizeMode="cover" />
+                    ) : (
+                        <View className="items-center">
+                            <Ionicons name="camera-outline" size={40} color="#E0AAFF" />
+                            <Text className="text-brand-muted mt-2">Dodaj zdjęcie (opcjonalne)</Text>
+                        </View>
+                    )}
+                </TouchableOpacity>
+
                 <TextInput className="bg-brand-card text-brand-text p-4 rounded-xl text-base border border-brand-accent mb-4" placeholder="np. Moja Owsianka" placeholderTextColor="#C77DFF" value={recipeName} onChangeText={setRecipeName}/>
                 
                 <View className="bg-brand-primary/20 p-4 rounded-2xl border border-brand-primary mb-4">
@@ -362,8 +429,15 @@ export default function AddScreen() {
             <View>
                 <Text className="text-brand-text text-xl font-bold mb-4">Twoje Przepisy</Text>
                 {recipes.length === 0 ? <Text className="text-brand-muted text-center p-4">Brak zapisanych przepisów</Text> : recipes.map((recipe, index) => (
-                    <TouchableOpacity key={`${recipe.id}_${index}`} onPress={() => openRecipeModal(recipe)} className="bg-brand-card p-4 mb-3 rounded-2xl border border-brand-accent flex-row justify-between items-center">
-                        <View>
+                    <TouchableOpacity key={`${recipe.id}_${index}`} onPress={() => openRecipeModal(recipe)} className="bg-brand-card p-4 mb-3 rounded-2xl border border-brand-accent flex-row items-center">
+                        <View className="w-16 h-16 bg-brand-dark rounded-xl mr-4 overflow-hidden border border-brand-accent/30">
+                            {recipe.imageUrl ? (
+                                <Image source={{ uri: recipe.imageUrl }} className="w-full h-full" resizeMode="cover" />
+                            ) : (
+                                <View className="w-full h-full items-center justify-center"><Ionicons name="restaurant" size={20} color="#666" /></View>
+                            )}
+                        </View>
+                        <View className="flex-1">
                             <Text className="text-brand-text font-bold text-lg">{recipe.name}</Text>
                             <Text className="text-brand-muted text-xs">Kliknij, aby dodać do dziennika</Text>
                         </View>

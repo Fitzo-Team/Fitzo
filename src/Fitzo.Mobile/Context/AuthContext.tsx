@@ -12,6 +12,7 @@ interface UserData extends Partial<UserProfileDto> {
   username?: string;
   email: string;
   goal?: string;
+  imageUrl?: string;
 }
 
 export interface WeightEntry {
@@ -110,9 +111,16 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
           const profileRes = await apiClient.get('/api/Users/profile');
           
           if (profileRes.data) {
+              let imgUrl = profileRes.data.imageUrl;
+              if (imgUrl) {
+                  const separator = imgUrl.includes('?') ? '&' : '?';
+                  imgUrl = `${imgUrl}${separator}t=${new Date().getTime()}`;
+              }
+
               setUserData(prev => ({ 
                   ...prev, 
                   ...profileRes.data,
+                  imageUrl: imgUrl,
                   email: prev?.email || 'Użytkownik' 
               }));
           }

@@ -4,12 +4,28 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../Context/AuthContext';
 
+const InputField = ({ label, val, setVal, secure = false, place, numeric = false }: any) => (
+  <View className="mb-4">
+    <Text className="text-brand-muted ml-2 mb-2 text-xs uppercase font-bold">{label}</Text>
+    <TextInput 
+      className="bg-brand-card text-brand-text p-4 rounded-2xl border border-brand-accent focus:border-brand-primary"
+      placeholder={place}
+      placeholderTextColor="#666"
+      secureTextEntry={secure}
+      keyboardType={numeric ? 'numeric' : 'default'}
+      value={val}
+      onChangeText={setVal}
+      autoCapitalize="none"
+    />
+  </View>
+);
+
 export default function LoginScreen() {
   const router = useRouter();
   const { login, register, isLoading } = useAuth();
   
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [step, setStep] = useState(1); // 1: Dane konta, 2: Dane fizyczne
+  const [step, setStep] = useState(1);
 
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -33,40 +49,41 @@ export default function LoginScreen() {
     setStep(2);
   };
 
-  const handleAuth = () => {
-    const mockToken = "jwt_token_123";
-    
-    if (isLoginMode) {
-      // Logowanie
-      login(mockToken, { username: 'Jan Kowalski', email });
-    } else {
-      register(mockToken, { 
-        username, email, age, weight, height, goal 
-      });
+  const handleAuth = async () => {
+    try {
+      if (isLoginMode) {
+        if (!email || !password) {
+            Alert.alert("Błąd", "Podaj email i hasło");
+            return;
+        }
+        await login(email, password);
+      } else {
+        const profileData = { 
+            username, 
+            email, 
+            age: parseInt(age) || 0, 
+            weight: parseFloat(weight) || 0, 
+            height: parseFloat(height) || 0, 
+            goal 
+        };
+        await register(email, password, profileData);
+      }
+    } catch (error: any) {
+        const msg = error.response?.data?.message || "Wystąpił błąd połączenia";
+        Alert.alert("Błąd", msg);
     }
   };
 
-  const InputField = ({ label, val, setVal, secure = false, place, numeric = false }: any) => (
-    <View className="mb-4">
-      <Text className="text-brand-muted ml-2 mb-2 text-xs uppercase font-bold">{label}</Text>
-      <TextInput 
-        className="bg-brand-card text-brand-text p-4 rounded-2xl border border-brand-accent focus:border-brand-primary"
-        placeholder={place}
-        placeholderTextColor="#666"
-        secureTextEntry={secure}
-        keyboardType={numeric ? 'numeric' : 'default'}
-        value={val}
-        onChangeText={setVal}
-        autoCapitalize="none"
-      />
-    </View>
-  );
-
   return (
     <View className="flex-1 bg-brand-dark pt-12 px-6">
-      <TouchableOpacity onPress={() => router.back()} className="mb-6 w-10 h-10 bg-brand-card rounded-full items-center justify-center">
-        <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
-      </TouchableOpacity>
+      
+      {router.canGoBack() ? (
+        <TouchableOpacity onPress={() => router.back()} className="mb-6 w-10 h-10 bg-brand-card rounded-full items-center justify-center">
+            <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
+        </TouchableOpacity>
+      ) : (
+        <View className="mb-6 h-10" />
+      )}
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="items-center mb-8">
@@ -86,6 +103,7 @@ export default function LoginScreen() {
              <TouchableOpacity 
                 className="bg-brand-primary h-14 rounded-2xl items-center justify-center mt-4 shadow-lg"
                 onPress={handleAuth}
+                disabled={isLoading}
              >
                 {isLoading ? <ActivityIndicator color="white" /> : <Text className="text-brand-text font-bold text-lg">Zaloguj się</Text>}
              </TouchableOpacity>
@@ -132,6 +150,7 @@ export default function LoginScreen() {
              <TouchableOpacity 
                 className="bg-brand-primary h-14 rounded-2xl items-center justify-center mt-4"
                 onPress={handleAuth}
+                disabled={isLoading}
              >
                  {isLoading ? <ActivityIndicator color="white" /> : <Text className="text-brand-text font-bold text-lg">Zakończ</Text>}
              </TouchableOpacity>
@@ -141,7 +160,6 @@ export default function LoginScreen() {
              </TouchableOpacity>
           </View>
         )}
-
 
         <View className="flex-row justify-center mt-10 pb-10">
           <Text className="text-brand-muted">

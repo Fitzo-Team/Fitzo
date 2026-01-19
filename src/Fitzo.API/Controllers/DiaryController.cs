@@ -64,7 +64,8 @@ public class DiaryCotroller: ControllerBase
                 Fat = recipe.CalculateFat(),
                 Carbs = recipe.CalculateCarbs(),
                 
-                ServingUnit = "g",
+                ServingUnit = "portion",
+                ServingSize = 1,
                 Category = FoodCategories.Unknown,
                 IsDataComplete = true
             };
@@ -94,16 +95,59 @@ public class DiaryCotroller: ControllerBase
         return Ok(entry);
     }
 
+    [Authorize]
+    [HttpGet("recent")]
+    public async Task<IActionResult> GetRecent()
+    {
+        var useridString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if(!Guid.TryParse(useridString, out var userid)){
+            return Unauthorized();
+        }
+
+        var entries = await context.FoodEntries
+            .Where(e => e.UserId == userid && e.ProductEntry != null)
+            .OrderByDescending(e => e.Date)
+            .Take(50)
+            .Select(e => new ProductDto 
+                {
+                    Name = e.ProductEntry.Name,
+                    brand = e.ProductEntry.brand,
+                    Calories = e.ProductEntry.Calories,
+                    Protein = e.ProductEntry.Protein,
+                    Fat = e.ProductEntry.Fat,
+                    Carbs = e.ProductEntry.Carbs,
+                    ServingUnit = e.ProductEntry.ServingUnit,
+                    ServingSize = e.ProductEntry.ServingSize,
+                    ImageUrl = e.ProductEntry.ImageUrl,
+                    ExternalId = e.ProductEntry.ExternalId
+                })
+            .ToListAsync();
+
+        var distinctEntries = entries
+            .GroupBy(e => (e.Name ?? " ").ToLower())
+            .Select(g => g.First())
+            .Take(15)
+            .ToList();
+
+        return Ok(distinctEntries);
+    }
+
+
     [HttpGet]
     public async Task<IActionResult> GetDiaryEntries([FromQuery] DateTime date)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
-        var entries = await context.FoodEntries
-            .Where(e => e.UserId == userId && e.Date.Date == date.Date)
-            .OrderBy(e => e.MealType)
-            .ToListAsync();
+            var startOfDay = date.Date; 
+            var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
+
+            var entries = await context.FoodEntries
+                .Where( e => e.UserId == userId && 
+                        e.Date >= startOfDay && 
+                        e.Date <= endOfDay)
+                .OrderBy(e => e.MealType)
+                .ToListAsync();
 
         return Ok(entries);
     }

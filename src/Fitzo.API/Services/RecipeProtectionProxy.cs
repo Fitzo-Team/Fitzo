@@ -20,6 +20,25 @@ public class RecipeProtectionProxy : IRecipeManager
         return await _innerManager.GetRecipeByIdAsync(id);
     }
 
+    public async Task<IEnumerable<Recipe>> GetRecipes(Guid id)
+    {
+        var role = _userContext.GetCurrentUserRole();
+        var currentUserId = _userContext.GetCurrentUserId();
+
+        if (role == UserRole.Admin)
+        {
+            return await _innerManager.GetRecipes(id);
+        }
+
+        if (id != currentUserId)
+        {
+            Console.WriteLine($"[SECURITY] User {currentUserId} próbował uzyskać dostęp do przepisów użytkownika {id}");
+            throw new UnauthorizedAccessException("Nie masz uprawnień do przeglądania tych przepisów.");
+        }
+
+        return await _innerManager.GetRecipes(id);
+    }
+
     public async Task CreateRecipeAsync(Recipe recipe)
     {
         var currentUserId = _userContext.GetCurrentUserId();

@@ -173,6 +173,18 @@
         }
       }
     },
+    "/api/DiaryCotroller/recent": {
+      "get": {
+        "tags": [
+          "DiaryCotroller"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Export/recipes/json": {
       "get": {
         "tags": [
@@ -451,6 +463,16 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Recipes"
+        ],
         "responses": {
           "200": {
             "description": "Success"
@@ -1047,6 +1069,13 @@
           },
           "isBought": {
             "type": "boolean"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -400,10 +400,14 @@ export default function AddScreen() {
                 <View className="bg-brand-primary/20 p-4 rounded-2xl border border-brand-primary mb-4">
                     <Text className="text-brand-text font-bold text-center mb-2">Podsumowanie (na porcję)</Text>
                     <View className="flex-row justify-around">
-                        <View className="items-center"><Text className="text-white font-bold text-xl">{recipeTotals.kcal.toFixed(0)}</Text><Text className="text-brand-muted text-xs">kcal</Text></View>
-                        <View className="items-center"><Text className="text-white font-bold text-lg">{recipeTotals.p.toFixed(1)}</Text><Text className="text-brand-muted text-xs">B</Text></View>
-                        <View className="items-center"><Text className="text-white font-bold text-lg">{recipeTotals.f.toFixed(1)}</Text><Text className="text-brand-muted text-xs">T</Text></View>
-                        <View className="items-center"><Text className="text-white font-bold text-lg">{recipeTotals.c.toFixed(1)}</Text><Text className="text-brand-muted text-xs">W</Text></View>
+                        <View className="items-center"><Text className="text-white font-bold text-xl">{recipeTotals.kcal.toFixed(0)}</Text>
+                        <Text className="text-brand-muted text-xs">kcal</Text></View>
+                        <View className="items-center"><Text className="text-white font-bold text-lg">{recipeTotals.p.toFixed(1)}</Text>
+                        <Text className="text-brand-muted text-xs">B</Text></View>
+                        <View className="items-center"><Text className="text-white font-bold text-lg">{recipeTotals.f.toFixed(1)}</Text>
+                        <Text className="text-brand-muted text-xs">T</Text></View>
+                        <View className="items-center"><Text className="text-white font-bold text-lg">{recipeTotals.c.toFixed(1)}</Text>
+                        <Text className="text-brand-muted text-xs">W</Text></View>
                     </View>
                 </View>
 
@@ -422,7 +426,9 @@ export default function AddScreen() {
                                 {isSelected && (
                                     <View className="px-4 pb-4 flex-row items-center justify-end gap-3">
                                             <Text className="text-brand-muted text-sm">Ilość:</Text>
-                                            <TextInput className="bg-brand-dark text-white p-2 rounded-lg w-20 text-center border border-brand-accent font-bold" keyboardType="numeric" placeholder="100" placeholderTextColor="#666" value={selectedItem?.amount?.toString()} onChangeText={(text) => item.id && updateIngredientAmount(item.id, text)}/>
+                                            <TextInput className="bg-brand-dark text-white p-2 rounded-lg w-20 text-center border border-brand-accent font-bold" 
+                                            keyboardType="numeric" placeholder="100" placeholderTextColor="#666" value={selectedItem?.amount?.toString()} 
+                                            onChangeText={(text) => item.id && updateIngredientAmount(item.id, text)}/>
                                             <Text className="text-brand-text text-sm">g</Text>
                                     </View>
                                 )}
@@ -432,7 +438,8 @@ export default function AddScreen() {
                     </ScrollView>
                 </View>
 
-                <TouchableOpacity className={`mt-4 p-4 rounded-xl items-center shadow-lg ${selectedIngredients.length > 0 ? 'bg-brand-primary' : 'bg-brand-card opacity-50'}`} onPress={handleSaveRecipe} disabled={selectedIngredients.length === 0 || isLoading}>
+                <TouchableOpacity className={`mt-4 p-4 rounded-xl items-center shadow-lg ${selectedIngredients.length > 0 ? 'bg-brand-primary' :
+                     'bg-brand-card opacity-50'}`} onPress={handleSaveRecipe} disabled={selectedIngredients.length === 0 || isLoading}>
                   {isLoading ? <ActivityIndicator color="white" /> : <Text className="text-brand-text font-bold text-lg">Utwórz i Zapisz</Text>}
                 </TouchableOpacity>
             </View>

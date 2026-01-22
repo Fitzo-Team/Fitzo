@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using Xunit;
 
 namespace Fitzo.Tests.Controllers;
@@ -51,13 +53,15 @@ public class UsersControllerTests
         };
     }
 
-
     [Fact]
     public async Task UpdateProfile_ShouldCreateNewProfile_WhenNoneExists()
     {
         var context = GetInMemoryDbContext();
         var bmrService = GetRealBmrService();
-        var controller = new UsersController(context, bmrService);
+        var mockConfig = new Mock<IConfiguration>();
+        
+        var controller = new UsersController(context, bmrService, mockConfig.Object);
+        
         var userId = Guid.NewGuid();
         
         SetupUser(controller, userId);
@@ -80,7 +84,9 @@ public class UsersControllerTests
     {
         var context = GetInMemoryDbContext();
         var bmrService = GetRealBmrService();
-        var controller = new UsersController(context, bmrService);
+        var mockConfig = new Mock<IConfiguration>();
+        
+        var controller = new UsersController(context, bmrService, mockConfig.Object);
         var userId = Guid.NewGuid();
 
         context.UserProfiles.Add(new UserProfile
@@ -101,19 +107,19 @@ public class UsersControllerTests
         okResult.StatusCode.Should().Be(200);
     }
 
-
     [Fact]
     public async Task GetBmr_ShouldReturnBadRequest_WhenProfileDoesNotExist()
     {
         var context = GetInMemoryDbContext();
         var bmrService = GetRealBmrService();
-        var controller = new UsersController(context, bmrService);
+        var mockConfig = new Mock<IConfiguration>();
+
+        var controller = new UsersController(context, bmrService, mockConfig.Object);
         var userId = Guid.NewGuid();
 
         SetupUser(controller, userId);
 
         var result = await controller.GetBmr(BmrFormula.MifflinStJeor);
-
 
         result.Should().BeOfType<BadRequestObjectResult>()
             .Which.Value.Should().Be("Najpierw uzupełnij profil użytkownika (waga, wzrost, wiek).");
@@ -124,7 +130,8 @@ public class UsersControllerTests
     {
         var context = GetInMemoryDbContext();
         var bmrService = GetRealBmrService();
-        var controller = new UsersController(context, bmrService);
+        var mockConfig = new Mock<IConfiguration>();
+        var controller = new UsersController(context, bmrService, mockConfig.Object);
         
         controller.ControllerContext = new ControllerContext()
         {

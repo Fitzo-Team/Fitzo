@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitzo - Twój Inteligentny Planer</title>
     
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    
+    <link rel="manifest" href="favicon_io/site.webmanifest">
+    
+    <link rel="shortcut icon" href="favicon_io/favicon.ico">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -53,7 +60,7 @@
             
             <div class="hero-image" data-aos="zoom-in" data-aos-duration="1200">
                 <div class="phone-mockup">
-                    <img src="images/IMG_0963.PNG" alt="Fitzo App Screenshot">
+                    <img src="images/IMG_1014.jpg" alt="Fitzo App Screenshot">
                     <div class="glow-effect"></div>
                 </div>
             </div>
@@ -94,20 +101,68 @@
             </div>
         </div>
     </section>
+    <section id="how-it-works" class="steps-section">
+        <div class="container">
+            
+            <div class="step-row">
+                <div class="step-text" data-aos="fade-right">
+                    <div class="step-number">01</div>
+                    <h3>Oblicz swoje <span class="text-brand">zapotrzebowanie</span></h3>
+                    <p>Nie wiesz ile jeść? Fitzo automatycznie obliczy Twoje <strong>BMR</strong> na podstawie Twojej wagi, wzrostu i celu (schudnięcie, masa, utrzymanie).</p>
+                    <ul class="step-list">
+                        <li><i class="fas fa-check-circle"></i> Automatyczne wyliczenie makroskładników</li>
+                        <li><i class="fas fa-check-circle"></i> Dostosowanie do aktywności fizycznej</li>
+                    </ul>
+                </div>
+                <div class="step-image" data-aos="fade-left">
+                    <div class="abstract-visual">
+                        <i class="fas fa-calculator"></i>
+                        <div class="floating-badge">2500 kcal</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-row reverse">
+                <div class="step-text" data-aos="fade-left">
+                    <div class="step-number">02</div>
+                    <h3><span class="text-flame">Planuj</span> i śledź kalorie</h3>
+                    <p>Dodawaj posiłki do interaktywnego kalendarza. Aplikacja na bieżąco sumuje kalorie i makroskładniki, pokazując ile jeszcze możesz zjeść dzisiaj.</p>
+                    <ul class="step-list">
+                        <li><i class="fas fa-check-circle"></i> Przejrzysty widok tygodniowy</li>
+                        <li><i class="fas fa-check-circle"></i> Szybkie dodawanie całych dań</li>
+                        <li><i class="fas fa-chart-pie"></i> Wykresy białka, tłuszczy i węglowodanów</li>
+                    </ul>
+                </div>
+                <div class="step-image" data-aos="fade-right">
+                    <div class="abstract-visual visual-secondary">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="floating-badge bottom">Białko: 180g</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
 
     <section id="download" class="download-section">
         <div class="container download-content" data-aos="zoom-in">
-            <h2>Pobierz <span class="text-flame">Fitzo</span> już dziś</h2>
-            <p>Dostępne na system Android oraz IOS. Przejmij kontrolę nad swoją dietą.</p>
+            <h2>Pobierz <span class="text-flame">Fitzo</span></h2>
+            <p>Pobierz aplikację bezpośrednio na swój telefon i zacznij działać.</p>
+            
             <div class="store-buttons">
-                <a href="#" class="store-btn">
-                    <i class="fab fa-google-play"></i>
+                <a href="fitzo-app.apk" class="store-btn" download>
+                    <i class="fab fa-android"></i>
                     <div>
-                        <span>Pobierz z</span>
-                        <strong>Google Play</strong>
+                        <span>Pobierz bezpośrednio</span>
+                        <strong>Plik .APK</strong>
                     </div>
+                    <i class="fas fa-download" style="font-size: 1rem; margin-left: 10px; color: var(--brand-primary);"></i>
                 </a>
-                </div>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">
+                <i class="fas fa-info-circle"></i> Może być wymagane włączenie instalacji z nieznanych źródeł.
+            </p>
         </div>
     </section>
 
@@ -121,8 +176,8 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
-            once: true, // Animacja odtwarza się tylko raz
-            offset: 100 // Uruchom animację 100px przed elementem
+            once: true,
+            offset: 100
         });
     </script>
 </body>

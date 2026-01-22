@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator, Image } from 'react-native'; // <--- DODANO IMAGE
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -90,16 +90,20 @@ export default function HomeScreen() {
   const targetCarbs = Math.round((currentBMR * 0.50) / 4);
   const targetFat = Math.round((currentBMR * 0.30) / 9);
 
-  const currentWeight = weightHistory.length > 0 
-      ? weightHistory[weightHistory.length - 1].weight 
+  const sortedHistory = [...weightHistory].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const lastEntry = sortedHistory.length > 0 ? sortedHistory[sortedHistory.length - 1] : null;
+  const currentWeight = lastEntry 
+      ? ((lastEntry as any).value ?? lastEntry.weight) 
       : (userData?.weight || 0);
 
   let chartValues: number[] = [];
   let chartLabels: string[] = [];
 
-  if (weightHistory.length > 0) {
-      const recent = weightHistory.slice(-6);
-      chartValues = recent.map(w => Number(w.weight));
+  if (sortedHistory.length > 0) {
+      const recent = sortedHistory.slice(-6);
+
+      chartValues = recent.map(w => Number((w as any).value ?? w.weight));
       chartLabels = recent.map(w => {
           const d = new Date(w.date);
           return `${d.getDate()}.${d.getMonth() + 1}`;
@@ -109,15 +113,18 @@ export default function HomeScreen() {
   if (chartValues.length === 0) {
       const w = Number(currentWeight) || 70;
       chartValues = [w, w];
-      chartLabels = ["Start", "Now"];
+      chartLabels = ["Start", "Teraz"];
   } else if (chartValues.length === 1) {
       chartValues = [chartValues[0], chartValues[0]];
-      chartLabels = [chartLabels[0], chartLabels[0]];
+      chartLabels = ["Start", chartLabels[0]];
   }
 
   const chartData = {
     labels: chartLabels,
-    datasets: [{ data: chartValues }]
+    datasets: [{ 
+        data: chartValues,
+        strokeWidth: 2,
+    }]
   };
 
   if (loading && !userData) {
@@ -238,15 +245,14 @@ export default function HomeScreen() {
                     <Ionicons name="add" size={24} color="white" />
                  </TouchableOpacity>
              </View>
+             
              {chartValues.length > 0 && !chartValues.some(isNaN) ? (
                  <LineChart
                     data={chartData}
-                    width={screenWidth - 80} 
-                    height={160}
+                    width={screenWidth - 40} 
+                    height={180}
                     yAxisSuffix="kg"
-                    withInnerLines={false}
-                    withOuterLines={false}
-                    withHorizontalLabels={true}
+                    yAxisInterval={1} 
                     chartConfig={{
                         backgroundColor: "#240046",
                         backgroundGradientFrom: "#240046",
@@ -258,10 +264,17 @@ export default function HomeScreen() {
                         propsForDots: { r: "4", strokeWidth: "2", stroke: "#9D4EDD" }
                     }}
                     bezier 
-                    style={{ marginVertical: 8, borderRadius: 16, paddingRight: 40, marginLeft: -20 }}
+                    style={{
+                        marginVertical: 8,
+                        borderRadius: 16,
+                    }}
+                    withInnerLines={false}
+                    withOuterLines={false}
                 />
              ) : (
-                 <Text className="text-brand-muted text-center">Brak danych wagi</Text>
+                 <View className="h-32 items-center justify-center">
+                    <Text className="text-brand-muted text-center">Dodaj więcej pomiarów wagi, aby zobaczyć wykres</Text>
+                 </View>
              )}
         </View>
       </ScrollView>

@@ -20,6 +20,7 @@ export interface WeightEntry {
     id?: string;
     weight: number;
     date: string;
+    value?: number;
 }
 
 interface AuthContextType {

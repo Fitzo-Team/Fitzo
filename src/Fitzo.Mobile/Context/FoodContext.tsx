@@ -251,7 +251,12 @@ export const FoodProvider: React.FC<{ children: React.ReactNode }> = ({
     let fPerPortion = 0;
     let cPerPortion = 0;
 
-    if (recipe.ingredients) {
+    if ((recipe as any).totalCalories !== undefined) {
+        kcalPerPortion = (recipe as any).totalCalories ?? 0;
+        pPerPortion = (recipe as any).totalProtein ?? 0;
+        fPerPortion = (recipe as any).totalFat ?? 0;
+        cPerPortion = (recipe as any).totalCarbs ?? 0;
+    } else if (recipe.ingredients) {
       recipe.ingredients.forEach((ing) => {
         const factor = ing.amount / 100;
         kcalPerPortion += ing.product.calories * factor;
@@ -259,11 +264,6 @@ export const FoodProvider: React.FC<{ children: React.ReactNode }> = ({
         fPerPortion += ing.product.fat * factor;
         cPerPortion += ing.product.carbs * factor;
       });
-    } else if ((recipe as any).totalCalories) {
-      kcalPerPortion = (recipe as any).totalCalories;
-      pPerPortion = (recipe as any).totalProtein;
-      fPerPortion = (recipe as any).totalFat;
-      cPerPortion = (recipe as any).totalCarbs;
     }
 
     const newItem: FoodItem = {
@@ -291,10 +291,10 @@ export const FoodProvider: React.FC<{ children: React.ReactNode }> = ({
         recipeId: recipe.id,
         product: {
           name: recipe.name || "Przepis",
-          calories: 0,
-          protein: 0,
-          fat: 0,
-          carbs: 0,
+          calories: kcalPerPortion,
+          protein: pPerPortion,
+          fat: fPerPortion,
+          carbs: cPerPortion,
           servingUnit: "portion",
           servingSize: 1,
         },

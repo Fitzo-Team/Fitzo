@@ -85,6 +85,7 @@ public class UsersController : ControllerBase
         return Ok(profileDto);
     }
 
+    [Authorize]
     [HttpGet("bmr")]
     public async Task<IActionResult> GetBmr([FromQuery] BmrFormula formula = BmrFormula.MifflinStJeor)
     {
@@ -93,7 +94,7 @@ public class UsersController : ControllerBase
 
         if (!Guid.TryParse(userIdString, out var userIdGuid))
         {
-            return BadRequest("Nieprawidłowy format identyfikatora użytkownika.");
+            return Unauthorized("Nieprawidłowy format ID w tokenie.");
         }
 
         var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userIdGuid);

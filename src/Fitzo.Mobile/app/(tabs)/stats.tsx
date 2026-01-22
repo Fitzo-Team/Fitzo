@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import apiClient from '../../Services/ApiClient';
 import { useAuth } from '../../Context/AuthContext';
 
+// Typy zgodne z Twoim endpointem C#
 interface DailySummary {
     date: string;
     totalCalories: number;
@@ -40,20 +41,17 @@ const ProgressBar = ({ value, max, color, label, suffix = "g" }: any) => {
 
 export default function StatsScreen() {
   const router = useRouter();
-  const { fetchBMR } = useAuth();
-  
+
+  const { userBmr } = useAuth(); 
+  const targetCalories = userBmr || 2500; 
+
   const [statsData, setStatsData] = useState<StatsDto | null>(null);
-  const [targetCalories, setTargetCalories] = useState(2500);
   const [isLoading, setIsLoading] = useState(true);
-  
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day');
 
   useEffect(() => {
     const load = async () => {
         try {
-            const bmr = await fetchBMR();
-            setTargetCalories(bmr);
-
             const res = await apiClient.get('/api/Stats');
             setStatsData(res.data);
         } catch (e) {
@@ -66,16 +64,14 @@ export default function StatsScreen() {
   }, []);
 
   const displayData = useMemo(() => {
-      if (!statsData) return { cals: 0, p: 0, f: 0, c: 0 };
+      if (!statsData) return { cals: 0, p: 0, f: 0, c: 0, targetP: 150, targetF: 80, targetC: 300 };
 
-      const targetP = 150; 
-      const targetF = 80;
-      const targetC = 300;
+      const targetP = Math.round((targetCalories * 0.20) / 4);
+      const targetF = Math.round((targetCalories * 0.30) / 9);
+      const targetC = Math.round((targetCalories * 0.50) / 4);
 
       if (period === 'day') {
-
           const todayStr = new Date().toISOString().split('T')[0];
-          
           const todayEntry = statsData.weeklySummary.find(d => d.date.startsWith(todayStr));
           
           return {
@@ -83,7 +79,6 @@ export default function StatsScreen() {
               p: todayEntry?.totalProtein || 0,
               f: todayEntry?.totalFat || 0,
               c: todayEntry?.totalCarbs || 0,
-              targetCals: targetCalories,
               targetP, targetF, targetC
           };
       } 
@@ -91,26 +86,18 @@ export default function StatsScreen() {
           const summary = statsData.weeklySummary;
           const count = summary.length || 1;
           
-          const avgP = summary.reduce((acc, curr) => acc + curr.totalProtein, 0) / count;
-          const avgF = summary.reduce((acc, curr) => acc + curr.totalFat, 0) / count;
-          const avgC = summary.reduce((acc, curr) => acc + curr.totalCarbs, 0) / count;
-
           return {
               cals: statsData.averageDailyCaloriesWeek,
-              p: avgP,
-              f: avgF,
-              c: avgC,
-              targetCals: targetCalories,
+              p: summary.reduce((acc, curr) => acc + curr.totalProtein, 0) / count,
+              f: summary.reduce((acc, curr) => acc + curr.totalFat, 0) / count,
+              c: summary.reduce((acc, curr) => acc + curr.totalCarbs, 0) / count,
               targetP, targetF, targetC
           };
       }
       else {
           return {
               cals: statsData.averageDailyCaloriesMonth,
-              p: 0,
-              f: 0,
-              c: 0,
-              targetCals: targetCalories,
+              p: 0, f: 0, c: 0,
               targetP, targetF, targetC
           };
       }
@@ -130,45 +117,35 @@ export default function StatsScreen() {
               const isActive = period === p;
               const labels: any = { day: 'Dziś', week: 'Tydzień', month: 'Miesiąc' };
               return (
-                  <TouchableOpacity 
-                      key={p} 
-                      onPress={() => setPeriod(p as any)}
-                      className={`flex-1 py-2 rounded-lg items-center ${isActive ? 'bg-brand-primary' : ''}`}
-                  >
-                      <Text className={`font-bold ${isActive ? 'text-white' : 'text-brand-muted'}`}>
-                          {labels[p]}
-                      </Text>
+                  <TouchableOpacity key={p} onPress={() => setPeriod(p as any)} className={`flex-1 py-2 rounded-lg items-center ${isActive ? 'bg-brand-primary' : ''}`}>
+                      <Text className={`font-bold ${isActive ? 'text-white' : 'text-brand-muted'}`}>{labels[p]}</Text>
                   </TouchableOpacity>
               );
           })}
       </View>
 
       {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-              <ActivityIndicator size="large" color="#E0AAFF" />
-          </View>
+          <ActivityIndicator size="large" color="#E0AAFF" className="mt-10"/>
       ) : (
           <ScrollView className="px-5" showsVerticalScrollIndicator={false}>
               
               <View className="bg-brand-card p-6 rounded-3xl border border-brand-accent mb-6 items-center shadow-lg shadow-brand-primary/20">
                   <Text className="text-brand-muted text-xs uppercase font-bold tracking-widest mb-2">
-                      {period === 'day' ? 'Spożycie Dziś' : 'Średnia Spożycia'}
+                      {period === 'day' ? 'Spożycie Dziś' : period === 'week' ? 'Średnia Tygodniowa' : 'Średnia Miesięczna'}
                   </Text>
-                  
                   <Text className="text-6xl font-black text-white mb-1 tracking-tighter">
                       {displayData.cals?.toFixed(0)}
                   </Text>
-                  
                   <View className="bg-brand-dark/50 px-4 py-1 rounded-full border border-brand-accent/30">
                     <Text className="text-brand-muted text-sm">
-                        Cel: <Text className="text-brand-vivid font-bold">{displayData.targetCals?.toFixed(0)}</Text> kcal
+                        Cel: <Text className="text-brand-vivid font-bold">{targetCalories.toFixed(0)}</Text> kcal
                     </Text>
                   </View>
               </View>
 
               <View className="bg-brand-card p-6 rounded-3xl border border-brand-accent mb-6">
                   <Text className="text-white text-xl font-bold mb-6">
-                      {period === 'month' ? 'Makro (Brak danych miesięcznych)' : 'Makroskładniki'}
+                      {period === 'month' ? 'Makro (Brak danych)' : 'Makroskładniki'}
                   </Text>
                   
                   {period !== 'month' && (

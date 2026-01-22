@@ -22,7 +22,8 @@ const ProgressCircle = ({ percentage, color }: { percentage: number, color: stri
             <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                 <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
                     <Circle cx={size / 2} cy={size / 2} r={radius} stroke="rgba(255,255,255,0.2)" strokeWidth={strokeWidth} fill="transparent" />
-                    <Circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
+                    <Circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference}
+                     strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
                 </G>
             </Svg>
             <View className="absolute inset-0 justify-center items-center">
@@ -34,22 +35,22 @@ const ProgressCircle = ({ percentage, color }: { percentage: number, color: stri
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { userData, userToken, weightHistory, fetchWeightHistory, fetchBMR } = useAuth();
+  
+  const { userData, userToken, weightHistory, fetchWeightHistory, userBmr } = useAuth();
   const { dailyMeals, fetchDailyMeals } = useFood();
   
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [targetCalories, setTargetCalories] = useState(2500);
+  
+  const currentBMR = userBmr || 2500;
 
   const loadData = async () => {
       const today = new Date().toISOString(); 
       try {
-        const [_, __, bmr] = await Promise.all([
+        await Promise.all([
             fetchDailyMeals(today),
             fetchWeightHistory(),
-            fetchBMR()
         ]);
-        if (bmr) setTargetCalories(bmr);
       } catch (e) {
         console.error("Load error", e);
       } finally {
@@ -81,13 +82,13 @@ export default function HomeScreen() {
   const totalCarbs = todaysItems.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0);
   const totalFat = todaysItems.reduce((sum, item) => sum + (Number(item.fat) || 0), 0);
 
-  const remainingCalories = targetCalories - totalCalories;
+  const remainingCalories = currentBMR - totalCalories;
   const isOverLimit = remainingCalories < 0;
-  const progressPercentage = totalCalories / (targetCalories || 1);
+  const progressPercentage = totalCalories / (currentBMR || 1);
 
-  const targetProtein = Math.round((targetCalories * 0.20) / 4);
-  const targetCarbs = Math.round((targetCalories * 0.50) / 4);
-  const targetFat = Math.round((targetCalories * 0.30) / 9);
+  const targetProtein = Math.round((currentBMR * 0.20) / 4);
+  const targetCarbs = Math.round((currentBMR * 0.50) / 4);
+  const targetFat = Math.round((currentBMR * 0.30) / 9);
 
   const currentWeight = weightHistory.length > 0 
       ? weightHistory[weightHistory.length - 1].weight 
@@ -127,10 +128,14 @@ export default function HomeScreen() {
     <SafeAreaView className="flex-1 bg-brand-dark">
       <View className="flex-row justify-between items-center px-5 py-3">
         <TouchableOpacity 
-            onPress={() => router.push('/profile')}
-            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'}`}
+            onPress={() => router.push('/settings')}
+            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'} overflow-hidden`}
         >
-            {userToken && userData?.username ? (
+            {userToken && userData?.imageUrl ? (
+                <View className="w-full h-full">
+                    <Text className="text-white font-bold text-xs text-center mt-3">IMG</Text> 
+                </View>
+            ) : userToken && userData?.username ? (
                 <Text className="text-white font-bold text-lg">
                     {userData.username.charAt(0).toUpperCase()}
                 </Text>
@@ -163,7 +168,7 @@ export default function HomeScreen() {
         <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5 border border-brand-accent">
             <View className="flex-row justify-between items-start mb-4">
                 <Text className="text-white text-lg font-bold">Kalorie</Text>
-                <Text className="text-brand-muted text-xs">Cel: {targetCalories} kcal</Text>
+                <Text className="text-brand-muted text-xs">Cel: {currentBMR.toFixed(0)} kcal</Text>
             </View>
 
             <View className="flex-row items-center">
@@ -222,7 +227,7 @@ export default function HomeScreen() {
                     <Text className="text-brand-muted font-semibold mb-1">Waga</Text>
                     <Text className="text-3xl font-bold text-white">{currentWeight || '--'} <Text className="text-lg text-brand-muted font-normal">kg</Text></Text>
                  </View>
-                 <TouchableOpacity className="bg-brand-primary p-3 rounded-full" onPress={() => router.push('/profile')}>
+                 <TouchableOpacity className="bg-brand-primary p-3 rounded-full" onPress={() => router.push('/settings')}>
                     <Ionicons name="add" size={24} color="white" />
                  </TouchableOpacity>
              </View>

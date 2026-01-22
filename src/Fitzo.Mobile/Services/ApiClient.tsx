@@ -6,7 +6,7 @@ const getBaseUrl = () => {
     const localhost = debuggerHost?.split(':')[0];
 
     if (!localhost) {
-        return 'http://172.20.10.2:5123';
+        return 'http://192.168.0.114:5123';
     }
 
     return `http://${localhost}:5123`;

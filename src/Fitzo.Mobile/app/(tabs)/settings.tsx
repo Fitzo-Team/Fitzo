@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth, BmrFormula } from '../../Context/AuthContext';
@@ -8,9 +8,12 @@ import { uploadImage } from '../../Services/ImageService';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { bmrFormula, setBmrFormula, userData, fetchProfile } = useAuth();
+  const { bmrFormula, setBmrFormula, userData, fetchProfile, addWeight } = useAuth();
   
   const [uploading, setUploading] = useState(false);
+  
+  const [weightModalVisible, setWeightModalVisible] = useState(false);
+  const [newWeight, setNewWeight] = useState('');
 
   const pickAvatar = async () => {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -24,7 +27,6 @@ export default function SettingsScreen() {
           setUploading(true);
           try {
               const success = await uploadImage('/api/Account/avatar', result.assets[0].uri);
-              
               if (success) {
                   await fetchProfile();
                   Alert.alert("Sukces", "Zdjęcie profilowe zostało zmienione.");
@@ -38,6 +40,26 @@ export default function SettingsScreen() {
               setUploading(false);
           }
       }
+  };
+
+  const handleUpdateWeight = async () => {
+    if (!newWeight) return;
+    
+    const weightValue = parseFloat(newWeight.replace(',', '.'));
+
+    if (isNaN(weightValue) || weightValue <= 0 || weightValue > 300) {
+        Alert.alert("Błąd", "Podaj prawidłową wagę");
+        return;
+    }
+
+    try {
+        await addWeight(weightValue, new Date());
+        setWeightModalVisible(false);
+        setNewWeight('');
+        Alert.alert("Sukces", "Waga zaktualizowana!"); 
+    } catch (error) {
+        Alert.alert("Błąd", "Wystąpił problem z zapisem wagi");
+    }
   };
 
   const formulas: { id: BmrFormula, name: string, desc: string }[] = [
@@ -55,7 +77,6 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-brand-dark pt-12">
-      {/* Nagłówek */}
       <View className="px-5 flex-row items-center mb-6">
         <TouchableOpacity onPress={() => router.back()} className="mr-4 bg-brand-card p-2 rounded-full border border-brand-accent">
           <Ionicons name="arrow-back" size={24} color="#E0AAFF" />
@@ -92,6 +113,25 @@ export default function SettingsScreen() {
               <Text className="text-brand-muted text-sm mt-1">Kliknij w zdjęcie, aby zmienić</Text>
           </View>
 
+          <Text className="text-brand-muted font-bold mb-3 ml-2 uppercase text-xs tracking-wider">Twoje Ciało</Text>
+          <View className="bg-brand-card rounded-2xl border border-brand-accent overflow-hidden mb-8">
+              <View className="p-5 flex-row justify-between items-center border-b border-brand-dark">
+                  <Text className="text-brand-text font-semibold">Aktualna waga</Text>
+                  <TouchableOpacity 
+                    className="flex-row items-center bg-brand-dark px-3 py-1 rounded-lg border border-brand-muted/30"
+                    onPress={() => setWeightModalVisible(true)}
+                  >
+                      <Text className="text-brand-vivid font-bold text-lg mr-2">
+                        {userData?.weight ? `${userData.weight} kg` : '--'}
+                      </Text>
+                      <Ionicons name="pencil" size={14} color="#E0AAFF" />
+                  </TouchableOpacity>
+              </View>
+              <View className="p-5 flex-row justify-between items-center">
+                  <Text className="text-brand-text font-semibold">Wzrost</Text>
+                  <Text className="text-brand-muted">{userData?.height ? `${userData.height} cm` : '--'}</Text>
+              </View>
+          </View>
 
           <Text className="text-brand-muted font-bold mb-3 ml-2 uppercase text-xs tracking-wider">Kalkulacja Kalorii</Text>
           <View className="bg-brand-card rounded-2xl border border-brand-accent overflow-hidden mb-8">
@@ -128,6 +168,53 @@ export default function SettingsScreen() {
           </View>
 
       </ScrollView>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={weightModalVisible}
+        onRequestClose={() => setWeightModalVisible(false)}
+      >
+        <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            className="flex-1 justify-center items-center bg-black/80"
+        >
+            <View className="bg-brand-card w-4/5 p-6 rounded-3xl border border-brand-accent">
+                <Text className="text-white text-xl font-bold mb-2 text-center">Aktualizuj wagę</Text>
+                <Text className="text-brand-muted text-sm mb-6 text-center">Podaj nową wagę, aby zaktualizować swoje zapotrzebowanie kaloryczne.</Text>
+
+                <View className="bg-brand-dark border border-brand-accent rounded-xl p-4 mb-6 flex-row items-center justify-center">
+                    <TextInput 
+                        className="text-white text-3xl font-bold text-center min-w-[60px]"
+                        placeholder="0.0"
+                        placeholderTextColor="#666"
+                        keyboardType="numeric"
+                        value={newWeight}
+                        onChangeText={setNewWeight}
+                        autoFocus
+                    />
+                    <Text className="text-brand-muted font-bold text-xl ml-2">kg</Text>
+                </View>
+
+                <View className="flex-row gap-4">
+                    <TouchableOpacity 
+                        className="flex-1 bg-transparent border border-brand-muted py-3 rounded-xl items-center"
+                        onPress={() => setWeightModalVisible(false)}
+                    >
+                        <Text className="text-brand-muted font-bold">Anuluj</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        className="flex-1 bg-brand-primary py-3 rounded-xl items-center"
+                        onPress={handleUpdateWeight}
+                    >
+                        <Text className="text-brand-text font-bold">Zapisz</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
     </View>
   );
 }

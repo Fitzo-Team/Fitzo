@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator, Image } from 'react-native'; // <--- DODANO IMAGE
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -23,7 +23,7 @@ const ProgressCircle = ({ percentage, color }: { percentage: number, color: stri
                 <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
                     <Circle cx={size / 2} cy={size / 2} r={radius} stroke="rgba(255,255,255,0.2)" strokeWidth={strokeWidth} fill="transparent" />
                     <Circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference}
-                     strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
+                      strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
                 </G>
             </Svg>
             <View className="absolute inset-0 justify-center items-center">
@@ -121,7 +121,8 @@ export default function HomeScreen() {
   };
 
   if (loading && !userData) {
-      return <View className="flex-1 bg-brand-dark justify-center items-center"><ActivityIndicator color="#E0AAFF" size="large"/></View>;
+      return <View className="flex-1 bg-brand-dark justify-center items-center">
+        <ActivityIndicator color="#E0AAFF" size="large"/></View>;
   }
 
   return (
@@ -129,12 +130,15 @@ export default function HomeScreen() {
       <View className="flex-row justify-between items-center px-5 py-3">
         <TouchableOpacity 
             onPress={() => router.push('/settings')}
-            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'} overflow-hidden`}
+            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent 
+                ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'} overflow-hidden`}
         >
             {userToken && userData?.imageUrl ? (
-                <View className="w-full h-full">
-                    <Text className="text-white font-bold text-xs text-center mt-3">IMG</Text> 
-                </View>
+                <Image 
+                    source={{ uri: userData.imageUrl }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                />
             ) : userToken && userData?.username ? (
                 <Text className="text-white font-bold text-lg">
                     {userData.username.charAt(0).toUpperCase()}
@@ -175,9 +179,11 @@ export default function HomeScreen() {
                 <ProgressCircle percentage={progressPercentage} color={isOverLimit ? "#EF4444" : "#FFFFFF"} />
                 <View className="flex-1 gap-3">
                     <View>
-                        <Text className="text-brand-muted text-xs uppercase font-bold">{isOverLimit ? "Przekroczono o" : "Pozostało"}</Text>
+                        <Text className="text-brand-muted text-xs uppercase font-bold">
+                            {isOverLimit ? "Przekroczono o" : "Pozostało"}</Text>
                         <Text className={`font-bold text-3xl ${isOverLimit ? "text-red-500" : "text-white"}`}>
-                            {Math.abs(remainingCalories).toFixed(0)} <Text className="text-sm font-normal text-brand-muted">kcal</Text>
+                            {Math.abs(remainingCalories).toFixed(0)} 
+                            <Text className="text-sm font-normal text-brand-muted">kcal</Text>
                         </Text>
                     </View>
                     <View className="flex-row items-center justify-between border-t border-brand-dark pt-2">
@@ -225,7 +231,8 @@ export default function HomeScreen() {
              <View className="flex-row justify-between items-center mb-4">
                  <View>
                     <Text className="text-brand-muted font-semibold mb-1">Waga</Text>
-                    <Text className="text-3xl font-bold text-white">{currentWeight || '--'} <Text className="text-lg text-brand-muted font-normal">kg</Text></Text>
+                    <Text className="text-3xl font-bold text-white">{currentWeight || '--'}
+                        <Text className="text-lg text-brand-muted font-normal">kg</Text></Text>
                  </View>
                  <TouchableOpacity className="bg-brand-primary p-3 rounded-full" onPress={() => router.push('/settings')}>
                     <Ionicons name="add" size={24} color="white" />

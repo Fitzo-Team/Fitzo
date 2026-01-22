@@ -14,7 +14,7 @@ public abstract class BlobStorageService
     public virtual async Task UploadBlobAsync(string containerName, string blobName, Stream data, string contentType)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-        await containerClient.CreateIfNotExistsAsync();
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
         
         var blobClient = containerClient.GetBlobClient(blobName);
 

@@ -2,8 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter, useSegments } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import apiClient from '../Services/ApiClient';
-import { UserProfileDto, AddWeightDto } from '../Types/Api';
+import apiClient, { API_BASE_URL } from '../Services/ApiClient';
+import { UserProfileDto } from '../Types/Api';
 import { Alert } from 'react-native';
 
 export type BmrFormula = 'MifflinStJeor' | 'HarrisBenedict';
@@ -13,6 +13,7 @@ interface UserData extends Partial<UserProfileDto> {
   email: string;
   goal?: string;
   imageUrl?: string;
+  userId?: string
 }
 
 export interface WeightEntry {
@@ -57,8 +58,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       try {
         const token = await SecureStore.getItemAsync('jwt_token');
         if (token) {
-          console.log("Znaleziono token, przywracam sesję...");
+          console.log("Przywracam sesję...");
           setUserToken(token);
+          
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           await Promise.all([
@@ -68,11 +70,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
                   setTimeout(() => fetchBMRInternal(true, (f as BmrFormula) || 'MifflinStJeor'), 100);
               })
           ]);
-        } else {
-            console.log("Brak tokena - użytkownik niezalogowany.");
         }
       } catch (e) {
-        console.log('Błąd przywracania sesji:', e);
+        console.log('Błąd sesji:', e);
       } finally {
         setIsLoading(false);
       }
@@ -81,14 +81,44 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     bootstrapAsync();
   }, []);
 
-
   const logout = async () => {
     setIsLoading(true);
     try { await SecureStore.deleteItemAsync('jwt_token'); } catch (e) {}
+
     delete apiClient.defaults.headers.common['Authorization'];
+    
     setUserToken(null); setUserData(null); setUserBmr(null); setWeightHistory([]);
     setIsLoading(false);
     router.replace('/login'); 
+  };
+
+  const fetchProfileInternal = async () => {
+      try {
+          const profileRes = await apiClient.get('/api/Users/profile');
+          if (profileRes.data) {
+              let imgUrl = profileRes.data.imageUrl;
+
+              if (imgUrl) {
+                  if (imgUrl.includes('127.0.0.1') || imgUrl.includes('localhost')) {
+                      const myIp = API_BASE_URL.split('://')[1].split(':')[0];
+                      imgUrl = imgUrl.replace('127.0.0.1', myIp).replace('localhost', myIp);
+                  }
+
+                  const separator = imgUrl.includes('?') ? '&' : '?';
+                  imgUrl = `${imgUrl}${separator}t=${new Date().getTime()}`;
+              }
+              
+              setUserData(prev => ({ 
+                  ...prev, 
+                  ...profileRes.data, 
+                  imageUrl: imgUrl, 
+                  email: prev?.email || 'Użytkownik' 
+              }));
+          }
+          await fetchWeightHistoryInternal();
+      } catch (e: any) {
+          if (e.response && e.response.status === 401) { await logout(); }
+      }
   };
 
   const fetchWeightHistoryInternal = async () => {
@@ -97,23 +127,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
           const sorted = (res.data || []).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
           setWeightHistory(sorted);
       } catch (e) { }
-  };
-
-  const fetchProfileInternal = async () => {
-      try {
-          const profileRes = await apiClient.get('/api/Users/profile');
-          if (profileRes.data) {
-              let imgUrl = profileRes.data.imageUrl;
-              if (imgUrl) {
-                  const separator = imgUrl.includes('?') ? '&' : '?';
-                  imgUrl = `${imgUrl}${separator}t=${new Date().getTime()}`;
-              }
-              setUserData(prev => ({ ...prev, ...profileRes.data, imageUrl: imgUrl, email: prev?.email || 'Użytkownik' }));
-          }
-          await fetchWeightHistoryInternal();
-      } catch (e: any) {
-          if (e.response && e.response.status === 401) { await logout(); }
-      }
   };
 
   const fetchBMRInternal = async (forceRefresh: boolean, formulaToUse: BmrFormula) => {
@@ -148,7 +161,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       const token = response.data.token || response.data; 
       if (token) {
         await SecureStore.setItemAsync('jwt_token', token);
+        
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
         setUserToken(token);
         setUserData({ email });
         await fetchProfileInternal();
@@ -167,9 +182,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
         await apiClient.post('/api/Auth/register', { email, password, confirmPassword: password });
         const loginRes = await apiClient.post('/api/Auth/login', { email, password });
         const token = loginRes.data.token || loginRes.data;
+        
         await SecureStore.setItemAsync('jwt_token', token);
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
         setUserToken(token);
+        
         const profileDto: UserProfileDto = {
           weight: Number(profileData.weight) || 70, height: Number(profileData.height) || 175,
           age: Number(profileData.age) || 25, gender: 'Male'

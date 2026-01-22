@@ -15,7 +15,7 @@ public class UserProfile
     public double Height { get; set; } 
 
     public int Age { get; set; }
-
+    public string? AvatarUrl { get; set; }
     public Gender Gender { get; set; }
 
 }

@@ -1,7 +1,18 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 
-const API_BASE_URL = 'http://192.168.0.114:5123';
+const getBaseUrl = () => {
+    const debuggerHost = Constants.expoConfig?.hostUri;
+    const localhost = debuggerHost?.split(':')[0];
+
+    if (!localhost) {
+        return 'http://192.168.0.114:5123';
+    }
+
+    return `http://${localhost}:5123`;
+};
+
+export const API_BASE_URL = getBaseUrl();
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -10,16 +21,14 @@ const apiClient = axios.create({
   },
 });
 
-apiClient.interceptors.request.use(async (config) => {
-  try {
-    const token = await SecureStore.getItemAsync('jwt_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  } catch (error) {
-    console.error("Error retrieving token", error);
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+      if (error.response && error.response.status === 401) {
+          console.log("Global 401 interceptor");
+      }
+      return Promise.reject(error);
   }
-  return config;
-});
+);
 
-export default apiClient;   
+export default apiClient;

@@ -17,11 +17,12 @@ public class UsersController : ControllerBase
 {
     private readonly FitzoDbContext _context;
     private readonly BmrService _bmrService;
-
-    public UsersController(FitzoDbContext context, BmrService bmrService)
+    private readonly IConfiguration _configuration;
+    public UsersController(FitzoDbContext context, BmrService bmrService, IConfiguration configuration)
     {
         _context = context;
         _bmrService = bmrService;
+        _configuration = configuration;
     }
 
     [HttpPost("profile")]
@@ -66,6 +67,26 @@ public class UsersController : ControllerBase
             return BadRequest("Nieprawidłowy format ID w tokenie.");
         }
 
+        var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userIdGuid);
+        if (profile == null)
+        {
+            return NotFound("Profil nie został jeszcze uzupełniony.");
+        }
+
+        var avatarBaseUrl = _configuration["BlobStorageSettings:AvatarsUrl"];
+        string fullImageUrl = null;
+        if (!string.IsNullOrEmpty(profile.AvatarUrl))
+        {
+            if (profile.AvatarUrl.StartsWith("http"))
+            {
+                fullImageUrl = profile.AvatarUrl;
+            }
+            else
+            {
+                fullImageUrl = $"{avatarBaseUrl}/{profile.AvatarUrl}";
+            }
+        }
+
         var profileDto = await _context.UserProfiles
             .Where(x => x.UserId == userIdGuid)
             .Select(x => new UserProfileDto 
@@ -73,7 +94,8 @@ public class UsersController : ControllerBase
                 Age = x.Age,
                 Weight = x.Weight,
                 Height = x.Height,
-                Gender = x.Gender
+                Gender = x.Gender,
+                ImageUrl = fullImageUrl
             })
             .FirstOrDefaultAsync();
 
@@ -85,6 +107,7 @@ public class UsersController : ControllerBase
         return Ok(profileDto);
     }
 
+    [Authorize]
     [HttpGet("bmr")]
     public async Task<IActionResult> GetBmr([FromQuery] BmrFormula formula = BmrFormula.MifflinStJeor)
     {
@@ -93,7 +116,7 @@ public class UsersController : ControllerBase
 
         if (!Guid.TryParse(userIdString, out var userIdGuid))
         {
-            return BadRequest("Nieprawidłowy format identyfikatora użytkownika.");
+            return Unauthorized("Nieprawidłowy format ID w tokenie.");
         }
 
         var profile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userIdGuid);

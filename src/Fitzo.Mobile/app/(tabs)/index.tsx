@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -22,7 +22,8 @@ const ProgressCircle = ({ percentage, color }: { percentage: number, color: stri
             <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                 <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
                     <Circle cx={size / 2} cy={size / 2} r={radius} stroke="rgba(255,255,255,0.2)" strokeWidth={strokeWidth} fill="transparent" />
-                    <Circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
+                    <Circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference}
+                      strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
                 </G>
             </Svg>
             <View className="absolute inset-0 justify-center items-center">
@@ -34,22 +35,22 @@ const ProgressCircle = ({ percentage, color }: { percentage: number, color: stri
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { userData, userToken, weightHistory, fetchWeightHistory, fetchBMR } = useAuth();
+  
+  const { userData, userToken, weightHistory, fetchWeightHistory, userBmr } = useAuth();
   const { dailyMeals, fetchDailyMeals } = useFood();
   
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [targetCalories, setTargetCalories] = useState(2500);
+  
+  const currentBMR = userBmr || 2500;
 
   const loadData = async () => {
       const today = new Date().toISOString(); 
       try {
-        const [_, __, bmr] = await Promise.all([
+        await Promise.all([
             fetchDailyMeals(today),
             fetchWeightHistory(),
-            fetchBMR()
         ]);
-        if (bmr) setTargetCalories(bmr);
       } catch (e) {
         console.error("Load error", e);
       } finally {
@@ -81,24 +82,28 @@ export default function HomeScreen() {
   const totalCarbs = todaysItems.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0);
   const totalFat = todaysItems.reduce((sum, item) => sum + (Number(item.fat) || 0), 0);
 
-  const remainingCalories = targetCalories - totalCalories;
+  const remainingCalories = currentBMR - totalCalories;
   const isOverLimit = remainingCalories < 0;
-  const progressPercentage = totalCalories / (targetCalories || 1);
+  const progressPercentage = totalCalories / (currentBMR || 1);
 
-  const targetProtein = Math.round((targetCalories * 0.20) / 4);
-  const targetCarbs = Math.round((targetCalories * 0.50) / 4);
-  const targetFat = Math.round((targetCalories * 0.30) / 9);
+  const targetProtein = Math.round((currentBMR * 0.20) / 4);
+  const targetCarbs = Math.round((currentBMR * 0.50) / 4);
+  const targetFat = Math.round((currentBMR * 0.30) / 9);
 
-  const currentWeight = weightHistory.length > 0 
-      ? weightHistory[weightHistory.length - 1].weight 
+  const sortedHistory = [...weightHistory].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const lastEntry = sortedHistory.length > 0 ? sortedHistory[sortedHistory.length - 1] : null;
+  const currentWeight = lastEntry 
+      ? ((lastEntry as any).value ?? lastEntry.weight) 
       : (userData?.weight || 0);
 
   let chartValues: number[] = [];
   let chartLabels: string[] = [];
 
-  if (weightHistory.length > 0) {
-      const recent = weightHistory.slice(-6);
-      chartValues = recent.map(w => Number(w.weight));
+  if (sortedHistory.length > 0) {
+      const recent = sortedHistory.slice(-6);
+
+      chartValues = recent.map(w => Number((w as any).value ?? w.weight));
       chartLabels = recent.map(w => {
           const d = new Date(w.date);
           return `${d.getDate()}.${d.getMonth() + 1}`;
@@ -108,29 +113,40 @@ export default function HomeScreen() {
   if (chartValues.length === 0) {
       const w = Number(currentWeight) || 70;
       chartValues = [w, w];
-      chartLabels = ["Start", "Now"];
+      chartLabels = ["Start", "Teraz"];
   } else if (chartValues.length === 1) {
       chartValues = [chartValues[0], chartValues[0]];
-      chartLabels = [chartLabels[0], chartLabels[0]];
+      chartLabels = ["Start", chartLabels[0]];
   }
 
   const chartData = {
     labels: chartLabels,
-    datasets: [{ data: chartValues }]
+    datasets: [{ 
+        data: chartValues,
+        strokeWidth: 2,
+    }]
   };
 
   if (loading && !userData) {
-      return <View className="flex-1 bg-brand-dark justify-center items-center"><ActivityIndicator color="#E0AAFF" size="large"/></View>;
+      return <View className="flex-1 bg-brand-dark justify-center items-center">
+        <ActivityIndicator color="#E0AAFF" size="large"/></View>;
   }
 
   return (
     <SafeAreaView className="flex-1 bg-brand-dark">
       <View className="flex-row justify-between items-center px-5 py-3">
         <TouchableOpacity 
-            onPress={() => router.push('/profile')}
-            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'}`}
+            onPress={() => router.push('/settings')}
+            className={`w-10 h-10 rounded-full items-center justify-center border border-brand-accent 
+                ${userToken ? 'bg-brand-vivid' : 'bg-brand-card'} overflow-hidden`}
         >
-            {userToken && userData?.username ? (
+            {userToken && userData?.imageUrl ? (
+                <Image 
+                    source={{ uri: userData.imageUrl }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                />
+            ) : userToken && userData?.username ? (
                 <Text className="text-white font-bold text-lg">
                     {userData.username.charAt(0).toUpperCase()}
                 </Text>
@@ -163,16 +179,18 @@ export default function HomeScreen() {
         <View className="mx-5 bg-brand-card rounded-3xl p-6 shadow-lg mb-5 border border-brand-accent">
             <View className="flex-row justify-between items-start mb-4">
                 <Text className="text-white text-lg font-bold">Kalorie</Text>
-                <Text className="text-brand-muted text-xs">Cel: {targetCalories} kcal</Text>
+                <Text className="text-brand-muted text-xs">Cel: {currentBMR.toFixed(0)} kcal</Text>
             </View>
 
             <View className="flex-row items-center">
                 <ProgressCircle percentage={progressPercentage} color={isOverLimit ? "#EF4444" : "#FFFFFF"} />
                 <View className="flex-1 gap-3">
                     <View>
-                        <Text className="text-brand-muted text-xs uppercase font-bold">{isOverLimit ? "Przekroczono o" : "Pozostało"}</Text>
+                        <Text className="text-brand-muted text-xs uppercase font-bold">
+                            {isOverLimit ? "Przekroczono o" : "Pozostało"}</Text>
                         <Text className={`font-bold text-3xl ${isOverLimit ? "text-red-500" : "text-white"}`}>
-                            {Math.abs(remainingCalories).toFixed(0)} <Text className="text-sm font-normal text-brand-muted">kcal</Text>
+                            {Math.abs(remainingCalories).toFixed(0)} 
+                            <Text className="text-sm font-normal text-brand-muted">kcal</Text>
                         </Text>
                     </View>
                     <View className="flex-row items-center justify-between border-t border-brand-dark pt-2">
@@ -220,21 +238,21 @@ export default function HomeScreen() {
              <View className="flex-row justify-between items-center mb-4">
                  <View>
                     <Text className="text-brand-muted font-semibold mb-1">Waga</Text>
-                    <Text className="text-3xl font-bold text-white">{currentWeight || '--'} <Text className="text-lg text-brand-muted font-normal">kg</Text></Text>
+                    <Text className="text-3xl font-bold text-white">{currentWeight || '--'}
+                        <Text className="text-lg text-brand-muted font-normal">kg</Text></Text>
                  </View>
-                 <TouchableOpacity className="bg-brand-primary p-3 rounded-full" onPress={() => router.push('/profile')}>
+                 <TouchableOpacity className="bg-brand-primary p-3 rounded-full" onPress={() => router.push('/settings')}>
                     <Ionicons name="add" size={24} color="white" />
                  </TouchableOpacity>
              </View>
+             
              {chartValues.length > 0 && !chartValues.some(isNaN) ? (
                  <LineChart
                     data={chartData}
-                    width={screenWidth - 80} 
-                    height={160}
+                    width={screenWidth - 40} 
+                    height={180}
                     yAxisSuffix="kg"
-                    withInnerLines={false}
-                    withOuterLines={false}
-                    withHorizontalLabels={true}
+                    yAxisInterval={1} 
                     chartConfig={{
                         backgroundColor: "#240046",
                         backgroundGradientFrom: "#240046",
@@ -246,10 +264,17 @@ export default function HomeScreen() {
                         propsForDots: { r: "4", strokeWidth: "2", stroke: "#9D4EDD" }
                     }}
                     bezier 
-                    style={{ marginVertical: 8, borderRadius: 16, paddingRight: 40, marginLeft: -20 }}
+                    style={{
+                        marginVertical: 8,
+                        borderRadius: 16,
+                    }}
+                    withInnerLines={false}
+                    withOuterLines={false}
                 />
              ) : (
-                 <Text className="text-brand-muted text-center">Brak danych wagi</Text>
+                 <View className="h-32 items-center justify-center">
+                    <Text className="text-brand-muted text-center">Dodaj więcej pomiarów wagi, aby zobaczyć wykres</Text>
+                 </View>
              )}
         </View>
       </ScrollView>

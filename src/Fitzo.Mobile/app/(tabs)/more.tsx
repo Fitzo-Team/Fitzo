@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../Context/AuthContext';
@@ -31,12 +31,19 @@ export default function MoreScreen() {
       </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        
         <TouchableOpacity 
             className="flex-row items-center mx-5 p-4 bg-brand-card rounded-2xl border border-brand-accent mb-6 shadow-md"
-            onPress={() => router.push('/settings')} // Profil jest teraz częścią ustawień/konta
+            onPress={() => router.push('/settings')}
         >
-            <View className="w-14 h-14 bg-brand-vivid rounded-full items-center justify-center border border-brand-light">
-                {userToken && userData?.email ? (
+            <View className="w-14 h-14 bg-brand-vivid rounded-full items-center justify-center border border-brand-light overflow-hidden">
+                {userToken && userData?.imageUrl ? (
+                   <Image 
+                      source={{ uri: userData.imageUrl }} 
+                      className="w-full h-full" 
+                      resizeMode="cover"
+                   />
+                ) : userToken && userData?.email ? (
                    <Text className="text-white text-xl font-bold">
                      {userData.email.charAt(0).toUpperCase()}
                    </Text>
@@ -44,6 +51,7 @@ export default function MoreScreen() {
                    <Ionicons name="person" size={24} color="white" />
                 )}
             </View>
+            
             <View className="ml-4 flex-1">
                 <Text className="text-brand-text font-bold text-lg">
                     {userToken ? (userData?.username || userData?.email || 'Użytkownik') : 'Profil Gościa'}
@@ -65,7 +73,7 @@ export default function MoreScreen() {
         <MenuRow 
           icon={<Ionicons name="cart-outline" size={24} color="#E0AAFF" />}
           title="Lista zakupów"
-          onPress={() => router.push('/ShoppingList')} // Upewnij się, że masz plik app/shopping.tsx lub app/(tabs)/shopping.tsx
+          onPress={() => router.push('/ShoppingList')} 
         />
         
         <View className="h-6" />
@@ -86,7 +94,7 @@ export default function MoreScreen() {
         <MenuRow 
           icon={<Ionicons name="settings-outline" size={24} color="#E0AAFF" />}
           title="Ustawienia"
-          subtitle="BMR, Wzory, Aplikacja"
+          subtitle="BMR, Język, Profil"
           onPress={() => router.push('/settings')}
         />
 

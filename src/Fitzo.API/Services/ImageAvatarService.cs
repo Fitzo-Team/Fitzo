@@ -1,34 +1,38 @@
+using Fitzo.API.Data;
 using Fitzo.API.Entities;
-using Microsoft.AspNetCore.Identity;
-
+using Microsoft.EntityFrameworkCore;
 namespace Fitzo.API.Services;
 
 public class ImageAvatarService
 {
     private readonly ProfileImageService _profileImageService;
-    private readonly UserManager<UserIdentity> _userManager;
-    public ImageAvatarService(ProfileImageService profileImageService, UserManager<UserIdentity> userManager)
+    private readonly FitzoDbContext _context;
+
+    public ImageAvatarService(ProfileImageService profileImageService, FitzoDbContext context)
     {
         _profileImageService = profileImageService;
-        _userManager = userManager;
+        _context = context;
     }
 
     public async Task<string> UpdateUserAvatarAsync(Guid userId, IFormFile file)
     {
         await _profileImageService.EnsureContainerExistAsync();
 
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null) 
-            throw new KeyNotFoundException("Użytkownik nie istnieje.");
+        var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == userId);
 
-        if (!string.IsNullOrEmpty(user.AvatarUrl))
+        if (userProfile == null)
         {
+            userProfile = new UserProfile { UserId = userId };
+            _context.UserProfiles.Add(userProfile);
+        }
 
-            await _profileImageService.DeleteBlobAsync(ProfileImageService.PublicContainerName, user.AvatarUrl);
+        if (!string.IsNullOrEmpty(userProfile.AvatarUrl))
+        {
+            await _profileImageService.DeleteBlobAsync(ProfileImageService.PublicContainerName, userProfile.AvatarUrl);
         }
 
         var extension = Path.GetExtension(file.FileName);
-        var uniqueFileName = $"{user.Id}_{Guid.NewGuid()}{extension}";
+        var uniqueFileName = $"{userId}_{Guid.NewGuid()}{extension}";
 
         using var stream = file.OpenReadStream();
         await _profileImageService.UploadBlobAsync(
@@ -38,13 +42,9 @@ public class ImageAvatarService
             file.ContentType
         );
 
-        user.AvatarUrl = uniqueFileName;
-        var result = await _userManager.UpdateAsync(user);
-
-        if (!result.Succeeded)
-        {
-            throw new Exception("Błąd podczas aktualizacji użytkownika w bazie.");
-        }
+        userProfile.AvatarUrl = uniqueFileName;
+        
+        await _context.SaveChangesAsync();
 
         return uniqueFileName;
     }

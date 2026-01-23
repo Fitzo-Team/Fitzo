@@ -1,0 +1,6 @@
+@startuml
+class RecipeManagerTests {
+    + <<async>> CreateRecipeAsync_ShouldAddRecipeToDatabase() : Task
+    + <<async>> GetRecipeByIdAsync_ShouldIncludeComponents() : Task
+}
+@enduml

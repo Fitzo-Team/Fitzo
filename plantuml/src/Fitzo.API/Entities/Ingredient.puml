@@ -1,0 +1,11 @@
+@startuml
+class Ingredient {
+    + Amount : double <<get>> <<set>>
+    + <<override>> CalculateCalories() : double
+    + <<override>> CalculateProtein() : double
+    + <<override>> CalculateFat() : double
+    + <<override>> CalculateCarbs() : double
+}
+RecipeComponent <|-- Ingredient
+Ingredient --> "Product" ProductDto
+@enduml

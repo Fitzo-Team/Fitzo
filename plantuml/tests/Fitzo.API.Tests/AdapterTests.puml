@@ -1,0 +1,13 @@
+@startuml
+class AdaptersTests {
+    + <<async>> UsdaAdapter_GetProductAsync_ShouldReturnMappedProduct_WhenApiReturnsData() : Task
+    + <<async>> UsdaAdapter_GetProductAsync_ShouldReturnNull_WhenApiReturns404() : Task
+    + <<async>> OffAdapter_GetProductAsync_ShouldReturnProduct_WhenFound() : Task
+    + <<async>> OffAdapter_GetProductAsync_ShouldReturnNull_WhenApiReturns404() : Task
+}
+class HybridNutritionProviderTests {
+    + HybridNutritionProviderTests()
+    + <<async>> GetProductAsync_ShouldCallOffAdapter_WhenIdStartsWithOffPrefix() : Task
+    + <<async>> GetProductAsync_ShouldCallUsdaAdapter_WhenIdStartsWithUsdaPrefix() : Task
+}
+@enduml

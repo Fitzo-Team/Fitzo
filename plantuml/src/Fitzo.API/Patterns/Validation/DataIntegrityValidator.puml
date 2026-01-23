@@ -1,0 +1,6 @@
+@startuml
+class DataIntegrityValidator {
+    + <<override>> Handle(recipe:Recipe) : void
+}
+RecipeValidationHandler <|-- DataIntegrityValidator
+@enduml

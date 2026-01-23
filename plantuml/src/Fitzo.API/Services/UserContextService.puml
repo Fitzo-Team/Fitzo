@@ -1,0 +1,8 @@
+@startuml
+class UserContextService {
+    + UserContextService(httpContextAccessor:IHttpContextAccessor)
+    + GetCurrentUserId() : Guid
+    + GetCurrentUserRole() : UserRole
+}
+IUserContextService <|-- UserContextService
+@enduml

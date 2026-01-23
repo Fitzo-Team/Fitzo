@@ -1,0 +1,10 @@
+@startuml
+class DiaryCotroller {
+    + DiaryCotroller(_fitzoDbContext:FitzoDbContext, _recipeManager:IRecipeManager)
+    + <<async>> AddEntry(dto:AddFoodEntryDto) : Task<IActionResult>
+    + <<async>> GetEntry(id:Guid) : Task<IActionResult>
+    + <<async>> GetRecent() : Task<IActionResult>
+    + <<async>> GetDiaryEntries(date:DateTime) : Task<IActionResult>
+}
+ControllerBase <|-- DiaryCotroller
+@enduml

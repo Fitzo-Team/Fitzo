@@ -1,0 +1,9 @@
+@startuml
+class PlanningController {
+    + PlanningController(calendarService:CalendarService, shoppingListGenerator:IShoppingListGenerator, context:FitzoDbContext, logger:ILogger<PlanningController>)
+    + <<async>> AddMeal(dto:AddMealDto) : Task<IActionResult>
+    + <<async>> GetWeeklyPlan(date:DateTime?) : Task<IActionResult>
+    + <<async>> GetShoppingList(startDate:DateTime?, endDate:DateTime?) : Task<ActionResult<List<ShoppingListItem>>>
+}
+ControllerBase <|-- PlanningController
+@enduml

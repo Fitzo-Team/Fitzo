@@ -1,0 +1,6 @@
+@startuml
+class BmrService {
+    + BmrService(serviceProvider:IServiceProvider)
+    + CalculateBmr(profile:UserProfile, formula:BmrFormula) : double
+}
+@enduml

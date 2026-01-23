@@ -1,0 +1,6 @@
+@startuml
+class ShoppingListGenerator {
+    + Generate(mealPlanEntries:List<MealPlanEntry>) : List<ShoppingListItem>
+}
+IShoppingListGenerator <|-- ShoppingListGenerator
+@enduml

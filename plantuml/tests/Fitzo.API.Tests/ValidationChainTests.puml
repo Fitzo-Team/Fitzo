@@ -1,0 +1,11 @@
+@startuml
+class ValidationChainTests {
+    + DataIntegrityValidator_ShouldThrow_WhenNameIsEmpty() : void
+    + DataIntegrityValidator_ShouldThrow_WhenOwnerIdIsEmpty() : void
+    + IngredientsCountValidator_ShouldThrow_WhenNoIngredients() : void
+    + IngredientsCountValidator_ShouldPass_WhenIngredientsExist() : void
+    + ImageValidator_ShouldThrow_WhenUrlIsInvalid() : void
+    + ImageValidator_ShouldPass_WhenUrlIsNull() : void
+    + FullChain_ShouldExecuteValidatorsInOrder() : void
+}
+@enduml

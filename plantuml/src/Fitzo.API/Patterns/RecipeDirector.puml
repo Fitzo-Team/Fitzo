@@ -1,0 +1,6 @@
+@startuml
+class RecipeDirector {
+    + RecipeDirector(builder:IRecipeBuilder)
+    + Construct(dto:CreateRecipeDto) : Recipe
+}
+@enduml

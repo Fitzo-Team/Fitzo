@@ -1,0 +1,7 @@
+@startuml
+class RecipeService {
+    + RecipeService(imageService:RecipeImageService)
+    + <<async>> UploadRecipeImage(file:IFormFile) : Task<string>
+    + <<async>> DeleteRecipeImage(imageName:string) : Task
+}
+@enduml

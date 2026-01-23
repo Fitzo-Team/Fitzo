@@ -1,0 +1,7 @@
+@startuml
+class CalendarService {
+    + CalendarService(context:FitzoDbContext, userContext:IUserContextService)
+    + <<async>> AddMealAsync(dto:AddMealDto) : Task
+    + <<async>> GetWeeklyPlanAsync(startDate:DateTime, endDate:DateTime) : Task<List<MealPlanEntry>>
+}
+@enduml

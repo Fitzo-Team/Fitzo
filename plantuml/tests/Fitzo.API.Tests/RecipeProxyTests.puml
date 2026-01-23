@@ -1,0 +1,8 @@
+@startuml
+class RecipeProxyTests {
+    + RecipeProxyTests()
+    + <<async>> CreateRecipe_ShouldAssignOwnerId() : Task
+    + <<async>> DeleteRecipe_ShouldThrow_WhenUserIsNotOwner() : Task
+    + <<async>> DeleteRecipe_ShouldSucceed_WhenUserIsOwner() : Task
+}
+@enduml

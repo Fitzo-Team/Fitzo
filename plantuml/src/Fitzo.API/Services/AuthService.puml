@@ -1,0 +1,7 @@
+@startuml
+class AuthService {
+    + AuthService(userManager:UserManager<UserIdentity>, configuration:IConfiguration)
+    + <<async>> RegisterAsync(dto:RegisterDto) : Task<IdentityResult>
+    + <<async>> LoginAsync(dto:LoginDto) : Task<string>
+}
+@enduml

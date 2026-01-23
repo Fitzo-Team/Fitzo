@@ -1,0 +1,7 @@
+@startuml
+class StatsController {
+    + StatsController(_context:FitzoDbContext)
+    + <<async>> GetUserStatistics() : Task<IActionResult>
+}
+ControllerBase <|-- StatsController
+@enduml

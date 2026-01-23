@@ -1,0 +1,7 @@
+@startuml
+class PlanningControllerTests {
+    + PlanningControllerTests()
+    + <<async>> GetShoppingList_ShouldReturnEmptyList_WhenNoPlanExists() : Task
+    + <<async>> GetShoppingList_ShouldReturnUnauthorized_WhenUserNotLogged() : Task
+}
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+class ShoppingListGeneratorTests {
+    + ShoppingListGeneratorTests()
+    + Generate_ShouldSumQuantities_WhenSameProductExistsMultipleTimes() : void
+    + Generate_ShouldHandleNestedRecipes_AndExtractDeepIngredients() : void
+    + Generate_ShouldSeparateDifferentProducts() : void
+    + Generate_ShouldReturnEmptyList_WhenInputIsEmpty() : void
+}
+@enduml

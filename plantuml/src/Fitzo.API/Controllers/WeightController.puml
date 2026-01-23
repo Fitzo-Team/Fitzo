@@ -1,0 +1,8 @@
+@startuml
+class WeightController {
+    + WeightController(context:FitzoDbContext)
+    + <<async>> AddWeight(dto:AddWeightDto) : Task<IActionResult>
+    + <<async>> GetHistory() : Task<IActionResult>
+}
+ControllerBase <|-- WeightController
+@enduml

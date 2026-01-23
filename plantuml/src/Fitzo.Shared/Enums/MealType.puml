@@ -1,0 +1,10 @@
+@startuml
+enum MealType {
+    Breakfast= 0,
+    SecondBreakfast,
+    Lunch,
+    Dinner,
+    Snack,
+    Supper,
+}
+@enduml

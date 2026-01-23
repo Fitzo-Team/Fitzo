@@ -1,0 +1,13 @@
+@startuml
+class ProductSearchFilterDto {
+    + Query : string? <<get>> <<set>>
+    + Category : string? <<get>> <<set>>
+    + Nutriscore : string? <<get>> <<set>>
+    + NoPalmOil : bool <<get>> <<set>>
+    + Vegetarian : bool <<get>> <<set>>
+    + Vegan : bool <<get>> <<set>>
+    + Page : int <<get>> <<set>> = 1
+    + PageSize : int <<get>> <<set>> = 20
+    + HasAdvancedFilters : bool <<get>>
+}
+@enduml

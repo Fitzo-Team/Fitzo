@@ -362,7 +362,6 @@ export default function RecipesScreen() {
                 </View>
             </View>
         )}
-        {renderSection('Odkrywaj', otherRecipes.length > 0 ? otherRecipes : recipes)}
         {recipes.length === 0 && !loading && (<View className="mt-10 items-center"><Text className="text-brand-muted">Brak przepisów w bazie.</Text></View>)}
         <View className="h-24" />
       </ScrollView>

@@ -1,0 +1,6 @@
+@startuml
+class ImageAvatarService {
+    + ImageAvatarService(profileImageService:ProfileImageService, context:FitzoDbContext)
+    + <<async>> UpdateUserAvatarAsync(userId:Guid, file:IFormFile) : Task<string>
+}
+@enduml

@@ -1,0 +1,11 @@
+@startuml
+class RecipeManager {
+    + RecipeManager(context:FitzoDbContext)
+    + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+    + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+    + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+    + <<async>> DeleteRecipeAsync(id:Guid) : Task
+    + <<async>> UpdateRecipeImageAsync(recipeId:Guid, fileName:string) : Task
+}
+IRecipeManager <|-- RecipeManager
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+class UsersController {
+    + UsersController(context:FitzoDbContext, bmrService:BmrService, configuration:IConfiguration)
+    + <<async>> UpdateProfile(dto:UserProfileDto) : Task<IActionResult>
+    + <<async>> GetProfile() : Task<IActionResult>
+    + <<async>> GetBmr(formula:BmrFormula) : Task<IActionResult>
+}
+ControllerBase <|-- UsersController
+@enduml

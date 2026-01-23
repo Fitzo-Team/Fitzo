@@ -1,0 +1,9 @@
+@startuml
+class AddMealDto {
+}
+AddMealDto --> "RecipeId" Guid
+AddMealDto --> "Date" DateTime
+AddMealDto --> "StartTime" TimeSpan
+AddMealDto --> "EndTime" TimeSpan
+AddMealDto --> "Type" MealType
+@enduml

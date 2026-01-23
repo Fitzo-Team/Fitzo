@@ -1,0 +1,8 @@
+@startuml
+class UserIdentity {
+}
+class "IdentityUser`1"<T> {
+}
+"IdentityUser`1" "<Guid>" <|-- UserIdentity
+UserIdentity --> "Role" UserRole
+@enduml

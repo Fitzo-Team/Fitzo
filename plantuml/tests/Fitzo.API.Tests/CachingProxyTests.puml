@@ -1,0 +1,7 @@
+@startuml
+class CachingProxyTests {
+    + CachingProxyTests()
+    + <<async>> GetProduct_ShouldCallInnerService_WhenCacheIsEmpty() : Task
+    + <<async>> GetProduct_ShouldReturnFromCache_AndNotCallInnerService_WhenDataIsCached() : Task
+}
+@enduml

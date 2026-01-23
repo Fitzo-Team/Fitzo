@@ -1,0 +1,6 @@
+@startuml
+class StatsControllerTests {
+    + <<async>> GetUserStatistics_ShouldCalculateAveragesAndWeightChangeCorrectly() : Task
+    + <<async>> GetUserStatistics_ShouldReturnZeros_WhenNoDataExists() : Task
+}
+@enduml

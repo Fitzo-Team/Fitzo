@@ -1,0 +1,16 @@
+@startuml
+class FoodEntry {
+    + Amount : double <<get>> <<set>>
+    + OriginRecipeName : string? <<get>> <<set>>
+    + CalculateCalories() : double
+    + CalculateProtein() : double
+    + CalculateFat() : double
+    + CalculateCarbs() : double
+}
+FoodEntry o-> "Id" Guid
+FoodEntry --> "UserId" Guid
+FoodEntry --> "Date" DateTime
+FoodEntry --> "MealType" MealType
+FoodEntry --> "ProductEntry" ProductDto
+FoodEntry --> "OriginalRecipeId" Guid
+@enduml

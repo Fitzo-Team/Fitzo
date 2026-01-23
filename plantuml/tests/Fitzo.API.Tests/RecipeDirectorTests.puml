@@ -1,0 +1,10 @@
+@startuml
+class RecipeDirectorTests {
+    + RecipeDirectorTests()
+    + Construct_ShouldCallBuilderMethods_InCorrectOrder() : void
+    + Construct_ShouldHandleNullOptionalFields() : void
+    + Ingredient_CalculateCalories_ShouldReturnCorrectValue_BasedOnServingSize() : void
+    + Recipe_CalculateMacros_ShouldSumUpAllIngredients() : void
+    + Calculate_ShouldReturnZero_WhenProductIsNull() : void
+}
+@enduml

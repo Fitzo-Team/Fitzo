@@ -1,0 +1,12 @@
+@startuml
+class StandardRecipeBuilder {
+    + StandardRecipeBuilder()
+    + Reset() : void
+    + SetName(name:string) : void
+    + SetImage(imageUrl:string) : void
+    + SetDietTags(tags:List<DietTag>) : void
+    + AddIngredient(ingredientDto:IngredientDto) : void
+    + Build() : Recipe
+}
+IRecipeBuilder <|-- StandardRecipeBuilder
+@enduml

@@ -1,0 +1,6 @@
+@startuml
+class IngredientDto {
+    + amount : double <<get>> <<set>>
+}
+IngredientDto o-> "Product" ProductDto
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+class AccountController {
+    + AccountController(accountService:ImageAvatarService, configuration:IConfiguration)
+    + <<async>> UploadAvatar(file:IFormFile) : Task<IActionResult>
+}
+ControllerBase <|-- AccountController
+@enduml

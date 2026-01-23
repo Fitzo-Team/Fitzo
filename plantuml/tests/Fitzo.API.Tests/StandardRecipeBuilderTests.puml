@@ -1,0 +1,8 @@
+@startuml
+class StandardRecipeBuilderTests {
+    + StandardRecipeBuilderTests()
+    + Build_ShouldCreateRecipe_WithBasicProperties() : void
+    + AddIngredient_ShouldMapDtoToEntityCorrectly() : void
+    + Reset_ShouldClearBuilderState() : void
+}
+@enduml

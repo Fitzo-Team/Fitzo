@@ -1,0 +1,24 @@
+@startuml
+class "AddDbContext`1"<T> {
+}
+class "AddIdentity`2"<T1,T2> {
+}
+class "AddEntityFrameworkStores`1"<T> {
+}
+class "GetValue`1"<T> {
+}
+class "AddHttpClient`1"<T> {
+}
+class "AddScoped`1"<T> {
+}
+class "GetRequiredService`1"<T> {
+}
+class "AddKeyedScoped`2"<T1,T2> {
+}
+class "AddTransient`2"<T1,T2> {
+}
+class "AddTransient`1"<T> {
+}
+class "AddScoped`2"<T1,T2> {
+}
+@enduml

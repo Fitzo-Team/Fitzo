@@ -1,0 +1,8 @@
+@startuml
+class ExportController {
+    + ExportController(service:ExportImportService, context:FitzoDbContext)
+    + <<async>> GetRecipesJson() : Task<IActionResult>
+    + <<async>> ImportRecipesJson(file:IFormFile) : Task<IActionResult>
+}
+ControllerBase <|-- ExportController
+@enduml

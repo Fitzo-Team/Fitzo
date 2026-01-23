@@ -1,0 +1,7 @@
+@startuml
+class CalendarServiceTests {
+    + <<async>> AddMealAsync_ShouldAddEntryToDatabase_WhenRecipeExists() : Task
+    + <<async>> AddMealAsync_ShouldThrow_WhenRecipeDoesNotExist() : Task
+    + <<async>> GetWeeklyPlanAsync_ShouldReturnOnlyUserMeals_InDateRange() : Task
+}
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+class FitzoDbContext {
+    + FitzoDbContext(options:DbContextOptions<FitzoDbContext>)
+}
+class "IdentityDbContext`3"<T1,T2,T3> {
+}
+class "DbSet`1"<T> {
+}
+"IdentityDbContext`3" "<UserIdentity,IdentityRole<Guid>,Guid>" <|-- FitzoDbContext
+FitzoDbContext --> "RecipeComponents<RecipeComponent>" "DbSet`1"
+FitzoDbContext --> "Recipes<Recipe>" "DbSet`1"
+FitzoDbContext --> "ingredients<Ingredient>" "DbSet`1"
+FitzoDbContext --> "UserProfiles<UserProfile>" "DbSet`1"
+FitzoDbContext --> "MealPlans<MealPlanEntry>" "DbSet`1"
+FitzoDbContext --> "FoodEntries<FoodEntry>" "DbSet`1"
+FitzoDbContext --> "WeightEntries<WeightEntry>" "DbSet`1"
+@enduml

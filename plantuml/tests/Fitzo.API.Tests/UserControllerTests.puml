@@ -1,0 +1,8 @@
+@startuml
+class UsersControllerTests {
+    + <<async>> UpdateProfile_ShouldCreateNewProfile_WhenNoneExists() : Task
+    + <<async>> GetBmr_ShouldReturnCorrectValue_WhenProfileExists() : Task
+    + <<async>> GetBmr_ShouldReturnBadRequest_WhenProfileDoesNotExist() : Task
+    + <<async>> UpdateProfile_ShouldReturnUnauthorized_WhenUserNotLoggedIn() : Task
+}
+@enduml

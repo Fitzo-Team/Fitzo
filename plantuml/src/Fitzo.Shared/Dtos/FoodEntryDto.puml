@@ -1,0 +1,9 @@
+@startuml
+class AddFoodEntryDto {
+    + Amount : double <<get>> <<set>>
+}
+AddFoodEntryDto --> "Date" DateTime
+AddFoodEntryDto --> "MealType" MealType
+AddFoodEntryDto --> "Product" ProductDto
+AddFoodEntryDto --> "RecipeId" Guid
+@enduml

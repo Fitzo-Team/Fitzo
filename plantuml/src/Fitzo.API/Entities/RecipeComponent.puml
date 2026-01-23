@@ -1,0 +1,10 @@
+@startuml
+abstract class RecipeComponent {
+    + Name : string <<get>> <<set>>
+    + {abstract} CalculateCalories() : double
+    + {abstract} CalculateProtein() : double
+    + {abstract} CalculateFat() : double
+    + {abstract} CalculateCarbs() : double
+}
+RecipeComponent o-> "Id" Guid
+@enduml

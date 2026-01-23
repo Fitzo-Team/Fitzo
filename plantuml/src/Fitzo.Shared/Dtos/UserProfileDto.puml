@@ -1,0 +1,9 @@
+@startuml
+class UserProfileDto {
+    + Weight : double <<get>> <<set>>
+    + Height : double <<get>> <<set>>
+    + Age : int <<get>> <<set>>
+    + ImageUrl : string? <<get>> <<set>>
+}
+UserProfileDto --> "Gender" Gender
+@enduml

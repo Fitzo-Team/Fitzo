@@ -1,0 +1,697 @@
+@startuml
+!define CONTROLLERS_COLOR #E1F5FF
+!define MODELS_COLOR #FFF9E1
+!define SERVICES_COLOR #E8F5E9
+!define INTERFACES_COLOR #F3E5F5
+!define DTOS_COLOR #FFF3E0
+!define ENUMS_COLOR #FCE4EC
+
+' ==================== CONTROLLERS ====================
+package "Controllers" CONTROLLERS_COLOR {
+    class AuthController {
+        + AuthController(authService:AuthService)
+        + <<async>> Register(dto:RegisterDto) : Task<IActionResult>
+        + <<async>> Login(dto:LoginDto) : Task<IActionResult>
+    }
+    
+    class AccountController {
+        + AccountController(accountService:ImageAvatarService, configuration:IConfiguration)
+        + <<async>> UploadAvatar(file:IFormFile) : Task<IActionResult>
+    }
+    
+    class DiaryCotroller {
+        + DiaryCotroller(_fitzoDbContext:FitzoDbContext, _recipeManager:IRecipeManager)
+        + <<async>> AddEntry(dto:AddFoodEntryDto) : Task<IActionResult>
+        + <<async>> GetEntry(id:Guid) : Task<IActionResult>
+        + <<async>> GetRecent() : Task<IActionResult>
+        + <<async>> GetDiaryEntries(date:DateTime) : Task<IActionResult>
+    }
+    
+    class ExportController {
+        + ExportController(service:ExportImportService, context:FitzoDbContext)
+        + <<async>> GetRecipesJson() : Task<IActionResult>
+        + <<async>> ImportRecipesJson(file:IFormFile) : Task<IActionResult>
+    }
+    
+    class PlanningController {
+        + PlanningController(calendarService:CalendarService, shoppingListGenerator:IShoppingListGenerator, context:FitzoDbContext, logger:ILogger<PlanningController>)
+        + <<async>> AddMeal(dto:AddMealDto) : Task<IActionResult>
+        + <<async>> GetWeeklyPlan(date:DateTime?) : Task<IActionResult>
+        + <<async>> GetShoppingList(startDate:DateTime?, endDate:DateTime?) : Task<ActionResult<List<ShoppingListItem>>>
+    }
+    
+    class ProductController {
+        + ProductController(nutritionProvider:INutritionProvider)
+        + <<async>> GetProduct(id:string) : Task<IActionResult>
+        + <<async>> Search(filter:ProductSearchFilterDto) : Task<IActionResult>
+    }
+    
+    class RecipesController {
+        + RecipesController(director:RecipeDirector, recipeManager:IRecipeManager, recipeService:RecipeService, configuration:IConfiguration)
+        + <<async>> CreateRecipe(dto:CreateRecipeDto) : Task<IActionResult>
+        + <<async>> GetRecipe(id:Guid) : Task<ActionResult<Recipe>>
+        + <<async>> GetRecipes() : Task<ActionResult>
+        + <<async>> DeleteRecipe(id:Guid) : Task<IActionResult>
+        + <<async>> UploadImage(id:Guid, file:IFormFile) : Task<IActionResult>
+    }
+    
+    class StatsController {
+        + StatsController(_context:FitzoDbContext)
+        + <<async>> GetUserStatistics() : Task<IActionResult>
+    }
+    
+    class UsersController {
+        + UsersController(context:FitzoDbContext, bmrService:BmrService, configuration:IConfiguration)
+        + <<async>> UpdateProfile(dto:UserProfileDto) : Task<IActionResult>
+        + <<async>> GetProfile() : Task<IActionResult>
+        + <<async>> GetBmr(formula:BmrFormula) : Task<IActionResult>
+    }
+    
+    class WeightController {
+        + WeightController(context:FitzoDbContext)
+        + <<async>> AddWeight(dto:AddWeightDto) : Task<IActionResult>
+        + <<async>> GetHistory() : Task<IActionResult>
+    }
+}
+
+' ==================== DATABASE CONTEXT ====================
+package "Database" MODELS_COLOR {
+    class FitzoDbContext {
+        + FitzoDbContext(options:DbContextOptions<FitzoDbContext>)
+        + RecipeComponents : DbSet<RecipeComponent>
+        + Recipes : DbSet<Recipe>
+        + ingredients : DbSet<Ingredient>
+        + UserProfiles : DbSet<UserProfile>
+        + MealPlans : DbSet<MealPlanEntry>
+        + FoodEntries : DbSet<FoodEntry>
+        + WeightEntries : DbSet<WeightEntry>
+    }
+}
+
+' ==================== DOMAIN MODELS ====================
+package "Entitites" MODELS_COLOR {
+    class FoodEntry {
+        + Id : Guid
+        + UserId : Guid
+        + Date : DateTime
+        + MealType : MealType
+        + ProductEntry : ProductDto
+        + OriginalRecipeId : Guid
+        + Amount : double <<get>> <<set>>
+        + OriginRecipeName : string? <<get>> <<set>>
+        + CalculateCalories() : double
+        + CalculateProtein() : double
+        + CalculateFat() : double
+        + CalculateCarbs() : double
+    }
+    
+    abstract class RecipeComponent {
+        + Id : Guid
+        + Name : string <<get>> <<set>>
+        + {abstract} CalculateCalories() : double
+        + {abstract} CalculateProtein() : double
+        + {abstract} CalculateFat() : double
+        + {abstract} CalculateCarbs() : double
+    }
+    
+    class Ingredient {
+        + Product : ProductDto
+        + Amount : double <<get>> <<set>>
+        + <<override>> CalculateCalories() : double
+        + <<override>> CalculateProtein() : double
+        + <<override>> CalculateFat() : double
+        + <<override>> CalculateCarbs() : double
+    }
+    
+    class Recipe {
+        + OwnerId : Guid
+        + Tags : List<DietTag>
+        + Components : List<RecipeComponent>
+        + ImageUrl : string? <<get>> <<set>>
+        + Description : string? <<get>> <<set>>
+        + <<override>> CalculateCalories() : double
+        + <<override>> CalculateProtein() : double
+        + <<override>> CalculateFat() : double
+        + <<override>> CalculateCarbs() : double
+        + AddComponent(component:RecipeComponent) : void
+        + RemoveComponent(component:RecipeComponent) : void
+    }
+    
+    class MealPlanEntry {
+        + Id : Guid
+        + UserId : Guid
+        + RecipeId : Guid
+        + Recipe : Recipe
+        + Date : DateTime
+        + StartTime : TimeSpan
+        + EndTime : TimeSpan
+        + Type : MealType
+        + MoveTo(newDate:DateTime, newTime:TimeSpan) : void
+    }
+    
+    class UserIdentity {
+        + Role : UserRole
+    }
+    
+    class UserProfile {
+        + Id : int <<get>> <<set>>
+        + UserId : Guid
+        + Createdate : DateTime
+        + Gender : Gender
+        + Weight : double <<get>> <<set>>
+        + Height : double <<get>> <<set>>
+        + Age : int <<get>> <<set>>
+        + AvatarUrl : string? <<get>> <<set>>
+    }
+    
+    class WeightEntry {
+        + Id : Guid
+        + UserId : Guid
+        + Date : DateTime
+        + Value : double <<get>> <<set>>
+    }
+}
+
+' ==================== INTERFACES ====================
+package "Interfaces" INTERFACES_COLOR {
+    interface IBmrStrategy {
+    }
+    
+    interface INutritionProvider {
+    }
+    
+    interface IRecipeBuilder {
+    }
+    
+    interface IRecipeManager {
+    }
+    
+    interface IShoppingListGenerator {
+    }
+    
+    interface IStatisticsService {
+    }
+    
+    interface IUserContextService {
+    }
+}
+
+' ==================== SERVICES ====================
+package "Services" SERVICES_COLOR {
+    class AuthService {
+        + AuthService(userManager:UserManager<UserIdentity>, configuration:IConfiguration)
+        + <<async>> RegisterAsync(dto:RegisterDto) : Task<IdentityResult>
+        + <<async>> LoginAsync(dto:LoginDto) : Task<string>
+    }
+    
+    abstract class BlobStorageService {
+        + <<virtual>> <<async>> UploadBlobAsync(containerName:string, blobName:string, data:Stream, contentType:string) : Task
+        + <<virtual>> <<async>> DownloadBlobAsync(containerName:string, blobName:string, destination:Stream) : Task
+        + <<virtual>> <<async>> DeleteBlobAsync(containerName:string, blobName:string) : Task
+    }
+    
+    class BmrService {
+        + BmrService(serviceProvider:IServiceProvider)
+        + CalculateBmr(profile:UserProfile, formula:BmrFormula) : double
+    }
+    
+    class CachingNutritionProxy {
+        + CachingNutritionProxy(innerProvider:INutritionProvider, cache:IMemoryCache, logger:ILogger<CachingNutritionProxy>)
+        + <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+        + <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+    }
+    
+    class CalendarService {
+        + CalendarService(context:FitzoDbContext, userContext:IUserContextService)
+        + <<async>> AddMealAsync(dto:AddMealDto) : Task
+        + <<async>> GetWeeklyPlanAsync(startDate:DateTime, endDate:DateTime) : Task<List<MealPlanEntry>>
+    }
+    
+    class CategoryMapper <<static>> {
+        + {static} MapFromOffTags(tags:List<string>?) : FoodCategories
+        + {static} MapFromUsdaTags(category:string?) : FoodCategories
+    }
+    
+    class ExportImportService {
+        + ExportRecipeJSON(recipes:IEnumerable<Recipe>) : byte[]
+        + ImportFromJSON(fileStream:Stream) : IEnumerable<Recipe>
+    }
+    
+    class HybridNutritionProvider {
+        + HybridNutritionProvider(usdaAdapter:UsdaAdapter, offAdapter:OffAdapter, logger:ILogger<HybridNutritionProvider>)
+        + <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+        + <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+    }
+    
+    class ImageAvatarService {
+        + ImageAvatarService(profileImageService:ProfileImageService, context:FitzoDbContext)
+        + <<async>> UpdateUserAvatarAsync(userId:Guid, file:IFormFile) : Task<string>
+    }
+    
+    class OffAdapter {
+        + OffAdapter(_httpClient:HttpClient)
+        + <<virtual>> <<async>> GetProductAsync(id:string) : Task<ProductDto>
+        + <<virtual>> <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+    }
+    
+    class ProfileImageService {
+        + <<const>> UploadContainerName : string = "avatars-temp"
+        + <<const>> PublicContainerName : string = "avatars"
+        + ProfileImageService(blobServiceClient:BlobServiceClient)
+        + <<virtual>> <<async>> EnsureContainerExistAsync() : Task
+    }
+    
+    class RecipeImageService {
+        + RecipeImageService(blobServiceClient:BlobServiceClient)
+        + <<async>> EnsureContainersExistAsync() : Task
+    }
+    
+    class RecipeManager {
+        + RecipeManager(context:FitzoDbContext)
+        + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+        + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+        + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+        + <<async>> DeleteRecipeAsync(id:Guid) : Task
+        + <<async>> UpdateRecipeImageAsync(recipeId:Guid, fileName:string) : Task
+    }
+    
+    class RecipeProtectionProxy {
+        + RecipeProtectionProxy(innerManager:IRecipeManager, userContext:IUserContextService)
+        + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+        + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+        + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+        + <<async>> DeleteRecipeAsync(id:Guid) : Task
+        + <<async>> UpdateRecipeImageAsync(id:Guid, fileName:string) : Task
+    }
+    
+    class RecipeService {
+        + RecipeService(imageService:RecipeImageService)
+        + <<async>> UploadRecipeImage(file:IFormFile) : Task<string>
+        + <<async>> DeleteRecipeImage(imageName:string) : Task
+    }
+    
+    class ShoppingListGenerator {
+        + Generate(mealPlanEntries:List<MealPlanEntry>) : List<ShoppingListItem>
+    }
+    
+    class UsdaAdapter {
+        + UsdaAdapter(httpClient:HttpClient, configuration:IConfiguration)
+        + <<virtual>> <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+        + <<virtual>> <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+    }
+    
+    class UserContextService {
+        + UserContextService(httpContextAccessor:IHttpContextAccessor)
+        + GetCurrentUserId() : Guid
+        + GetCurrentUserRole() : UserRole
+    }
+    
+    class ImageResizer {
+        + ImageResizer(log:ILogger<ImageResizer>, blobServiceClient:BlobServiceClient)
+        + <<async>> RunRecipeResize(imageBytes:byte[], name:string) : Task<byte[]>
+        + <<async>> RunAvatarProcess(imageBytes:byte[], name:string) : Task
+    }
+}
+
+' ==================== PATTERNS ====================
+package "Design Patterns" SERVICES_COLOR {
+    abstract class RecipeValidationHandler {
+        + SetNext(handler:RecipeValidationHandler) : RecipeValidationHandler
+        + <<virtual>> Handle(recipe:Recipe) : void
+    }
+    
+    class DataIntegrityValidator {
+        + <<override>> Handle(recipe:Recipe) : void
+    }
+    
+    class ImageValidator {
+        + <<override>> Handle(recipe:Recipe) : void
+    }
+    
+    class IngredientsCountValidator {
+        + <<override>> Handle(recipe:Recipe) : void
+    }
+    
+    class RecipeDirector {
+        + RecipeDirector(builder:IRecipeBuilder)
+        + Construct(dto:CreateRecipeDto) : Recipe
+    }
+    
+    class StandardRecipeBuilder {
+        + StandardRecipeBuilder()
+        + Reset() : void
+        + SetName(name:string) : void
+        + SetImage(imageUrl:string) : void
+        + SetDietTags(tags:List<DietTag>) : void
+        + AddIngredient(ingredientDto:IngredientDto) : void
+        + Build() : Recipe
+    }
+    
+    class HarrisBenedictStrategy {
+        + CalculateBmr(profile:UserProfile) : double
+    }
+    
+    class MifflinStJeorStrategy {
+        + CalculateBmr(profile:UserProfile) : double
+    }
+}
+
+' ==================== DTOs ====================
+package "DTOs" DTOS_COLOR {
+    class AddMealDto {
+        + RecipeId : Guid
+        + Date : DateTime
+        + StartTime : TimeSpan
+        + EndTime : TimeSpan
+        + Type : MealType
+    }
+    
+    class AddWeightDto {
+        + Date : DateTime
+        + Weight : double <<get>> <<set>>
+    }
+    
+    class CreateRecipeDto {
+        + Name : string <<get>> <<set>>
+        + ImageUrl : string? <<get>> <<set>>
+        + Tags : List<DietTag>
+        + Ingredients : List<IngredientDto>
+    }
+    
+    class AddFoodEntryDto {
+        + Date : DateTime
+        + MealType : MealType
+        + Product : ProductDto
+        + RecipeId : Guid
+        + Amount : double <<get>> <<set>>
+    }
+    
+    class IngredientDto {
+        + Product : ProductDto
+        + amount : double <<get>> <<set>>
+    }
+    
+    class LoginDto {
+        + Email : string <<get>> <<set>>
+        + Password : string <<get>> <<set>>
+    }
+    
+    class ProductDto {
+        + ExternalId : string <<get>> <<set>>
+        + Name : string <<get>> <<set>>
+        + brand : string? <<get>> <<set>>
+        + ImageUrl : string? <<get>> <<set>>
+        + Category : FoodCategories
+        + Calories : double <<get>> <<set>>
+        + Protein : double <<get>> <<set>>
+        + Fat : double <<get>> <<set>>
+        + Carbs : double <<get>> <<set>>
+        + ServingSize : double? <<get>> <<set>>
+        + ServingUnit : string <<get>> <<set>>
+        + NutriScore : string? <<get>> <<set>>
+        + EcoScore : string? <<get>> <<set>>
+        + HasPalmOil : bool? <<get>> <<set>>
+        + IsDataComplete : bool <<get>> <<set>> = true
+        + labels : List<string>
+        + Allergens : List<string>
+        + DataQualityMessages : List<string>
+    }
+    
+    class ProductSearchFilterDto {
+        + Query : string? <<get>> <<set>>
+        + Category : string? <<get>> <<set>>
+        + Nutriscore : string? <<get>> <<set>>
+        + NoPalmOil : bool <<get>> <<set>>
+        + Vegetarian : bool <<get>> <<set>>
+        + Vegan : bool <<get>> <<set>>
+        + Page : int <<get>> <<set>> = 1
+        + PageSize : int <<get>> <<set>> = 20
+        + HasAdvancedFilters : bool <<get>>
+    }
+    
+    class RegisterDto {
+        + Email : string <<get>> <<set>>
+        + Password : string <<get>> <<set>>
+        + ConfirmPassword : string <<get>> <<set>>
+    }
+    
+    class ShoppingListItem {
+        + ProductId : string <<get>> <<set>>
+        + Name : string <<get>> <<set>>
+        + TotalAmount : double <<get>> <<set>>
+        + Unit : string <<get>> <<set>>
+        + Category : string <<get>> <<set>>
+        + IsBought : bool <<get>> <<set>> = false
+        + Sources : List<string>
+    }
+    
+    class UserStatsDto {
+        + TotalRecipesCount : int <<get>> <<set>>
+        + TotalIngredientCount : int <<get>> <<set>>
+        + AverageDailyCaloriesWeek : double <<get>> <<set>>
+        + AverageDailyCaloriesMonth : double <<get>> <<set>>
+        + CurrentWeight : double <<get>> <<set>>
+        + WeightChangeMonth : double <<get>> <<set>>
+        + WeeklySummary : List<DailySummaryDto>
+        + CategoryBreakdown : List<CategorySummaryDto>
+        + WeightHistory : List<WeightHistoryDto>
+    }
+    
+    class DailySummaryDto {
+        + Date : DateTime
+        + TotalCalories : double <<get>> <<set>>
+        + TotalProtein : double <<get>> <<set>>
+        + TotalCarbs : double <<get>> <<set>>
+        + TotalFat : double <<get>> <<set>>
+    }
+    
+    class CategorySummaryDto {
+        + CategoryName : string <<get>> <<set>>
+        + Totalcalories : double <<get>> <<set>>
+        + Percentage : double <<get>> <<set>>
+    }
+    
+    class WeightHistoryDto {
+        + Date : DateTime
+        + Weight : double <<get>> <<set>>
+    }
+    
+    class StatisticsDto {
+        + DateFrom : DateTime
+        + DateTo : DateTime
+        + TotalCalories : double <<get>> <<set>>
+        + TotalProtein : double <<get>> <<set>>
+        + TotalFat : double <<get>> <<set>>
+        + TotalCarbs : double <<get>> <<set>>
+        + AverageDailyCalories : double <<get>> <<set>>
+        + AverageWeeklyCalories : double <<get>> <<set>>
+    }
+    
+    class UserProfileDto {
+        + Gender : Gender
+        + Weight : double <<get>> <<set>>
+        + Height : double <<get>> <<set>>
+        + Age : int <<get>> <<set>>
+        + ImageUrl : string? <<get>> <<set>>
+    }
+}
+
+' ==================== EXTERNAL API MODELS ====================
+package "Adapter" DTOS_COLOR {
+    class OffSearchResponse {
+        + Products : List<OffProduct>
+    }
+    
+    class OffProductResponse {
+        + Product : OffProduct
+    }
+    
+    class OffProduct {
+        + Code : string <<get>> <<set>>
+        + ProductName : string? <<get>> <<set>>
+        + Brands : string? <<get>> <<set>>
+        + ImageUrl : string? <<get>> <<set>>
+        + NutriScoreGrade : string? <<get>> <<set>>
+        + EcoScoreGrade : string? <<get>> <<set>>
+        + IngredientsFromPalmOilN : int <<get>> <<set>>
+        + ServingQuantity : double? <<get>> <<set>>
+        + StatesTags : List<string>
+        + CategoriesTags : List<string>
+        + AllergensTags : List<string>
+        + LabelsTags : List<string>
+        + Nutriments : OffNutriments
+    }
+    
+    class OffNutriments {
+        + EnergyKcal100g : double? <<get>> <<set>>
+        + Proteins100g : double? <<get>> <<set>>
+        + Carbohydrates100g : double? <<get>> <<set>>
+        + Fat100g : double? <<get>> <<set>>
+        + Fiber100g : double? <<get>> <<set>>
+        + FruitsVegetablesNuts100g : double? <<get>> <<set>>
+    }
+    
+    class UsdaSearchResult {
+        + TotalHits : int <<get>> <<set>>
+        + Foods : List<UsdaFoodItem>
+    }
+    
+    class UsdaFoodItem {
+        + FdcId : int <<get>> <<set>>
+        + Description : string? <<get>> <<set>>
+        + BrandName : string? <<get>> <<set>>
+        + FoodCategory : string? <<get>> <<set>>
+        + FoodNutrients : List<UsdaNutrient>
+    }
+    
+    class UsdaNutrient {
+        + NutrientName : string <<get>> <<set>>
+        + Value : double <<get>> <<set>>
+        + UnitName : string <<get>> <<set>>
+    }
+}
+
+' ==================== ENUMS ====================
+package "Enums" ENUMS_COLOR {
+    enum BmrFormula {
+        MifflinStJeor
+        HarrisBenedict
+    }
+    
+    enum DietTag {
+        Vegan
+        Vegetarian
+        Keto
+        HighProtein
+    }
+    
+    enum Gender {
+        Male
+        Female
+    }
+    
+    enum MealType {
+        Breakfast = 0
+        SecondBreakfast
+        Lunch
+        Dinner
+        Snack
+        Supper
+    }
+    
+    enum UserRole {
+        User
+        Admin
+    }
+    
+    enum FoodCategories {
+    }
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Controller inheritance
+ControllerBase <|-- AuthController
+ControllerBase <|-- AccountController
+ControllerBase <|-- DiaryCotroller
+ControllerBase <|-- ExportController
+ControllerBase <|-- PlanningController
+ControllerBase <|-- ProductController
+ControllerBase <|-- RecipesController
+ControllerBase <|-- StatsController
+ControllerBase <|-- UsersController
+ControllerBase <|-- WeightController
+
+' Database Context
+"IdentityDbContext`3" "<UserIdentity,IdentityRole<Guid>,Guid>" <|-- FitzoDbContext
+
+' Domain Model inheritance
+RecipeComponent <|-- Ingredient
+RecipeComponent <|-- Recipe
+"IdentityUser`1" "<Guid>" <|-- UserIdentity
+
+' Interface implementations
+INutritionProvider <|-- CachingNutritionProxy
+INutritionProvider <|-- HybridNutritionProvider
+INutritionProvider <|-- OffAdapter
+INutritionProvider <|-- UsdaAdapter
+IRecipeBuilder <|-- StandardRecipeBuilder
+IRecipeManager <|-- RecipeManager
+IRecipeManager <|-- RecipeProtectionProxy
+IShoppingListGenerator <|-- ShoppingListGenerator
+IUserContextService <|-- UserContextService
+IBmrStrategy <|-- HarrisBenedictStrategy
+IBmrStrategy <|-- MifflinStJeorStrategy
+
+' Pattern implementations
+RecipeValidationHandler <|-- DataIntegrityValidator
+RecipeValidationHandler <|-- ImageValidator
+RecipeValidationHandler <|-- IngredientsCountValidator
+BlobStorageService <|-- ProfileImageService
+BlobStorageService <|-- RecipeImageService
+
+' Controller dependencies
+AuthController --> AuthService
+AccountController --> ImageAvatarService
+DiaryCotroller --> FitzoDbContext
+DiaryCotroller --> IRecipeManager
+ExportController --> ExportImportService
+ExportController --> FitzoDbContext
+PlanningController --> CalendarService
+PlanningController --> IShoppingListGenerator
+PlanningController --> FitzoDbContext
+ProductController --> INutritionProvider
+RecipesController --> RecipeDirector
+RecipesController --> IRecipeManager
+RecipesController --> RecipeService
+StatsController --> FitzoDbContext
+UsersController --> FitzoDbContext
+UsersController --> BmrService
+WeightController --> FitzoDbContext
+
+' Service dependencies
+CalendarService --> FitzoDbContext
+CalendarService --> IUserContextService
+ImageAvatarService --> ProfileImageService
+ImageAvatarService --> FitzoDbContext
+RecipeManager --> FitzoDbContext
+RecipeProtectionProxy --> IRecipeManager
+RecipeProtectionProxy --> IUserContextService
+RecipeService --> RecipeImageService
+ShoppingListGenerator --> MealPlanEntry
+HybridNutritionProvider --> UsdaAdapter
+HybridNutritionProvider --> OffAdapter
+RecipeDirector --> IRecipeBuilder
+
+' Model relationships
+FoodEntry --> ProductDto
+FoodEntry --> MealType
+Ingredient --> ProductDto
+Recipe --> DietTag
+Recipe --> RecipeComponent
+MealPlanEntry --> Recipe
+MealPlanEntry --> MealType
+UserIdentity --> UserRole
+UserProfile --> Gender
+
+' DTO relationships
+AddMealDto --> MealType
+AddFoodEntryDto --> ProductDto
+AddFoodEntryDto --> MealType
+IngredientDto --> ProductDto
+CreateRecipeDto --> DietTag
+CreateRecipeDto --> IngredientDto
+ProductDto --> FoodCategories
+UserProfileDto --> Gender
+UserStatsDto --> DailySummaryDto
+UserStatsDto --> CategorySummaryDto
+UserStatsDto --> WeightHistoryDto
+
+' External API relationships
+OffSearchResponse --> OffProduct
+OffProductResponse --> OffProduct
+OffProduct --> OffNutriments
+UsdaSearchResult --> UsdaFoodItem
+UsdaFoodItem --> UsdaNutrient
+
+@enduml

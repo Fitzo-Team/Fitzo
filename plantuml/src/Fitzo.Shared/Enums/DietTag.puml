@@ -1,0 +1,8 @@
+@startuml
+enum DietTag {
+    Vegan,
+    Vegetarian,
+    Keto,
+    HighProtein,
+}
+@enduml

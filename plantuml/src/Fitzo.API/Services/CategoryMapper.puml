@@ -1,0 +1,6 @@
+@startuml
+class CategoryMapper <<static>> {
+    + {static} MapFromOffTags(tags:List<string>?) : FoodCategories
+    + {static} MapFromUsdaTags(category:string?) : FoodCategories
+}
+@enduml

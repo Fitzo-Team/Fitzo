@@ -1,0 +1,7 @@
+@startuml
+class ProductControllerTests {
+    + ProductControllerTests()
+    + <<async>> GetProduct_ShouldReturnOk_WhenProductExists() : Task
+    + <<async>> GetProduct_ShouldReturnNotFound_WhenProductDoesNotExist() : Task
+}
+@enduml

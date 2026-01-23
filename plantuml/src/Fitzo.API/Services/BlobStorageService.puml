@@ -1,0 +1,7 @@
+@startuml
+abstract class BlobStorageService {
+    + <<virtual>> <<async>> UploadBlobAsync(containerName:string, blobName:string, data:Stream, contentType:string) : Task
+    + <<virtual>> <<async>> DownloadBlobAsync(containerName:string, blobName:string, destination:Stream) : Task
+    + <<virtual>> <<async>> DeleteBlobAsync(containerName:string, blobName:string) : Task
+}
+@enduml

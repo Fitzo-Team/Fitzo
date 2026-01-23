@@ -1,0 +1,8 @@
+@startuml
+class ProductController {
+    + ProductController(nutritionProvider:INutritionProvider)
+    + <<async>> GetProduct(id:string) : Task<IActionResult>
+    + <<async>> Search(filter:ProductSearchFilterDto) : Task<IActionResult>
+}
+ControllerBase <|-- ProductController
+@enduml

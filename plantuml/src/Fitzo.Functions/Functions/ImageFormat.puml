@@ -1,0 +1,7 @@
+@startuml
+class ImageResizer {
+    + ImageResizer(log:ILogger<ImageResizer>, blobServiceClient:BlobServiceClient)
+    + <<async>> RunRecipeResize(imageBytes:byte[], name:string) : Task<byte[]>
+    + <<async>> RunAvatarProcess(imageBytes:byte[], name:string) : Task
+}
+@enduml

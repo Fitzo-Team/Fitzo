@@ -1,0 +1,8 @@
+@startuml
+class BmrStrategyTests {
+    + MifflinStJeor_ShouldCalculateCorrectly_ForMale() : void
+    + MifflinStJeor_ShouldCalculateCorrectly_ForFemale() : void
+    + HarrisBenedict_ShouldCalculateCorrectly_ForMale() : void
+    + HarrisBenedict_ShouldCalculateCorrectly_ForFemale() : void
+}
+@enduml

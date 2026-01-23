@@ -1,0 +1,6 @@
+@startuml
+class IngredientsCountValidator {
+    + <<override>> Handle(recipe:Recipe) : void
+}
+RecipeValidationHandler <|-- IngredientsCountValidator
+@enduml

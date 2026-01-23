@@ -1,0 +1,6 @@
+@startuml
+class HarrisBenedictStrategy {
+    + CalculateBmr(profile:UserProfile) : double
+}
+IBmrStrategy <|-- HarrisBenedictStrategy
+@enduml

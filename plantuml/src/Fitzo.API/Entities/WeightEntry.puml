@@ -1,0 +1,8 @@
+@startuml
+class WeightEntry {
+    + Value : double <<get>> <<set>>
+}
+WeightEntry o-> "Id" Guid
+WeightEntry --> "UserId" Guid
+WeightEntry --> "Date" DateTime
+@enduml

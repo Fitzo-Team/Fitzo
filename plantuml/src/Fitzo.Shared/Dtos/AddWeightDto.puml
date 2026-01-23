@@ -1,0 +1,6 @@
+@startuml
+class AddWeightDto {
+    + Weight : double <<get>> <<set>>
+}
+AddWeightDto o-> "Date" DateTime
+@enduml

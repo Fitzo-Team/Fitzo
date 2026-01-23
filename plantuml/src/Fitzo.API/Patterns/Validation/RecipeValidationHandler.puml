@@ -1,0 +1,6 @@
+@startuml
+abstract class RecipeValidationHandler {
+    + SetNext(handler:RecipeValidationHandler) : RecipeValidationHandler
+    + <<virtual>> Handle(recipe:Recipe) : void
+}
+@enduml

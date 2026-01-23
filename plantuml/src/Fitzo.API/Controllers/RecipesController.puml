@@ -1,0 +1,11 @@
+@startuml
+class RecipesController {
+    + RecipesController(director:RecipeDirector, recipeManager:IRecipeManager, recipeService:RecipeService, configuration:IConfiguration)
+    + <<async>> CreateRecipe(dto:CreateRecipeDto) : Task<IActionResult>
+    + <<async>> GetRecipe(id:Guid) : Task<ActionResult<Recipe>>
+    + <<async>> GetRecipes() : Task<ActionResult>
+    + <<async>> DeleteRecipe(id:Guid) : Task<IActionResult>
+    + <<async>> UploadImage(id:Guid, file:IFormFile) : Task<IActionResult>
+}
+ControllerBase <|-- RecipesController
+@enduml

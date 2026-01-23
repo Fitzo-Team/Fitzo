@@ -1,0 +1,10 @@
+@startuml
+class CreateRecipeDto {
+    + Name : string <<get>> <<set>>
+    + ImageUrl : string? <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+CreateRecipeDto o-> "Tags<DietTag>" "List`1"
+CreateRecipeDto o-> "Ingredients<IngredientDto>" "List`1"
+@enduml

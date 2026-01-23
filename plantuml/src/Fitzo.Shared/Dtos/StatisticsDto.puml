@@ -1,0 +1,12 @@
+@startuml
+class StatisticsDto {
+    + TotalCalories : double <<get>> <<set>>
+    + TotalProtein : double <<get>> <<set>>
+    + TotalFat : double <<get>> <<set>>
+    + TotalCarbs : double <<get>> <<set>>
+    + AverageDailyCalories : double <<get>> <<set>>
+    + AverageWeeklyCalories : double <<get>> <<set>>
+}
+StatisticsDto --> "DateFrom" DateTime
+StatisticsDto --> "DateTo" DateTime
+@enduml

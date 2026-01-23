@@ -1,0 +1,33 @@
+@startuml
+class OffSearchResponse {
+}
+class OffProductResponse {
+}
+class OffProduct {
+    + Code : string <<get>> <<set>>
+    + ProductName : string? <<get>> <<set>>
+    + Brands : string? <<get>> <<set>>
+    + ImageUrl : string? <<get>> <<set>>
+    + NutriScoreGrade : string? <<get>> <<set>>
+    + EcoScoreGrade : string? <<get>> <<set>>
+    + IngredientsFromPalmOilN : int <<get>> <<set>>
+    + ServingQuantity : double? <<get>> <<set>>
+}
+class OffNutriments {
+    + EnergyKcal100g : double? <<get>> <<set>>
+    + Proteins100g : double? <<get>> <<set>>
+    + Carbohydrates100g : double? <<get>> <<set>>
+    + Fat100g : double? <<get>> <<set>>
+    + Fiber100g : double? <<get>> <<set>>
+    + FruitsVegetablesNuts100g : double? <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+OffSearchResponse o-> "Products<OffProduct>" "List`1"
+OffProductResponse --> "Product" OffProduct
+OffProduct --> "StatesTags<string>" "List`1"
+OffProduct --> "CategoriesTags<string>" "List`1"
+OffProduct --> "AllergensTags<string>" "List`1"
+OffProduct --> "LabelsTags<string>" "List`1"
+OffProduct --> "Nutriments" OffNutriments
+@enduml

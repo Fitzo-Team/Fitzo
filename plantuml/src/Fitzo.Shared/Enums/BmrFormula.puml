@@ -1,0 +1,6 @@
+@startuml
+enum BmrFormula {
+    MifflinStJeor,
+    HarrisBenedict,
+}
+@enduml

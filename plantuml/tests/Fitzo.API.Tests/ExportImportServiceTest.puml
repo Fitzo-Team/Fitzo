@@ -1,0 +1,12 @@
+@startuml
+class ExportImportServiceTests {
+    + ExportImportServiceTests()
+    + ExportRecipeJSON_ShouldReturnNotEmptyBytes_WhenListIsNotEmpty() : void
+    + ExportRecipeJSON_ShouldHandleEmptyList() : void
+    + ExportRecipeJSON_ShouldIncludeComponents() : void
+    + ImportFromJSON_ShouldReturnRecipes_WhenJsonIsValid() : void
+    + ImportFromJSON_ShouldBeCaseInsensitive() : void
+    + ImportFromJSON_ShouldHandleNestedComponents() : void
+    + ImportFromJSON_ShouldReturnEmptyList_WhenInputIsEmptyArray() : void
+}
+@enduml

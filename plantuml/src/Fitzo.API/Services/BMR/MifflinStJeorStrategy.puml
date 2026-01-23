@@ -1,0 +1,6 @@
+@startuml
+class MifflinStJeorStrategy {
+    + CalculateBmr(profile:UserProfile) : double
+}
+IBmrStrategy <|-- MifflinStJeorStrategy
+@enduml

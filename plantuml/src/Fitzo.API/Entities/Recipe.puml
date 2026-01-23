@@ -1,0 +1,18 @@
+@startuml
+class Recipe {
+    + ImageUrl : string? <<get>> <<set>>
+    + Description : string? <<get>> <<set>>
+    + <<override>> CalculateCalories() : double
+    + <<override>> CalculateProtein() : double
+    + <<override>> CalculateFat() : double
+    + <<override>> CalculateCarbs() : double
+    + AddComponent(component:RecipeComponent) : void
+    + RemoveComponent(component:RecipeComponent) : void
+}
+class "List`1"<T> {
+}
+RecipeComponent <|-- Recipe
+Recipe --> "OwnerId" Guid
+Recipe o-> "Tags<DietTag>" "List`1"
+Recipe o-> "Components<RecipeComponent>" "List`1"
+@enduml

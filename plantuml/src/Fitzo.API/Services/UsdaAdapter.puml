@@ -1,0 +1,8 @@
+@startuml
+class UsdaAdapter {
+    + UsdaAdapter(httpClient:HttpClient, configuration:IConfiguration)
+    + <<virtual>> <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+    + <<virtual>> <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+INutritionProvider <|-- UsdaAdapter
+@enduml

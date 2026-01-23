@@ -1,0 +1,7 @@
+@startuml
+class RegisterDto {
+    + Email : string <<get>> <<set>>
+    + Password : string <<get>> <<set>>
+    + ConfirmPassword : string <<get>> <<set>>
+}
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+class ProductDto {
+    + ExternalId : string <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+    + brand : string? <<get>> <<set>>
+    + ImageUrl : string? <<get>> <<set>>
+    + Calories : double <<get>> <<set>>
+    + Protein : double <<get>> <<set>>
+    + Fat : double <<get>> <<set>>
+    + Carbs : double <<get>> <<set>>
+    + ServingSize : double? <<get>> <<set>>
+    + ServingUnit : string <<get>> <<set>>
+    + NutriScore : string? <<get>> <<set>>
+    + EcoScore : string? <<get>> <<set>>
+    + HasPalmOil : bool? <<get>> <<set>>
+    + IsDataComplete : bool <<get>> <<set>> = true
+}
+class "List`1"<T> {
+}
+ProductDto o-> "Category" FoodCategories
+ProductDto o-> "labels<string>" "List`1"
+ProductDto o-> "Allergens<string>" "List`1"
+ProductDto o-> "DataQualityMessages<string>" "List`1"
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+class TestHelper <<static>> {
+    + {static} GetInMemoryDbContext(dbName:string) : FitzoDbContext
+    + {static} SimulateUser(controller:ControllerBase, userId:Guid) : void
+}
+class WeightControllerTests {
+    + <<async>> AddWeight_ShouldAddHistoryAndUpdateProfile() : Task
+}
+@enduml

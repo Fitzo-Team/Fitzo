@@ -1,0 +1,13 @@
+@startuml
+class MealPlanEntry {
+    + MoveTo(newDate:DateTime, newTime:TimeSpan) : void
+}
+MealPlanEntry --> "Id" Guid
+MealPlanEntry --> "UserId" Guid
+MealPlanEntry --> "RecipeId" Guid
+MealPlanEntry --> "Recipe" Recipe
+MealPlanEntry --> "Date" DateTime
+MealPlanEntry --> "StartTime" TimeSpan
+MealPlanEntry --> "EndTime" TimeSpan
+MealPlanEntry --> "Type" MealType
+@enduml

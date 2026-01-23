@@ -1,0 +1,425 @@
+@startuml
+' Ustawienia dla czytelnego, pionowego układu
+skinparam ranksep 100
+skinparam nodesep 60
+skinparam style strictuml
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+title Kompleksowy Diagram Klas Fitzo - DTO i Enumy w blokach
+
+' --- KLASY BAZOWE ---
+class ControllerBase << (F, #FF7700) Framework >>
+
+' --- BAZA DANYCH ---
+class FitzoDbContext {
+    + FitzoDbContext(options:DbContextOptions<FitzoDbContext>)
+    + RecipeComponents : DbSet<RecipeComponent>
+    + Recipes : DbSet<Recipe>
+    + ingredients : DbSet<Ingredient>
+    + UserProfiles : DbSet<UserProfile>
+    + MealPlans : DbSet<MealPlanEntry>
+    + FoodEntries : DbSet<FoodEntry>
+    + WeightEntries : DbSet<WeightEntry>
+}
+
+' --- KONTROLERY API ---
+class AuthController {
+    + AuthController(authService:AuthService)
+    + <<async>> Register(dto:RegisterDto) : Task<IActionResult>
+    + <<async>> Login(dto:LoginDto) : Task<IActionResult>
+}
+class AccountController {
+    + AccountController(accountService:ImageAvatarService, configuration:IConfiguration)
+    + <<async>> UploadAvatar(file:IFormFile) : Task<IActionResult>
+}
+class DiaryCotroller {
+    + DiaryCotroller(_fitzoDbContext:FitzoDbContext, _recipeManager:IRecipeManager)
+    + <<async>> AddEntry(dto:AddFoodEntryDto) : Task<IActionResult>
+    + <<async>> GetEntry(id:Guid) : Task<IActionResult>
+    + <<async>> GetRecent() : Task<IActionResult>
+    + <<async>> GetDiaryEntries(date:DateTime) : Task<IActionResult>
+}
+class ExportController {
+    + ExportController(service:ExportImportService, context:FitzoDbContext)
+    + <<async>> GetRecipesJson() : Task<IActionResult>
+    + <<async>> ImportRecipesJson(file:IFormFile) : Task<IActionResult>
+}
+class PlanningController {
+    + PlanningController(calendarService:CalendarService, shoppingListGenerator:IShoppingListGenerator, context:FitzoDbContext, logger:ILogger<PlanningController>)
+    + <<async>> AddMeal(dto:AddMealDto) : Task<IActionResult>
+    + <<async>> GetWeeklyPlan(date:DateTime?) : Task<IActionResult>
+    + <<async>> GetShoppingList(startDate:DateTime?, endDate:DateTime?) : Task<ActionResult<List<ShoppingListItem>>>
+}
+class ProductController {
+    + ProductController(nutritionProvider:INutritionProvider)
+    + <<async>> GetProduct(id:string) : Task<IActionResult>
+    + <<async>> Search(filter:ProductSearchFilterDto) : Task<IActionResult>
+}
+class RecipesController {
+    + RecipesController(director:RecipeDirector, recipeManager:IRecipeManager, recipeService:RecipeService, configuration:IConfiguration)
+    + <<async>> CreateRecipe(dto:CreateRecipeDto) : Task<IActionResult>
+    + <<async>> GetRecipe(id:Guid) : Task<ActionResult<Recipe>>
+    + <<async>> GetRecipes() : Task<ActionResult>
+    + <<async>> DeleteRecipe(id:Guid) : Task<IActionResult>
+    + <<async>> UploadImage(id:Guid, file:IFormFile) : Task<IActionResult>
+}
+class StatsController {
+    + StatsController(_context:FitzoDbContext)
+    + <<async>> GetUserStatistics() : Task<IActionResult>
+}
+class UsersController {
+    + UsersController(context:FitzoDbContext, bmrService:BmrService, configuration:IConfiguration)
+    + <<async>> UpdateProfile(dto:UserProfileDto) : Task<IActionResult>
+    + <<async>> GetProfile() : Task<IActionResult>
+    + <<async>> GetBmr(formula:BmrFormula) : Task<IActionResult>
+}
+class WeightController {
+    + WeightController(context:FitzoDbContext)
+    + <<async>> AddWeight(dto:AddWeightDto) : Task<IActionResult>
+    + <<async>> GetHistory() : Task<IActionResult>
+}
+
+ControllerBase <|-- AuthController
+ControllerBase <|-- AccountController
+ControllerBase <|-- DiaryCotroller
+ControllerBase <|-- ExportController
+ControllerBase <|-- PlanningController
+ControllerBase <|-- ProductController
+ControllerBase <|-- RecipesController
+ControllerBase <|-- StatsController
+ControllerBase <|-- UsersController
+ControllerBase <|-- WeightController
+
+' --- DOMENA I MODELE ---
+abstract class RecipeComponent {
+    + Id : Guid
+    + Name : string <<get>> <<set>>
+    + {abstract} CalculateCalories() : double
+    + {abstract} CalculateProtein() : double
+    + {abstract} CalculateFat() : double
+    + {abstract} CalculateCarbs() : double
+}
+
+class Recipe {
+    + OwnerId : Guid
+    + ImageUrl : string? <<get>> <<set>>
+    + Description : string? <<get>> <<set>>
+    + Tags : List<DietTag>
+    + Components : List<RecipeComponent>
+    + <<override>> CalculateCalories() : double
+    + <<override>> CalculateProtein() : double
+    + <<override>> CalculateFat() : double
+    + <<override>> CalculateCarbs() : double
+    + AddComponent(component:RecipeComponent) : void
+    + RemoveComponent(component:RecipeComponent) : void
+}
+RecipeComponent <|-- Recipe
+
+class Ingredient {
+    + Product : ProductDto
+    + Amount : double <<get>> <<set>>
+    + <<override>> CalculateCalories() : double
+    + <<override>> CalculateProtein() : double
+    + <<override>> CalculateFat() : double
+    + <<override>> CalculateCarbs() : double
+}
+RecipeComponent <|-- Ingredient
+
+class FoodEntry {
+    + Id : Guid
+    + UserId : Guid
+    + Date : DateTime
+    + MealType : MealType
+    + ProductEntry : ProductDto
+    + OriginalRecipeId : Guid
+    + Amount : double <<get>> <<set>>
+    + OriginRecipeName : string? <<get>> <<set>>
+    + CalculateCalories() : double
+    + CalculateProtein() : double
+    + CalculateFat() : double
+    + CalculateCarbs() : double
+}
+
+class MealPlanEntry {
+    + Id : Guid
+    + UserId : Guid
+    + RecipeId : Guid
+    + Recipe : Recipe
+    + Date : DateTime
+    + StartTime : TimeSpan
+    + EndTime : TimeSpan
+    + Type : MealType
+    + MoveTo(newDate:DateTime, newTime:TimeSpan) : void
+}
+
+class UserIdentity {
+    + Role : UserRole
+}
+
+class UserProfile {
+    + UserId : Guid
+    + Id : int <<get>> <<set>>
+    + Weight : double <<get>> <<set>>
+    + Height : double <<get>> <<set>>
+    + Age : int <<get>> <<set>>
+    + AvatarUrl : string? <<get>> <<set>>
+    + Createdate : DateTime
+    + Gender : Gender
+}
+
+class WeightEntry {
+    + Id : Guid
+    + UserId : Guid
+    + Date : DateTime
+    + Value : double <<get>> <<set>>
+}
+
+' --- DESIGN PATTERNS & SERVICES ---
+interface INutritionProvider {
+    + GetProductAsync(id:string) : Task<ProductDto?>
+    + SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+class OffAdapter implements INutritionProvider {
+    + OffAdapter(_httpClient:HttpClient)
+    + <<virtual>> <<async>> GetProductAsync(id:string) : Task<ProductDto>
+    + <<virtual>> <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+class UsdaAdapter implements INutritionProvider {
+    + UsdaAdapter(httpClient:HttpClient, configuration:IConfiguration)
+    + <<virtual>> <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+    + <<virtual>> <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+class CachingNutritionProxy implements INutritionProvider {
+    + CachingNutritionProxy(innerProvider:INutritionProvider, cache:IMemoryCache, logger:ILogger<CachingNutritionProxy>)
+    + <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+    + <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+class HybridNutritionProvider implements INutritionProvider {
+    + HybridNutritionProvider(usdaAdapter:UsdaAdapter, offAdapter:OffAdapter, logger:ILogger<HybridNutritionProvider>)
+    + <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+    + <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+
+interface IRecipeBuilder {
+    + Reset() : void
+    + SetName(name:string) : void
+    + SetImage(imageUrl:string) : void
+    + SetDietTags(tags:List<DietTag>) : void
+    + AddIngredient(ingredientDto:IngredientDto) : void
+    + Build() : Recipe
+}
+class StandardRecipeBuilder implements IRecipeBuilder {
+    + StandardRecipeBuilder()
+    + Reset() : void
+    + SetName(name:string) : void
+    + SetImage(imageUrl:string) : void
+    + SetDietTags(tags:List<DietTag>) : void
+    + AddIngredient(ingredientDto:IngredientDto) : void
+    + Build() : Recipe
+}
+class RecipeDirector {
+    + RecipeDirector(builder:IRecipeBuilder)
+    + Construct(dto:CreateRecipeDto) : Recipe
+}
+
+interface IBmrStrategy {
+    + CalculateBmr(profile:UserProfile) : double
+}
+class HarrisBenedictStrategy implements IBmrStrategy {
+    + CalculateBmr(profile:UserProfile) : double
+}
+class MifflinStJeorStrategy implements IBmrStrategy {
+    + CalculateBmr(profile:UserProfile) : double
+}
+
+abstract class RecipeValidationHandler {
+    + SetNext(handler:RecipeValidationHandler) : RecipeValidationHandler
+    + <<virtual>> Handle(recipe:Recipe) : void
+}
+class DataIntegrityValidator extends RecipeValidationHandler {
+    + <<override>> Handle(recipe:Recipe) : void
+}
+class ImageValidator extends RecipeValidationHandler {
+    + <<override>> Handle(recipe:Recipe) : void
+}
+class IngredientsCountValidator extends RecipeValidationHandler {
+    + <<override>> Handle(recipe:Recipe) : void
+}
+
+interface IRecipeManager {
+    + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+    + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+    + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+    + <<async>> DeleteRecipeAsync(id:Guid) : Task
+    + <<async>> UpdateRecipeImageAsync(recipeId:Guid, fileName:string) : Task
+}
+class RecipeManager implements IRecipeManager {
+    + RecipeManager(context:FitzoDbContext)
+    + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+    + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+    + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+    + <<async>> DeleteRecipeAsync(id:Guid) : Task
+    + <<async>> UpdateRecipeImageAsync(recipeId:Guid, fileName:string) : Task
+}
+class RecipeProtectionProxy implements IRecipeManager {
+    + RecipeProtectionProxy(innerManager:IRecipeManager, userContext:IUserContextService)
+    + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+    + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+    + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+    + <<async>> DeleteRecipeAsync(id:Guid) : Task
+    + <<async>> UpdateRecipeImageAsync(id:Guid, fileName:string) : Task
+}
+
+' --- PAKIET DTO ---
+package "Data Transfer Objects (DTO)" #D6EAF8 {
+    class ProductDto {
+        + ExternalId : string
+        + Name : string
+        + brand : string?
+        + ImageUrl : string?
+        + Calories : double
+        + Protein : double
+        + Fat : double
+        + Carbs : double
+        + ServingSize : double?
+        + ServingUnit : string
+        + NutriScore : string?
+        + EcoScore : string?
+        + HasPalmOil : bool?
+        + IsDataComplete : bool
+        + Category : FoodCategories
+        + labels : List<string>
+        + Allergens : List<string>
+        + DataQualityMessages : List<string>
+    }
+    class RegisterDto {
+        + Email : string
+        + Password : string
+        + ConfirmPassword : string
+    }
+    class LoginDto {
+        + Email : string
+        + Password : string
+    }
+    class AddMealDto {
+        + RecipeId : Guid
+        + Date : DateTime
+        + StartTime : TimeSpan
+        + EndTime : TimeSpan
+        + Type : MealType
+    }
+    class CreateRecipeDto {
+        + Name : string
+        + ImageUrl : string?
+        + Tags : List<DietTag>
+        + Ingredients : List<IngredientDto>
+    }
+    class UserProfileDto {
+        + Weight : double
+        + Height : double
+        + Age : int
+        + ImageUrl : string?
+        + Gender : Gender
+    }
+    class ShoppingListItem {
+        + ProductId : string
+        + Name : string
+        + TotalAmount : double
+        + Unit : string
+        + Category : string
+        + IsBought : bool
+        + Sources : List<string>
+    }
+    class UserStatsDto {
+        + TotalRecipesCount : int
+        + TotalIngredientCount : int
+        + AverageDailyCaloriesWeek : double
+        + AverageDailyCaloriesMonth : double
+        + CurrentWeight : double
+        + WeightChangeMonth : double
+        + WeeklySummary : List<DailySummaryDto>
+        + CategoryBreakdown : List<CategorySummaryDto>
+        + WeightHistory : List<WeightHistoryDto>
+    }
+    class DailySummaryDto {
+        + TotalCalories : double
+        + TotalProtein : double
+        + TotalCarbs : double
+        + TotalFat : double
+        + Date : DateTime
+    }
+    class CategorySummaryDto {
+        + CategoryName : string
+        + Totalcalories : double
+        + Percentage : double
+    }
+    class WeightHistoryDto {
+        + Weight : double
+        + Date : DateTime
+    }
+    class StatisticsDto {
+        + TotalCalories : double
+        + TotalProtein : double
+        + TotalFat : double
+        + TotalCarbs : double
+        + AverageDailyCalories : double
+        + AverageWeeklyCalories : double
+        + DateFrom : DateTime
+        + DateTo : DateTime
+    }
+    class AddWeightDto {
+        + Weight : double
+        + Date : DateTime
+    }
+    class AddFoodEntryDto {
+        + Amount : double
+        + Date : DateTime
+        + MealType : MealType
+        + Product : ProductDto
+        + RecipeId : Guid
+    }
+    class IngredientDto {
+        + amount : double
+        + Product : ProductDto
+    }
+}
+
+' --- PAKIET ENUMY ---
+package "Enums" #F2F3F4 {
+    enum MealType {
+        Breakfast = 0
+        SecondBreakfast
+        Lunch
+        Dinner
+        Snack
+        Supper
+    }
+    enum UserRole {
+        User
+        Admin
+    }
+    enum DietTag {
+        Vegan
+        Vegetarian
+        Keto
+        HighProtein
+    }
+    enum Gender {
+        Male
+        Female
+    }
+    enum BmrFormula {
+        MifflinStJeor
+        HarrisBenedict
+    }
+}
+
+' --- RELACJE ---
+FitzoDbContext -down-> Recipe
+FitzoDbContext -down-> UserProfile
+RecipesController -down-> RecipeDirector
+PlanningController -down-> IShoppingListGenerator
+ProductController -down-> INutritionProvider
+UsersController -down-> BmrService
+@enduml

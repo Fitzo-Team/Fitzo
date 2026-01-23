@@ -1,0 +1,6 @@
+@startuml
+class ExportImportService {
+    + ExportRecipeJSON(recipes:IEnumerable<Recipe>) : byte[]
+    + ImportFromJSON(fileStream:Stream) : IEnumerable<Recipe>
+}
+@enduml

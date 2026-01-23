@@ -1,0 +1,12 @@
+@startuml
+class UserProfile {
+    + Id : int <<get>> <<set>>
+    + Weight : double <<get>> <<set>>
+    + Height : double <<get>> <<set>>
+    + Age : int <<get>> <<set>>
+    + AvatarUrl : string? <<get>> <<set>>
+}
+UserProfile --> "UserId" Guid
+UserProfile o-> "Createdate" DateTime
+UserProfile --> "Gender" Gender
+@enduml

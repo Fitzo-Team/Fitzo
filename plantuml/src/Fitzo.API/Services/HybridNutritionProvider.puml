@@ -1,0 +1,8 @@
+@startuml
+class HybridNutritionProvider {
+    + HybridNutritionProvider(usdaAdapter:UsdaAdapter, offAdapter:OffAdapter, logger:ILogger<HybridNutritionProvider>)
+    + <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+    + <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+INutritionProvider <|-- HybridNutritionProvider
+@enduml

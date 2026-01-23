@@ -1,0 +1,31 @@
+@startuml
+class UserStatsDto {
+    + TotalRecipesCount : int <<get>> <<set>>
+    + TotalIngredientCount : int <<get>> <<set>>
+    + AverageDailyCaloriesWeek : double <<get>> <<set>>
+    + AverageDailyCaloriesMonth : double <<get>> <<set>>
+    + CurrentWeight : double <<get>> <<set>>
+    + WeightChangeMonth : double <<get>> <<set>>
+}
+class DailySummaryDto {
+    + TotalCalories : double <<get>> <<set>>
+    + TotalProtein : double <<get>> <<set>>
+    + TotalCarbs : double <<get>> <<set>>
+    + TotalFat : double <<get>> <<set>>
+}
+class CategorySummaryDto {
+    + CategoryName : string <<get>> <<set>>
+    + Totalcalories : double <<get>> <<set>>
+    + Percentage : double <<get>> <<set>>
+}
+class WeightHistoryDto {
+    + Weight : double <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+UserStatsDto o-> "WeeklySummary<DailySummaryDto>" "List`1"
+UserStatsDto o-> "CategoryBreakdown<CategorySummaryDto>" "List`1"
+UserStatsDto o-> "WeightHistory<WeightHistoryDto>" "List`1"
+DailySummaryDto --> "Date" DateTime
+WeightHistoryDto --> "Date" DateTime
+@enduml

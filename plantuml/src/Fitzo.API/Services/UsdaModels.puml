@@ -1,0 +1,20 @@
+@startuml
+class UsdaSearchResult {
+    + TotalHits : int <<get>> <<set>>
+}
+class UsdaFoodItem {
+    + FdcId : int <<get>> <<set>>
+    + Description : string? <<get>> <<set>>
+    + BrandName : string? <<get>> <<set>>
+    + FoodCategory : string? <<get>> <<set>>
+}
+class UsdaNutrient {
+    + NutrientName : string <<get>> <<set>>
+    + Value : double <<get>> <<set>>
+    + UnitName : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+UsdaSearchResult o-> "Foods<UsdaFoodItem>" "List`1"
+UsdaFoodItem o-> "FoodNutrients<UsdaNutrient>" "List`1"
+@enduml

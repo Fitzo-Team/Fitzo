@@ -1,0 +1,7 @@
+@startuml
+class RecipeImageService {
+    + RecipeImageService(blobServiceClient:BlobServiceClient)
+    + <<async>> EnsureContainersExistAsync() : Task
+}
+BlobStorageService <|-- RecipeImageService
+@enduml

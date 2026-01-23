@@ -1,0 +1,9 @@
+@startuml
+class ProfileImageService {
+    + <<const>> UploadContainerName : string = "avatars-temp"
+    + <<const>> PublicContainerName : string = "avatars"
+    + ProfileImageService(blobServiceClient:BlobServiceClient)
+    + <<virtual>> <<async>> EnsureContainerExistAsync() : Task
+}
+BlobStorageService <|-- ProfileImageService
+@enduml

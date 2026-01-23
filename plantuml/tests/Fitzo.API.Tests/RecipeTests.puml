@@ -1,0 +1,6 @@
+@startuml
+class RecipeTests {
+    + CalculateCalories_ShouldReturnSumOfAllIngredients() : void
+    + CalculateCalories_ShouldReturnZero_WhenNoIngredients() : void
+}
+@enduml

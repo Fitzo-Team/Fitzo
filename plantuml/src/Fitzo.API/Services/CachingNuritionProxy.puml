@@ -1,0 +1,8 @@
+@startuml
+class CachingNutritionProxy {
+    + CachingNutritionProxy(innerProvider:INutritionProvider, cache:IMemoryCache, logger:ILogger<CachingNutritionProxy>)
+    + <<async>> GetProductAsync(id:string) : Task<ProductDto?>
+    + <<async>> SearchProductsAsync(filter:ProductSearchFilterDto) : Task<IEnumerable<ProductDto>>
+}
+INutritionProvider <|-- CachingNutritionProxy
+@enduml

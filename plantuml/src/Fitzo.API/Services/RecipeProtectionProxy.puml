@@ -1,0 +1,11 @@
+@startuml
+class RecipeProtectionProxy {
+    + RecipeProtectionProxy(innerManager:IRecipeManager, userContext:IUserContextService)
+    + <<async>> GetRecipeByIdAsync(id:Guid) : Task<Recipe?>
+    + <<async>> GetRecipes(id:Guid) : Task<IEnumerable<Recipe>>
+    + <<async>> CreateRecipeAsync(recipe:Recipe) : Task
+    + <<async>> DeleteRecipeAsync(id:Guid) : Task
+    + <<async>> UpdateRecipeImageAsync(id:Guid, fileName:string) : Task
+}
+IRecipeManager <|-- RecipeProtectionProxy
+@enduml

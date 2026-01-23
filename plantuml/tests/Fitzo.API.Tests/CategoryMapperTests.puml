@@ -1,0 +1,10 @@
+@startuml
+class CategoryMapperTests {
+    + MapFromOffTags_ShouldMapVegetables(tag:string, expected:FoodCategories) : void
+    + MapFromOffTags_ShouldReturnDairy_WhenTagsContainMilkOrCheese() : void
+    + MapFromOffTags_ShouldReturnUnknown_WhenListIsNullorEmpty() : void
+    + MapFromUsdaCategory_ShouldMapCorrectly(usdaCategory:string, expected:FoodCategories) : void
+    + MapFromUsdaCategory_ShouldReturnUnknown_OnEmptyInput(input:string) : void
+    + MapFromUsdaCategory_ShouldBeCaseInsensitive() : void
+}
+@enduml

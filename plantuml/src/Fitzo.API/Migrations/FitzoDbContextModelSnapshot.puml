@@ -1,0 +1,5 @@
+@startuml
+class FitzoDbContextModelSnapshot <<partial>> {
+}
+ModelSnapshot <|-- FitzoDbContextModelSnapshot
+@enduml

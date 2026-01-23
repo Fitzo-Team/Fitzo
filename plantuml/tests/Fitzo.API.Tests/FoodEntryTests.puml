@@ -1,0 +1,6 @@
+@startuml
+class FoodEntryTests {
+    + CalculateCalories_ShouldReturnCorrectValue_BasedOnAmount() : void
+    + CalculateMacros_ShouldCalculateProportionally() : void
+}
+@enduml

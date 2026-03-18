@@ -1,4 +1,4 @@
-# Dokumentacja Projektu Fitzo
+# Dokumentacja Projektu Fitzo :)
 
 ## 1. Wstęp
 Fitzo to aplikacja mobilna i system backendowy służący do śledzenia posiłków, monitorowania spożytych kalorii oraz zarządzania celami dietetycznymi.
